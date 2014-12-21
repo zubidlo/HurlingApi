@@ -28,8 +28,10 @@ namespace HurlingApi
             // For more information, refer to: http://www.asp.net/web-api
             config.EnableSystemDiagnosticsTracing();
 
+            config.Formatters.Remove(config.Formatters.XmlFormatter);
             var json_settings = config.Formatters.JsonFormatter.SerializerSettings;
-
+            var  defaultResorlver =  (DefaultContractResolver) json_settings.ContractResolver;
+            defaultResorlver.IgnoreSerializableAttribute = true;
             json_settings.PreserveReferencesHandling = PreserveReferencesHandling.None;
             json_settings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             json_settings.Formatting = Formatting.Indented;

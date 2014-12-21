@@ -15,9 +15,9 @@ namespace HurlingApi.Models
     
     public partial class HurlingModelContext : DbContext
     {
-        public HurlingModelContext()
-            : base("name=HurlingModelContext")
+        public HurlingModelContext() : base("name=HurlingModelContext")
         {
+            this.Database.Log = message => System.Diagnostics.Debug.WriteLine(message);
         }
     
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
