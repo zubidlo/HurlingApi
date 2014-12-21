@@ -9,18 +9,10 @@ namespace HurlingApi.Models
     {
         public PositionDTO GetPositionDTO(Position pos)
         {
-            var playerIdSet = new HashSet<int>();
-            
-            foreach(Player player in pos.Players)
-            {
-                playerIdSet.Add(player.Id);
-            }
-
-            return new PositionDTO()
+           return new PositionDTO()
             {
                 Id = pos.Id,
                 Name = pos.Name,
-                PlayerIds = playerIdSet
             };
         }
 

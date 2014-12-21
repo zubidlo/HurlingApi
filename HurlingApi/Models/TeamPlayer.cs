@@ -12,21 +12,13 @@ namespace HurlingApi.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class Team
+    public partial class TeamPlayer
     {
-        public Team()
-        {
-            this.TeamPlayers = new HashSet<TeamPlayer>();
-        }
-    
         public int Id { get; set; }
-        public string Name { get; set; }
-        public Nullable<decimal> LeaguePoints { get; set; }
-        public Nullable<decimal> LastWeekPoints { get; set; }
-        public Nullable<decimal> Budget { get; set; }
+        public Nullable<int> TeamId { get; set; }
+        public Nullable<int> PlayerId { get; set; }
     
-        public virtual League League { get; set; }
-        public virtual User User { get; set; }
-        public virtual ICollection<TeamPlayer> TeamPlayers { get; set; }
+        public virtual Team Team { get; set; }
+        public virtual Player Player { get; set; }
     }
 }

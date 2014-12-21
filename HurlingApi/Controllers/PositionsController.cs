@@ -9,6 +9,7 @@ using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Description;
 using HurlingApi.Models;
+using System.Threading.Tasks;
 
 namespace HurlingApi.Controllers
 {
@@ -19,7 +20,7 @@ namespace HurlingApi.Controllers
 
         // GET: api/Positions
         
-        public IQueryable<PositionDTO> GetPositions()
+        public IQueryable<PositionDTO> GetAllPositions()
         {
             var posList = factory.GetAllPositionDTOs(db.Positions.Include(pos => pos.Players).ToList());
             var positionsQueryable = posList.AsQueryable<PositionDTO>();
@@ -29,9 +30,9 @@ namespace HurlingApi.Controllers
 
         // GET: api/Positions/5
         [ResponseType(typeof(PositionDTO))]
-        public IHttpActionResult GetPosition(int id)
+        public async Task<IHttpActionResult> GetPosition(int id)
         {
-            Position position = db.Positions.Include(p => p.Players).Where(pos => pos.Id == id).FirstOrDefault();
+            Position position = await db.Positions.Include(p => p.Players).Where(pos => pos.Id == id).FirstOrDefaultAsync();
             if (position == null)
             {
                 return NotFound();
@@ -42,7 +43,7 @@ namespace HurlingApi.Controllers
 
         // PUT: api/Positions/5
         [ResponseType(typeof(void))]
-        public IHttpActionResult PutPosition(int id, Position position)
+        public async Task<IHttpActionResult> PutPosition(int id, Position position)
         {
             Console.WriteLine(id);
             Console.WriteLine(position);
@@ -54,14 +55,14 @@ namespace HurlingApi.Controllers
 
             if (id != position.Id)
             {
-                return BadRequest();
+                return BadRequest(id + " != " + position.Id);
             }
 
             db.Entry(position).State = EntityState.Modified;
 
             try
             {
-                db.SaveChanges();
+                await db.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -80,7 +81,7 @@ namespace HurlingApi.Controllers
 
         // POST: api/Positions
         [ResponseType(typeof(Position))]
-        public IHttpActionResult PostPosition(Position position)
+        public async Task<IHttpActionResult> PostPosition(Position position)
         {
             if (!ModelState.IsValid)
             {
@@ -88,23 +89,23 @@ namespace HurlingApi.Controllers
             }
 
             db.Positions.Add(position);
-            db.SaveChanges();
+            await db.SaveChangesAsync();
 
             return CreatedAtRoute("DefaultApi", new { id = position.Id }, position);
         }
 
         // DELETE: api/Positions/5
         [ResponseType(typeof(Position))]
-        public IHttpActionResult DeletePosition(int id)
+        public async Task<IHttpActionResult> DeletePosition(int id)
         {
-            Position position = db.Positions.Find(id);
+            Position position = await db.Positions.FindAsync(id);
             if (position == null)
             {
                 return NotFound();
             }
 
             db.Positions.Remove(position);
-            db.SaveChanges();
+            await db.SaveChangesAsync();
 
             return Ok(position);
         }
