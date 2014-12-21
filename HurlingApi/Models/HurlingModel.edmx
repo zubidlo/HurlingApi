@@ -1,0 +1,490 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="HurlingModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2012.Azure" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityContainer Name="HurlingModelStoreContainer">
+    <EntitySet Name="Positions" EntityType="HurlingModel.Store.Positions" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Users" EntityType="HurlingModel.Store.Users" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Leagues" EntityType="HurlingModel.Store.Leagues" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Teams" EntityType="HurlingModel.Store.Teams" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Players" EntityType="HurlingModel.Store.Players" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Messages" EntityType="HurlingModel.Store.Messages" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="PlayerTeam" EntityType="HurlingModel.Store.PlayerTeam" store:Type="Tables" Schema="dbo" />
+    <AssociationSet Name="UserMessage" Association="HurlingModel.Store.UserMessage">
+      <End Role="User" EntitySet="Users" />
+      <End Role="Message" EntitySet="Messages" />
+    </AssociationSet>
+    <AssociationSet Name="FK_PlayerTeam_Player" Association="HurlingModel.Store.FK_PlayerTeam_Player">
+      <End Role="Player" EntitySet="Players" />
+      <End Role="PlayerTeam" EntitySet="PlayerTeam" />
+    </AssociationSet>
+    <AssociationSet Name="FK_PlayerTeam_Team" Association="HurlingModel.Store.FK_PlayerTeam_Team">
+      <End Role="Team" EntitySet="Teams" />
+      <End Role="PlayerTeam" EntitySet="PlayerTeam" />
+    </AssociationSet>
+    <AssociationSet Name="UserTeam" Association="HurlingModel.Store.UserTeam">
+      <End Role="User" EntitySet="Users" />
+      <End Role="Team" EntitySet="Teams" />
+    </AssociationSet>
+    <AssociationSet Name="TeamLeague" Association="HurlingModel.Store.TeamLeague">
+      <End Role="Team" EntitySet="Teams" />
+      <End Role="League" EntitySet="Leagues" />
+    </AssociationSet>
+    <AssociationSet Name="PositionPlayer" Association="HurlingModel.Store.PositionPlayer">
+      <End Role="Position" EntitySet="Positions" />
+      <End Role="Player" EntitySet="Players" />
+    </AssociationSet>
+  </EntityContainer>
+  <EntityType Name="Positions">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Users">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Email" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Username" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Password" Type="nvarchar(max)" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Leagues">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="NextFixtures" Type="datetimeoffset" Nullable="true" />
+    <Property Name="Week" Type="tinyint" Nullable="true" />
+  </EntityType>
+  <EntityType Name="Teams">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="LeaguePoints" Type="decimal" Nullable="false" />
+    <Property Name="LastWeekPoints" Type="decimal" Nullable="true" />
+    <Property Name="Budget" Type="decimal" Nullable="true" />
+    <Property Name="User_Id" Type="int" Nullable="false" />
+    <Property Name="League_Id" Type="int" Nullable="true" />
+  </EntityType>
+  <EntityType Name="Players">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="FirstName" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="LastName" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="GaaTeam" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="LastWeekPoints" Type="decimal" Nullable="true" />
+    <Property Name="OverallPoints" Type="decimal" Nullable="true" />
+    <Property Name="Price" Type="decimal" Nullable="false" />
+    <Property Name="Rating" Type="tinyint" Nullable="false" />
+    <Property Name="Injured" Type="bit" Nullable="false" />
+    <Property Name="Position_Id" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Messages">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Text" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="UserId" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="PlayerTeam">
+    <Key>
+      <PropertyRef Name="Players_Id" />
+      <PropertyRef Name="Teams_Id" />
+    </Key>
+    <Property Name="Players_Id" Type="int" Nullable="false" />
+    <Property Name="Teams_Id" Type="int" Nullable="false" />
+  </EntityType>
+  <Association Name="UserMessage">
+    <End Role="User" Type="HurlingModel.Store.Users" Multiplicity="1" />
+    <End Role="Message" Type="HurlingModel.Store.Messages" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Message">
+        <PropertyRef Name="UserId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="UserTeam">
+    <End Role="User" Type="HurlingModel.Store.Users" Multiplicity="1" />
+    <End Role="Team" Type="HurlingModel.Store.Teams" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Team">
+        <PropertyRef Name="User_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="TeamLeague">
+    <End Role="Team" Type="HurlingModel.Store.Teams" Multiplicity="*" />
+    <End Role="League" Type="HurlingModel.Store.Leagues" Multiplicity="0..1" />
+    <ReferentialConstraint>
+      <Principal Role="League">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Team">
+        <PropertyRef Name="League_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="PositionPlayer">
+    <End Role="Position" Type="HurlingModel.Store.Positions" Multiplicity="1" />
+    <End Role="Player" Type="HurlingModel.Store.Players" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Position">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Player">
+        <PropertyRef Name="Position_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_PlayerTeam_Player">
+    <End Role="Player" Type="HurlingModel.Store.Players" Multiplicity="1" />
+    <End Role="PlayerTeam" Type="HurlingModel.Store.PlayerTeam" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Player">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="PlayerTeam">
+        <PropertyRef Name="Players_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_PlayerTeam_Team">
+    <End Role="PlayerTeam" Type="HurlingModel.Store.PlayerTeam" Multiplicity="*" />
+    <End Role="Team" Type="HurlingModel.Store.Teams" Multiplicity="1" />
+    <ReferentialConstraint>
+      <Principal Role="Team">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="PlayerTeam">
+        <PropertyRef Name="Teams_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema xmlns="http://schemas.microsoft.com/ado/2009/11/edm" xmlns:cg="http://schemas.microsoft.com/ado/2006/04/codegeneration" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" Namespace="HurlingModel" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" annotation:UseStrongSpatialTypes="false">
+        <EntityContainer Name="HurlingModelContext" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Positions" EntityType="HurlingModel.Position" />
+          <EntitySet Name="Users" EntityType="HurlingModel.User" />
+          <EntitySet Name="Leagues" EntityType="HurlingModel.League" />
+          <EntitySet Name="Teams" EntityType="HurlingModel.Team" />
+          <EntitySet Name="Players" EntityType="HurlingModel.Player" />
+          <EntitySet Name="Messages" EntityType="HurlingModel.Message" />
+          <AssociationSet Name="UserMessage" Association="HurlingModel.UserMessage">
+            <End Role="User" EntitySet="Users" />
+            <End Role="Message" EntitySet="Messages" />
+          </AssociationSet>
+          <AssociationSet Name="PlayerTeam" Association="HurlingModel.PlayerTeam">
+            <End Role="Player" EntitySet="Players" />
+            <End Role="Team" EntitySet="Teams" />
+          </AssociationSet>
+          <AssociationSet Name="UserTeam" Association="HurlingModel.UserTeam">
+            <End Role="User" EntitySet="Users" />
+            <End Role="Team" EntitySet="Teams" />
+          </AssociationSet>
+          <AssociationSet Name="TeamLeague" Association="HurlingModel.TeamLeague">
+            <End Role="Team" EntitySet="Teams" />
+            <End Role="League" EntitySet="Leagues" />
+          </AssociationSet>
+          <AssociationSet Name="PositionPlayer" Association="HurlingModel.PositionPlayer">
+            <End Role="Position" EntitySet="Positions" />
+            <End Role="Player" EntitySet="Players" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="Position">
+          <Documentation>
+            <Summary>GAA Hurling field position type, example: goalkeeper, defender etc...</Summary>
+          </Documentation>
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" >
+            <Documentation>
+              <Summary>GAA hurling field position, can't be omitted.</Summary>
+            </Documentation>
+          </Property>
+          <NavigationProperty Name="Players" Relationship="HurlingModel.PositionPlayer" FromRole="Position" ToRole="Player" />
+        </EntityType>
+        <EntityType Name="User">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Email" Type="String" Nullable="false" />
+          <Property Name="Username" Type="String" Nullable="false" />
+          <Property Name="Password" Type="String" Nullable="false" />
+          <NavigationProperty Name="Messages" Relationship="HurlingModel.UserMessage" FromRole="User" ToRole="Message" />
+          <NavigationProperty Name="Team" Relationship="HurlingModel.UserTeam" FromRole="User" ToRole="Team" />
+        </EntityType>
+        <EntityType Name="League">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false">
+            <Documentation>
+              <Summary>A name, can't be omitted.</Summary>
+            </Documentation>
+          </Property>
+          <Property Name="NextFixtures" Type="DateTimeOffset" Nullable="true" />
+          <Property Name="Week" Type="Byte" Nullable="true" >
+            <Documentation>
+              <Summary>Current week the League is in.</Summary>
+            </Documentation>
+          </Property>
+          <NavigationProperty Name="Teams" Relationship="HurlingModel.TeamLeague" FromRole="League" ToRole="Team" />
+        </EntityType>
+        <EntityType Name="Team">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" />
+          <Property Name="LeaguePoints" Type="Decimal" Nullable="false" >
+            <Documentation>
+              <Summary>Summary of all points acquired each week</Summary>
+            </Documentation>
+          </Property>
+          <Property Name="LastWeekPoints" Type="Decimal" Nullable="true" >
+            <Documentation>
+              <Summary>Summary of all points acquired by this team players in last week</Summary>
+            </Documentation>
+          </Property>
+          <Property Name="Budget" Type="Decimal" Nullable="true" />
+          <NavigationProperty Name="Players" Relationship="HurlingModel.PlayerTeam" FromRole="Team" ToRole="Player" />
+          <NavigationProperty Name="User" Relationship="HurlingModel.UserTeam" FromRole="Team" ToRole="User" />
+          <NavigationProperty Name="League" Relationship="HurlingModel.TeamLeague" FromRole="Team" ToRole="League" />
+        </EntityType>
+        <EntityType Name="Player">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="FirstName" Type="String" Nullable="false" >
+            <Documentation>
+              <Summary>First name, can't be omitted</Summary>
+            </Documentation>
+          </Property>
+          <Property Name="LastName" Type="String" Nullable="false" >
+            <Documentation>
+              <Summary>Last name, can't be omitted.</Summary>
+            </Documentation>
+          </Property>
+          <Property Name="GaaTeam" Type="String" Nullable="false">
+            <Documentation>
+              <Summary>Real GAA team name this player plays for, can't be omitted.</Summary>
+            </Documentation>
+          </Property>
+          <Property Name="LastWeekPoints" Type="Decimal" Nullable="true" >
+            <Documentation>
+              <Summary>Point acquired in real matches last week, can be omitted.</Summary>
+            </Documentation>
+          </Property>
+          <Property Name="OverallPoints" Type="Decimal" Nullable="true" >
+            <Documentation>
+              <Summary>Summary of all weekly points, can be omitted.</Summary>
+            </Documentation>
+          </Property>
+          <Property Name="Price" Type="Decimal" Nullable="false" >
+            <Documentation>
+              <Summary>Price in euros, can't be omitted.</Summary>
+            </Documentation>
+          </Property>
+          <Property Name="Rating" Type="Byte" Nullable="false" >
+            <Documentation>
+              <Summary>Some rank system, for example from 1 to 10, can't be omitted</Summary>
+            </Documentation>
+          </Property>
+          <NavigationProperty Name="Teams" Relationship="HurlingModel.PlayerTeam" FromRole="Player" ToRole="Team" />
+          <NavigationProperty Name="Position" Relationship="HurlingModel.PositionPlayer" FromRole="Player" ToRole="Position" />
+          <Property Name="Injured" Type="Boolean" Nullable="false" >
+            <Documentation>
+              <Summary>If injured the player is not going to play this week GAA matches</Summary>
+            </Documentation>
+          </Property>
+        </EntityType>
+        <EntityType Name="Message">
+          <Documentation>
+            <Summary>Messages for chat arrea</Summary>
+          </Documentation>
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Text" Type="String" Nullable="false" />
+          <NavigationProperty Name="User" Relationship="HurlingModel.UserMessage" FromRole="Message" ToRole="User" />
+          <Property Name="UserId" Type="Int32" Nullable="false" />
+        </EntityType>
+        <Association Name="UserMessage">
+          <End Type="HurlingModel.User" Role="User" Multiplicity="1" />
+          <End Type="HurlingModel.Message" Role="Message" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Message">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="PlayerTeam">
+          <End Type="HurlingModel.Player" Role="Player" Multiplicity="*" />
+          <End Type="HurlingModel.Team" Role="Team" Multiplicity="*" />
+        </Association>
+        <Association Name="UserTeam">
+          <End Type="HurlingModel.User" Role="User" Multiplicity="1" />
+          <End Type="HurlingModel.Team" Role="Team" Multiplicity="0..1" />
+        </Association>
+        <Association Name="TeamLeague">
+          <End Type="HurlingModel.Team" Role="Team" Multiplicity="*" />
+          <End Type="HurlingModel.League" Role="League" Multiplicity="0..1" />
+        </Association>
+        <Association Name="PositionPlayer">
+          <End Type="HurlingModel.Position" Role="Position" Multiplicity="1" />
+          <End Type="HurlingModel.Player" Role="Player" Multiplicity="*" />
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+    <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="HurlingModelStoreContainer" CdmEntityContainer="HurlingModelContext">
+    <EntitySetMapping Name="Positions">
+      <EntityTypeMapping TypeName="IsTypeOf(HurlingModel.Position)">
+        <MappingFragment StoreEntitySet="Positions">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Users">
+      <EntityTypeMapping TypeName="IsTypeOf(HurlingModel.User)">
+        <MappingFragment StoreEntitySet="Users">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Email" ColumnName="Email" />
+          <ScalarProperty Name="Username" ColumnName="Username" />
+          <ScalarProperty Name="Password" ColumnName="Password" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Leagues">
+      <EntityTypeMapping TypeName="IsTypeOf(HurlingModel.League)">
+        <MappingFragment StoreEntitySet="Leagues">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="NextFixtures" ColumnName="NextFixtures" />
+          <ScalarProperty Name="Week" ColumnName="Week" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Teams">
+      <EntityTypeMapping TypeName="IsTypeOf(HurlingModel.Team)">
+        <MappingFragment StoreEntitySet="Teams">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="LeaguePoints" ColumnName="LeaguePoints" />
+          <ScalarProperty Name="LastWeekPoints" ColumnName="LastWeekPoints" />
+          <ScalarProperty Name="Budget" ColumnName="Budget" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Players">
+      <EntityTypeMapping TypeName="IsTypeOf(HurlingModel.Player)">
+        <MappingFragment StoreEntitySet="Players">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+          <ScalarProperty Name="LastName" ColumnName="LastName" />
+          <ScalarProperty Name="GaaTeam" ColumnName="GaaTeam" />
+          <ScalarProperty Name="LastWeekPoints" ColumnName="LastWeekPoints" />
+          <ScalarProperty Name="OverallPoints" ColumnName="OverallPoints" />
+          <ScalarProperty Name="Price" ColumnName="Price" />
+          <ScalarProperty Name="Rating" ColumnName="Rating" />
+          <ScalarProperty Name="Injured" ColumnName="Injured" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Messages">
+      <EntityTypeMapping TypeName="IsTypeOf(HurlingModel.Message)">
+        <MappingFragment StoreEntitySet="Messages">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Text" ColumnName="Text" />
+          <ScalarProperty Name="UserId" ColumnName="UserId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <AssociationSetMapping Name="PlayerTeam" TypeName="HurlingModel.PlayerTeam" StoreEntitySet="PlayerTeam">
+      <EndProperty Name="Player">
+        <ScalarProperty Name="Id" ColumnName="Players_Id" />
+      </EndProperty>
+      <EndProperty Name="Team">
+        <ScalarProperty Name="Id" ColumnName="Teams_Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="UserTeam" TypeName="HurlingModel.UserTeam" StoreEntitySet="Teams">
+      <EndProperty Name="User">
+        <ScalarProperty Name="Id" ColumnName="User_Id" />
+      </EndProperty>
+      <EndProperty Name="Team">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="TeamLeague" TypeName="HurlingModel.TeamLeague" StoreEntitySet="Teams">
+      <EndProperty Name="League">
+        <ScalarProperty Name="Id" ColumnName="League_Id" />
+      </EndProperty>
+      <EndProperty Name="Team">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+      <Condition ColumnName="League_Id" IsNull="false" />
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="PositionPlayer" TypeName="HurlingModel.PositionPlayer" StoreEntitySet="Players">
+      <EndProperty Name="Position">
+        <ScalarProperty Name="Id" ColumnName="Position_Id" />
+      </EndProperty>
+      <EndProperty Name="Player">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+  </EntityContainerMapping>
+</Mapping></edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <edmx:Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </edmx:Connection>
+    <edmx:Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="True" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+        <DesignerProperty Name="UseLegacyProvider" Value="False" />
+      </DesignerInfoPropertySet>
+    </edmx:Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>
