@@ -21,29 +21,32 @@ namespace HurlingApi.Controllers
         
         public IQueryable<PositionDTO> GetPositions()
         {
-            var posList = factory.GetAllPositions(db.Positions.Include(pos => pos.Players).ToList());
+            var posList = factory.GetAllPositionDTOs(db.Positions.Include(pos => pos.Players).ToList());
             var positionsQueryable = posList.AsQueryable<PositionDTO>();
             
             return positionsQueryable;
         }
 
         // GET: api/Positions/5
-        [ResponseType(typeof(Position))]
+        [ResponseType(typeof(PositionDTO))]
         public IHttpActionResult GetPosition(int id)
         {
-            Position position = db.Positions.Find(id);
+            Position position = db.Positions.Include(p => p.Players).Where(pos => pos.Id == id).FirstOrDefault();
             if (position == null)
             {
                 return NotFound();
             }
 
-            return Ok(position);
+            return Ok(factory.GetPositionDTO(position));
         }
 
         // PUT: api/Positions/5
         [ResponseType(typeof(void))]
         public IHttpActionResult PutPosition(int id, Position position)
         {
+            Console.WriteLine(id);
+            Console.WriteLine(position);
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);

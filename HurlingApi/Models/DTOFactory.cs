@@ -7,30 +7,30 @@ namespace HurlingApi.Models
 {
     public class DTOFactory
     {
-        public PositionDTO GetPosition(Position pos)
+        public PositionDTO GetPositionDTO(Position pos)
         {
-            var playerIdList = new HashSet<int>();
+            var playerIdSet = new HashSet<int>();
             
             foreach(Player player in pos.Players)
             {
-                playerIdList.Add(player.Id);
+                playerIdSet.Add(player.Id);
             }
 
             return new PositionDTO()
             {
                 Id = pos.Id,
                 Name = pos.Name,
-                PlayerIds = playerIdList
+                PlayerIds = playerIdSet
             };
         }
 
-        public List<PositionDTO> GetAllPositions(List<Position> positions)
+        public ICollection<PositionDTO> GetAllPositionDTOs(ICollection<Position> positions)
         {
-            var positionDTOList = new List<PositionDTO>();
+            var positionDTOList = new HashSet<PositionDTO>();
             
             foreach(var position in positions)
             {
-                positionDTOList.Add(GetPosition(position));
+                positionDTOList.Add(GetPositionDTO(position));
             }
 
             return positionDTOList;
