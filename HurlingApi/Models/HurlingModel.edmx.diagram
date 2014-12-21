@@ -13,9 +13,9 @@
         <EntityTypeShape EntityType="HurlingModel.Message" Width="1.5" PointX="0.5" PointY="5.75" />
         <AssociationConnector Association="HurlingModel.UserMessage" />
         <AssociationConnector Association="HurlingModel.PlayerTeam" />
-        <AssociationConnector Association="HurlingModel.UserTeam" />
         <AssociationConnector Association="HurlingModel.TeamLeague" />
         <AssociationConnector Association="HurlingModel.PositionPlayer" />
+        <AssociationConnector Association="HurlingModel.UserTeam" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

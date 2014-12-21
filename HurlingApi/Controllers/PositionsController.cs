@@ -15,12 +15,14 @@ namespace HurlingApi.Controllers
     public class PositionsController : ApiController
     {
         private HurlingModelContext db = new HurlingModelContext();
+        private DTOFactory factory = new DTOFactory();
 
         // GET: api/Positions
         
-        public IQueryable<Position> GetPositions()
+        public IQueryable<PositionDTO> GetPositions()
         {
-            var positionsQueryable = db.Positions.ToList().AsQueryable<Position>();
+            var posList = factory.GetAllPositions(db.Positions.Include(pos => pos.Players).ToList());
+            var positionsQueryable = posList.AsQueryable<PositionDTO>();
             
             return positionsQueryable;
         }

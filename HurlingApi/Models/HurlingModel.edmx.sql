@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 12/21/2014 10:42:48
+-- Date Created: 12/21/2014 14:13:51
 -- Generated from EDMX file: C:\Users\martin\Documents\Visual Studio 2013\Projects\HurlingApi\HurlingApi\Models\HurlingModel.edmx
 -- --------------------------------------------------
 
@@ -98,8 +98,8 @@ CREATE TABLE [dbo].[Teams] (
     [LeaguePoints] decimal(18,0)  NOT NULL,
     [LastWeekPoints] decimal(18,0)  NULL,
     [Budget] decimal(18,0)  NULL,
-    [User_Id] int  NOT NULL,
-    [League_Id] int  NULL
+    [League_Id] int  NULL,
+    [User_Id] int  NOT NULL
 );
 GO
 
@@ -114,7 +114,7 @@ CREATE TABLE [dbo].[Players] (
     [Price] decimal(18,0)  NOT NULL,
     [Rating] tinyint  NOT NULL,
     [Injured] bit  NOT NULL,
-    [Position_Id] int  NOT NULL
+    [PositionId] int  NOT NULL
 );
 GO
 
@@ -222,21 +222,6 @@ ON [dbo].[PlayerTeam]
     ([Teams_Id]);
 GO
 
--- Creating foreign key on [User_Id] in table 'Teams'
-ALTER TABLE [dbo].[Teams]
-ADD CONSTRAINT [FK_UserTeam]
-    FOREIGN KEY ([User_Id])
-    REFERENCES [dbo].[Users]
-        ([Id])
-    ON DELETE NO ACTION ON UPDATE NO ACTION;
-GO
-
--- Creating non-clustered index for FOREIGN KEY 'FK_UserTeam'
-CREATE INDEX [IX_FK_UserTeam]
-ON [dbo].[Teams]
-    ([User_Id]);
-GO
-
 -- Creating foreign key on [League_Id] in table 'Teams'
 ALTER TABLE [dbo].[Teams]
 ADD CONSTRAINT [FK_TeamLeague]
@@ -252,10 +237,10 @@ ON [dbo].[Teams]
     ([League_Id]);
 GO
 
--- Creating foreign key on [Position_Id] in table 'Players'
+-- Creating foreign key on [PositionId] in table 'Players'
 ALTER TABLE [dbo].[Players]
 ADD CONSTRAINT [FK_PositionPlayer]
-    FOREIGN KEY ([Position_Id])
+    FOREIGN KEY ([PositionId])
     REFERENCES [dbo].[Positions]
         ([Id])
     ON DELETE NO ACTION ON UPDATE NO ACTION;
@@ -264,7 +249,22 @@ GO
 -- Creating non-clustered index for FOREIGN KEY 'FK_PositionPlayer'
 CREATE INDEX [IX_FK_PositionPlayer]
 ON [dbo].[Players]
-    ([Position_Id]);
+    ([PositionId]);
+GO
+
+-- Creating foreign key on [User_Id] in table 'Teams'
+ALTER TABLE [dbo].[Teams]
+ADD CONSTRAINT [FK_UserTeam]
+    FOREIGN KEY ([User_Id])
+    REFERENCES [dbo].[Users]
+        ([Id])
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
+
+-- Creating non-clustered index for FOREIGN KEY 'FK_UserTeam'
+CREATE INDEX [IX_FK_UserTeam]
+ON [dbo].[Teams]
+    ([User_Id]);
 GO
 
 -- --------------------------------------------------

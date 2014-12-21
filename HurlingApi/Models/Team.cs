@@ -26,7 +26,7 @@ namespace HurlingApi.Models
         public Nullable<decimal> Budget { get; set; }
     
         public virtual ICollection<Player> Players { get; set; }
-        public virtual User User { get; set; }
         public virtual League League { get; set; }
+        public virtual User User { get; set; }
     }
 }

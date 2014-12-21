@@ -28,6 +28,7 @@ namespace HurlingApi.Models
         public decimal Price { get; set; }
         public byte Rating { get; set; }
         public bool Injured { get; set; }
+        public int PositionId { get; set; }
     
         public virtual ICollection<Team> Teams { get; set; }
         public virtual Position Position { get; set; }
