@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 12/21/2014 21:15:18
+-- Date Created: 12/22/2014 10:12:55
 -- Generated from EDMX file: C:\Users\martin\Documents\Visual Studio 2013\Projects\HurlingApi\HurlingApi\Models\HurlingModel.edmx
 -- --------------------------------------------------
 
@@ -29,6 +29,12 @@ GO
 IF OBJECT_ID(N'[dbo].[FK_UserTeam]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[Teams] DROP CONSTRAINT [FK_UserTeam];
 GO
+IF OBJECT_ID(N'[dbo].[FK_TeamTeamPlayer]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[TeamPlayers] DROP CONSTRAINT [FK_TeamTeamPlayer];
+GO
+IF OBJECT_ID(N'[dbo].[FK_PlayerTeamPlayer]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[TeamPlayers] DROP CONSTRAINT [FK_PlayerTeamPlayer];
+GO
 
 -- --------------------------------------------------
 -- Dropping existing tables
@@ -51,6 +57,9 @@ IF OBJECT_ID(N'[dbo].[Players]', 'U') IS NOT NULL
 GO
 IF OBJECT_ID(N'[dbo].[Messages]', 'U') IS NOT NULL
     DROP TABLE [dbo].[Messages];
+GO
+IF OBJECT_ID(N'[dbo].[TeamPlayers]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[TeamPlayers];
 GO
 
 -- --------------------------------------------------
@@ -89,6 +98,8 @@ CREATE TABLE [dbo].[Teams] (
     [LeaguePoints] decimal(18,0)  NULL,
     [LastWeekPoints] decimal(18,0)  NULL,
     [Budget] decimal(18,0)  NULL,
+    [UserId] int  NOT NULL,
+    [LeagueId] int  NULL,
     [League_Id] int  NULL,
     [User_Id] int  NOT NULL
 );
@@ -113,7 +124,8 @@ GO
 CREATE TABLE [dbo].[Messages] (
     [Id] int IDENTITY(1,1) NOT NULL,
     [Text] nvarchar(max)  NOT NULL,
-    [UserId] int  NOT NULL
+    [UserId] int  NOT NULL,
+    [Created] datetimeoffset  NOT NULL
 );
 GO
 
