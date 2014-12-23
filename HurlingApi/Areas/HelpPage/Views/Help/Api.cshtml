@@ -1,13 +1,10 @@
 @using System.Web.Http
 @using HurlingApi.Areas.HelpPage.Models
 @model HelpPageApiModel
-
 @{
     var description = Model.ApiDescription;
     ViewBag.Title = description.HttpMethod.Method + " " + description.RelativePath;
 }
-
-<link type="text/css" href="~/Areas/HelpPage/HelpPage.css" rel="stylesheet" />
 <div id="body" class="help-page">
     <section class="featured">
         <div class="content-wrapper">
@@ -20,3 +17,8 @@
         @Html.DisplayForModel()
     </section>
 </div>
+@Html.DisplayForModel("TestClientDialogs")
+@section Scripts {
+    <link type="text/css" href="~/Areas/HelpPage/HelpPage.css" rel="stylesheet" />
+    @Html.DisplayForModel("TestClientReferences")
+}

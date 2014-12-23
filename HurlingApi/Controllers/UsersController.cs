@@ -13,42 +13,76 @@ using HurlingApi.Models;
 
 namespace HurlingApi.Controllers
 {
+    [RoutePrefix("api/users")]
     public class UsersController : ApiController
     {
         private HurlingModelContext db = new HurlingModelContext();
+        private DTOFactory factory = new DTOFactory();
 
-        // GET: api/Users
-        public IQueryable<User> GetUsers()
+        // GET: api/users
+        /// <summary>
+        /// Returns all users. This method supports OData filters.
+        /// </summary>
+        [Route("")]
+        public IQueryable<UserDTO> GetUsers()
         {
-            return db.Users;
+            var users = db.Users;
+            var userDTOs = factory.GetAllUserDTOs(users).AsQueryable<UserDTO>();
+            return userDTOs;
+        }
+
+        // GET : api/users/username
+        /// <summary>
+        /// Returns user with given username or 404/Not Found
+        /// </summary>
+        /// <param name="id">The ID of the data.</param>
+        [Route("{Username}")]
+        [ResponseType(typeof(UserDTO))]
+        public async Task<IHttpActionResult> GetUserByUsername([FromUri] string Username)
+        {
+            var user = await db.Users.SingleOrDefaultAsync(u => u.Username == Username);
+           
+            if (user == null)
+            {
+                return NotFound();
+            }
+            
+            var userDTO = factory.GetUserDTO(user);
+            return Ok(userDTO);
         }
 
         // GET: api/Users/5
-        [ResponseType(typeof(User))]
-        public async Task<IHttpActionResult> GetUser(int id)
+        [ResponseType(typeof(UserDTO))]
+        public async Task<IHttpActionResult> GetUserById([FromUri] int id)
         {
-            User user = await db.Users.FindAsync(id);
+            var user = await db.Users.FindAsync(id);
+
             if (user == null)
             {
                 return NotFound();
             }
 
-            return Ok(user);
+            var userDTO = factory.GetUserDTO(user);
+            return Ok(userDTO);
         }
 
         // PUT: api/Users/5
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> PutUser(int id, User user)
+        public async Task<IHttpActionResult> PutUser([FromUri] int id, [FromBody] UserDTO userDTO)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            if (id != user.Id)
+            var user = await db.Users.FindAsync(id);
+
+            if (user == null)
             {
-                return BadRequest();
+                return BadRequest("user with id:" + id + " doesn't exist" );
             }
+            
+            user = factory.GetUser(userDTO);
 
             db.Entry(user).State = EntityState.Modified;
 
@@ -73,12 +107,14 @@ namespace HurlingApi.Controllers
 
         // POST: api/Users
         [ResponseType(typeof(User))]
-        public async Task<IHttpActionResult> PostUser(User user)
+        public async Task<IHttpActionResult> PostUser([FromBody] UserDTO userDTO)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
+
+            var user = factory.GetUser(userDTO);
 
             db.Users.Add(user);
             await db.SaveChangesAsync();
@@ -88,9 +124,9 @@ namespace HurlingApi.Controllers
 
         // DELETE: api/Users/5
         [ResponseType(typeof(User))]
-        public async Task<IHttpActionResult> DeleteUser(int id)
+        public async Task<IHttpActionResult> DeleteUser([FromUri] int id)
         {
-            User user = await db.Users.FindAsync(id);
+            var user = await db.Users.FindAsync(id);
             if (user == null)
             {
                 return NotFound();

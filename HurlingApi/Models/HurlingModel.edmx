@@ -69,11 +69,9 @@
     </Key>
     <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
-    <Property Name="LeaguePoints" Type="decimal" Nullable="true" />
+    <Property Name="OverAllPoints" Type="decimal" Nullable="true" />
     <Property Name="LastWeekPoints" Type="decimal" Nullable="true" />
     <Property Name="Budget" Type="decimal" Nullable="true" />
-    <Property Name="UserId" Type="int" Nullable="false" />
-    <Property Name="LeagueId" Type="int" Nullable="true" />
     <Property Name="League_Id" Type="int" Nullable="true" />
     <Property Name="User_Id" Type="int" Nullable="false" />
   </EntityType>
@@ -99,6 +97,7 @@
     <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="Text" Type="nvarchar(max)" Nullable="false" />
     <Property Name="UserId" Type="int" Nullable="false" />
+    <Property Name="Created" Type="datetimeoffset" Nullable="true" />
   </EntityType>
   <EntityType Name="TeamPlayers">
     <Key>
@@ -267,7 +266,7 @@
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Name" Type="String" Nullable="false" />
-          <Property Name="LeaguePoints" Type="Decimal" Nullable="true" >
+          <Property Name="OverAllPoints" Type="Decimal" Nullable="true" >
             <Documentation>
               <Summary>Summary of all points acquired each week</Summary>
             </Documentation>
@@ -281,8 +280,6 @@
           <NavigationProperty Name="League" Relationship="HurlingModel.TeamLeague" FromRole="Team" ToRole="League" />
           <NavigationProperty Name="User" Relationship="HurlingModel.UserTeam" FromRole="Team" ToRole="User" />
           <NavigationProperty Name="TeamPlayers" Relationship="HurlingModel.TeamTeamPlayer" FromRole="Team" ToRole="TeamPlayer" />
-          <Property Name="UserId" Type="Int32" Nullable="false" />
-          <Property Name="LeagueId" Type="Int32" Nullable="true" />
         </EntityType>
         <EntityType Name="Player">
           <Key>
@@ -344,7 +341,7 @@
           <Property Name="Text" Type="String" Nullable="false" />
           <NavigationProperty Name="User" Relationship="HurlingModel.UserMessage" FromRole="Message" ToRole="User" />
           <Property Name="UserId" Type="Int32" Nullable="false" />
-          <Property Name="Created" Type="DateTimeOffset" Nullable="false" />
+          <Property Name="Created" Type="DateTimeOffset" Nullable="true" />
         </EntityType>
         <Association Name="UserMessage">
           <End Type="HurlingModel.User" Role="User" Multiplicity="1" />
@@ -451,11 +448,9 @@
         <MappingFragment StoreEntitySet="Teams">
           <ScalarProperty Name="Id" ColumnName="Id" />
           <ScalarProperty Name="Name" ColumnName="Name" />
-          <ScalarProperty Name="LeaguePoints" ColumnName="LeaguePoints" />
+          <ScalarProperty Name="OverAllPoints" ColumnName="OverAllPoints" />
           <ScalarProperty Name="LastWeekPoints" ColumnName="LastWeekPoints" />
           <ScalarProperty Name="Budget" ColumnName="Budget" />
-          <ScalarProperty Name="UserId" ColumnName="UserId" />
-          <ScalarProperty Name="LeagueId" ColumnName="LeagueId" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -481,6 +476,7 @@
           <ScalarProperty Name="Id" ColumnName="Id" />
           <ScalarProperty Name="Text" ColumnName="Text" />
           <ScalarProperty Name="UserId" ColumnName="UserId" />
+          <ScalarProperty Name="Created" ColumnName="Created" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>

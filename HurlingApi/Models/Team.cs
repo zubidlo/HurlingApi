@@ -21,11 +21,9 @@ namespace HurlingApi.Models
     
         public int Id { get; set; }
         public string Name { get; set; }
-        public Nullable<decimal> LeaguePoints { get; set; }
+        public Nullable<decimal> OverAllPoints { get; set; }
         public Nullable<decimal> LastWeekPoints { get; set; }
         public Nullable<decimal> Budget { get; set; }
-        public int UserId { get; set; }
-        public Nullable<int> LeagueId { get; set; }
     
         public virtual League League { get; set; }
         public virtual User User { get; set; }
