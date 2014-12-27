@@ -488,7 +488,7 @@
         </member>
         <member name="M:HurlingApi.Controllers.UsersController.GetUserByUsername(System.String)">
             <summary>
-            Returns user with given username or Not Found 404
+            Returns user with given username or 404/Not Found
             </summary>
             <param name="id">The ID of the data.</param>
         </member>

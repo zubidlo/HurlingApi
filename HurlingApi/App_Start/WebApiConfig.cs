@@ -5,6 +5,7 @@ using System.Web.Http;
 using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;
 using System.Web.Http.Tracing;
+using System.Web.Http.Description;
 
 namespace HurlingApi
 {
