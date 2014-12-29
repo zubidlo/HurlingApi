@@ -345,7 +345,7 @@
         <member name="P:HurlingApi.Areas.HelpPage.HelpPageSampleGenerator.SampleObjectFactories">
             <summary>
             Gets factories for the objects that the supported formatters will serialize as samples. Processed in order,
-            stopping when the factory successfully returns a non-<see langref="null"/> object.
+            stopping when the _factory successfully returns a non-<see langref="null"/> object.
             </summary>
             <remarks>
             Collection includes just <see cref="M:HurlingApi.Areas.HelpPage.ObjectGenerator.GenerateObject(System.Type)"/> initially. Use
@@ -483,14 +483,33 @@
         </member>
         <member name="M:HurlingApi.Controllers.UsersController.GetUsers">
             <summary>
-            Returns all users. This method supports OData filters.
+            Returns json array of users in response body.
+            Can return empty array.
+            This method supports OData filters:
+            /api/users?$orderby=Username : will return users sorted by username
             </summary>
+        </member>
+        <member name="M:HurlingApi.Controllers.UsersController.GetUserById(System.Int32)">
+            <summary>
+            Returns success: 200/OK with json user in response body
+            Returns error: 404/Not Found
+            </summary>
+            <param name="id">The Id of the user.</param>
         </member>
         <member name="M:HurlingApi.Controllers.UsersController.GetUserByUsername(System.String)">
             <summary>
-            Returns user with given username or 404/Not Found
+            Returns success: 200/Ok with json user in response body 
+            Returns error: 404/Not Found
             </summary>
-            <param name="id">The ID of the data.</param>
+            <param name="username">The Username of the user.</param>
+        </member>
+        <member name="M:HurlingApi.Controllers.UsersController.EditUser(System.Int32,HurlingApi.Models.UserDTO)">
+            <summary>
+            Updates all user fields except Id. id from uri must match json user id in request body and existing user Id.
+            Returns success: 204/No Content
+            Returns error: 400/BadRequest with short error message
+            </summary>
+            <param name="id">The Id of the user.</param>
         </member>
     </members>
 </doc>

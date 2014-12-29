@@ -10,20 +10,11 @@ namespace HurlingApi.Models
     {
         private HurlingModelContext db = new HurlingModelContext();
 
-        public PositionDTO GetPositionDTO(Position pos)
-        {
-           return new PositionDTO()
-            {
-                Id = pos.Id,
-                Name = pos.Name,
-            };
-        }
-
-        public UserDTO GetUserDTO(User user)
+        public UserDTO UserDTO(User user)
         {
             var userDTO = new UserDTO()
             {
-                //Id = user.Id,
+                Id = user.Id,
                 Email = user.Email,
                 Username = user.Username,
                 Password = user.Password,
@@ -32,39 +23,52 @@ namespace HurlingApi.Models
             return userDTO;
         }
 
-        public User GetUser(UserDTO userDTO)
+        public User User(UserDTO userDTO)
         {
             return new User()
             {
+                Id = userDTO.Id,
                 Email = userDTO.Email,
                 Username = userDTO.Username,
                 Password = userDTO.Password
             };
         }
 
-        public IEnumerable<PositionDTO> GetAllPositionDTOs(IEnumerable<Position> positions)
+        public IEnumerable<UserDTO> UserDTOs(IEnumerable<User> users)
+        {
+            var userDTOs = new HashSet<UserDTO>();
+
+            foreach (var user in users)
+            {
+                userDTOs.Add(UserDTO(user));
+            }
+
+            return userDTOs;
+        }
+
+        public PositionDTO PositionDTO(Position pos)
+        {
+            return new PositionDTO()
+            {
+                Id = pos.Id,
+                Name = pos.Name,
+            };
+        }
+
+        public IEnumerable<PositionDTO> PositionDTOs(IEnumerable<Position> positions)
         {
             var positionDTOSet = new HashSet<PositionDTO>();
             
             foreach(var position in positions)
             {
-                positionDTOSet.Add(GetPositionDTO(position));
+                positionDTOSet.Add(PositionDTO(position));
             }
 
             return positionDTOSet;
         }
 
-        public IEnumerable<UserDTO> GetAllUserDTOs(IEnumerable<User> users)
-        {
-            var userDTOset = new HashSet<UserDTO>();
 
-            foreach(var user in users)
-            {
-                userDTOset.Add(GetUserDTO(user));
-            }
-
-            return userDTOset;
-        }
+        
 
     }
 

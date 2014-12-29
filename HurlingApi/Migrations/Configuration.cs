@@ -4,6 +4,7 @@ namespace HurlingApi.Migrations
     using System.Data.Entity;
     using System.Data.Entity.Migrations;
     using System.Linq;
+    using HurlingApi.Models;
 
     internal sealed class Configuration : DbMigrationsConfiguration<HurlingApi.Models.HurlingModelContext>
     {

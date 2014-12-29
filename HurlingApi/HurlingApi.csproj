@@ -221,12 +221,7 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\LeaguesController.cs" />
-    <Compile Include="Controllers\MessagesController.cs" />
-    <Compile Include="Controllers\PlayersController.cs" />
     <Compile Include="Controllers\PositionsController.cs" />
-    <Compile Include="Controllers\TeamPlayersController.cs" />
-    <Compile Include="Controllers\TeamsController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -248,6 +243,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>HurlingModel.edmx</DependentUpon>
     </Compile>
+    <Compile Include="Models\Repositiory.cs" />
+    <Compile Include="Models\IRepository.cs" />
     <Compile Include="Models\League.cs">
       <DependentUpon>HurlingModel.tt</DependentUpon>
     </Compile>
