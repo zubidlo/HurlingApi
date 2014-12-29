@@ -39,5 +39,19 @@ namespace HurlingApi.Models
             _context.Entry(t).State = EntityState.Modified;
             return await _context.SaveChangesAsync();
         }
+
+
+        public async Task<int> InsertAsync(T t)
+        {
+            _context.Set<T>().Add(t);
+            return await _context.SaveChangesAsync();
+        }
+
+
+        public async Task<int> RemoveAsync(T t)
+        {
+            _context.Entry(t).State = EntityState.Deleted;
+            return await _context.SaveChangesAsync();
+        }
     }
 }

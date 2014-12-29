@@ -511,5 +511,71 @@
             </summary>
             <param name="id">The Id of the user.</param>
         </member>
+        <member name="T:HurlingApi.Models.DTOFactory">
+            <summary>
+            Object mapper
+            </summary>
+        </member>
+        <member name="M:HurlingApi.Models.DTOFactory.UserDTO(HurlingApi.Models.User)">
+            <summary>
+            Makes new UserDTO object from given User object
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HurlingApi.Models.DTOFactory.User(HurlingApi.Models.UserDTO)">
+            <summary>
+            Makes new User object from given UserDTO object
+            </summary>
+            <param name="userDTO"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HurlingApi.Models.DTOFactory.UserDTOs(System.Collections.Generic.IEnumerable{HurlingApi.Models.User})">
+            <summary>
+            Makes new collection of UserDTOs from given collection of Users
+            </summary>
+            <param name="users"></param>
+            <returns></returns>
+        </member>
+        <member name="T:HurlingApi.Models.IRepository`1">
+            <summary>
+            Generic repository per entity
+            </summary>
+            <typeparam name="T">Entity</typeparam>
+        </member>
+        <member name="M:HurlingApi.Models.IRepository`1.GetAllAsync">
+            <summary>
+            select * from T
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:HurlingApi.Models.IRepository`1.FindAsync(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}})">
+            <summary>
+            select * from T where match
+            </summary>
+            <param name="match"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HurlingApi.Models.IRepository`1.UpdateAsync(`0)">
+            <summary>
+            update T set T where T id ...
+            </summary>
+            <param name="t"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HurlingApi.Models.IRepository`1.InsertAsync(`0)">
+            <summary>
+            Insert into t where id ...
+            </summary>
+            <param name="t"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HurlingApi.Models.IRepository`1.RemoveAsync(`0)">
+            <summary>
+            delete from t where t.Id ...
+            </summary>
+            <param name="t"></param>
+            <returns></returns>
+        </member>
     </members>
 </doc>
