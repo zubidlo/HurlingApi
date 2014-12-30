@@ -511,32 +511,6 @@
             </summary>
             <param name="id">The Id of the user.</param>
         </member>
-        <member name="T:HurlingApi.Models.DTOFactory">
-            <summary>
-            Object mapper
-            </summary>
-        </member>
-        <member name="M:HurlingApi.Models.DTOFactory.UserDTO(HurlingApi.Models.User)">
-            <summary>
-            Makes new UserDTO object from given User object
-            </summary>
-            <param name="user"></param>
-            <returns></returns>
-        </member>
-        <member name="M:HurlingApi.Models.DTOFactory.User(HurlingApi.Models.UserDTO)">
-            <summary>
-            Makes new User object from given UserDTO object
-            </summary>
-            <param name="userDTO"></param>
-            <returns></returns>
-        </member>
-        <member name="M:HurlingApi.Models.DTOFactory.UserDTOs(System.Collections.Generic.IEnumerable{HurlingApi.Models.User})">
-            <summary>
-            Makes new collection of UserDTOs from given collection of Users
-            </summary>
-            <param name="users"></param>
-            <returns></returns>
-        </member>
         <member name="T:HurlingApi.Models.IRepository`1">
             <summary>
             Generic repository per entity

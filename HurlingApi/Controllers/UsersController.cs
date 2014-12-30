@@ -18,7 +18,7 @@ namespace HurlingApi.Controllers
     {
         private readonly HurlingModelContext _context = new HurlingModelContext();
         private readonly Repositiory<User> _repository = new Repositiory<User>();
-        private readonly DTOFactory _factory = new DTOFactory();
+        private readonly UserFactoryDTO _factory = new UserFactoryDTO();
        
         // GET: api/users
         /// <summary>
@@ -32,7 +32,7 @@ namespace HurlingApi.Controllers
         public async Task<IQueryable<UserDTO>> GetUsers()
         {
             var users = await _repository.GetAllAsync();
-            var userDTOs = _factory.UserDTOs(users).AsQueryable<UserDTO>();
+            var userDTOs = _factory.GetCollection(users).AsQueryable<UserDTO>();
             return userDTOs;
         }
 
@@ -54,7 +54,7 @@ namespace HurlingApi.Controllers
                 return NotFound();
             }
 
-            var userDTO = _factory.UserDTO(user);
+            var userDTO = _factory.GetDTO(user);
             return Ok(userDTO);
         }
 
@@ -76,7 +76,7 @@ namespace HurlingApi.Controllers
                 return NotFound();
             }
             
-            var userDTO = _factory.UserDTO(user);
+            var userDTO = _factory.GetDTO(user);
             return Ok(userDTO);
         }
 
@@ -134,7 +134,7 @@ namespace HurlingApi.Controllers
                 return BadRequest(ModelState);
             }
 
-            var user = _factory.User(userDTO);
+            var user = _factory.GeTModel(userDTO);
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
