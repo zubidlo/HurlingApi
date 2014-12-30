@@ -19,6 +19,6 @@ namespace HurlingApi.Models
         public int UserId { get; set; }
         public Nullable<System.DateTimeOffset> Created { get; set; }
     
-        public virtual User User { get; set; }
+        public User User { get; set; }
     }
 }

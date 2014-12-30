@@ -18,7 +18,7 @@ namespace HurlingApi.Models
         public Nullable<int> TeamId { get; set; }
         public Nullable<int> PlayerId { get; set; }
     
-        public virtual Team Team { get; set; }
-        public virtual Player Player { get; set; }
+        public Team Team { get; set; }
+        public Player Player { get; set; }
     }
 }

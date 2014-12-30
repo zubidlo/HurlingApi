@@ -27,7 +27,7 @@ namespace HurlingApi.Controllers
         /// This method supports OData filters:
         /// /api/users?$orderby=Username : will return users sorted by username
         /// </summary>
-        [Route("")]
+        [Route("", Name = "DefaultRoute")]
         [HttpGet]
         public async Task<IQueryable<UserDTO>> GetUsers()
         {
@@ -84,7 +84,7 @@ namespace HurlingApi.Controllers
         /// <summary>
         /// Updates all user fields except Id. id from uri must match json user id in request body and existing user Id.
         /// Returns success: 204/No Content
-        /// Returns error: 400/BadRequest with short error message
+        /// Returns error: 400/BadRequest with error message in response body
         /// </summary>
         /// <param name="id">The Id of the user.</param>
         [Route("id/{id}")]
@@ -125,8 +125,17 @@ namespace HurlingApi.Controllers
             return StatusCode(HttpStatusCode.NoContent);
         }
 
-        // POST: api/Users
-        [ResponseType(typeof(User))]
+        // POST: api/users
+        /// <summary>
+        /// Inserts a new user. Id value will be ignored or doesn't need to be included in json in request body
+        /// Returns success: 201/Created with user json in response body
+        /// Returns errorr: 400/BadRequest with some error message in response body
+        /// </summary>
+        /// <param name="userDTO"></param>
+        /// <returns></returns>
+        [Route("")]
+        [HttpPost]
+        [ResponseType(typeof(UserDTO))]
         public async Task<IHttpActionResult> PostUser([FromBody] UserDTO userDTO)
         {
             if (!ModelState.IsValid)
@@ -135,11 +144,10 @@ namespace HurlingApi.Controllers
             }
 
             var user = _factory.GeTModel(userDTO);
+            await _repository.InsertAsync(user);
+            userDTO = _factory.GetDTO(user);
 
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtRoute("DefaultApi", new { id = user.Id }, user);
+            return CreatedAtRoute("DefaultRoute", new { id = userDTO.Id }, userDTO);
         }
 
         // DELETE: api/Users/5
