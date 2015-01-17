@@ -6,6 +6,7 @@ using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;
 using System.Web.Http.Tracing;
 using System.Web.Http.Description;
+using System.Web.Http.Cors;
 
 namespace HurlingApi
 {
@@ -13,6 +14,7 @@ namespace HurlingApi
     {
         public static void Register(HttpConfiguration config)
         {
+            var cors = new EnableCorsAttribute("*", "*", "*");
             config.EnableCors();
 
             // Web API routes

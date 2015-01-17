@@ -10,9 +10,11 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
 using HurlingApi.Models;
+using System.Web.Http.Cors;
 
 namespace HurlingApi.Controllers
 {
+    [EnableCors(origins: "*", headers: "*", methods: "*")]
     [RoutePrefix("api/users")]
     public class UsersController : ApiController
     {
