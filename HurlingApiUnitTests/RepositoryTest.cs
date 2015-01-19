@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace HurlingApiUnitTests
 {
     /// <summary>
-    /// Tests user repository
+    /// Tests model repository
     /// </summary>
     [TestClass]
     public class UserRepositoryTest
@@ -37,8 +37,8 @@ namespace HurlingApiUnitTests
         }
 
         /// <summary>
-        /// test: find user with id=1.
-        /// pass: if user.Id == 1.
+        /// test: find model with id=1.
+        /// pass: if model.Id == 1.
         /// </summary>
         /// <returns></returns>
         [TestMethod]
@@ -50,8 +50,8 @@ namespace HurlingApiUnitTests
         }
 
         /// <summary>
-        /// test: find user with username="zubidlo".
-        /// pass: if user.Username == "zubidlo".
+        /// test: find model with username="zubidlo".
+        /// pass: if model.Username == "zubidlo".
         /// </summary>
         /// <returns></returns>
         [TestMethod]
@@ -63,8 +63,8 @@ namespace HurlingApiUnitTests
         }
 
         /// <summary>
-        /// test: insert new user and then find that user back
-        /// pass: if new user and user returned back are the same
+        /// test: insert new model and then find that model back
+        /// pass: if new model and model returned back are the same
         /// </summary>
         /// <returns></returns>
         [TestMethod]
@@ -85,7 +85,7 @@ namespace HurlingApiUnitTests
         }
 
         /// <summary>
-        /// test: delete user with id=5
+        /// test: delete model with id=5
         /// pass: if one row in table affected result came back
         /// </summary>
         /// <returns></returns>

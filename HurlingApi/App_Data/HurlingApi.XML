@@ -481,44 +481,59 @@
             </summary>
             <param name="documentPath">The physical path to XML document.</param>
         </member>
+        <member name="M:HurlingApi.Controllers.PositionsController.GetPostions">
+            <summary>
+            Gets all positions.
+            This method supports OData filters, for example:
+            /api/positions?$orderby=Name : will return positions sorted by username
+            </summary>
+        </member>
+        <member name="M:HurlingApi.Controllers.PositionsController.GetPosition(System.Int32)">
+            <summary>
+            Gets position by his Id.
+            </summary>
+            <param name="id">The Id of the user.</param>
+        </member>
+        <member name="M:HurlingApi.Controllers.PositionsController.GetUserByUsername(System.String)">
+            <summary>
+            Gets position by it's Name
+            </summary>
+            <param name="username">The Name of the position.</param>
+        </member>
         <member name="M:HurlingApi.Controllers.UsersController.GetUsers">
             <summary>
-            Returns json array of users in response body.
-            Can return empty array.
-            This method supports OData filters:
+            Gets all users.
+            This method supports OData filters, for example:
             /api/users?$orderby=Username : will return users sorted by username
             </summary>
         </member>
         <member name="M:HurlingApi.Controllers.UsersController.GetUserById(System.Int32)">
             <summary>
-            Returns success: 200/OK with json user in response body
-            Returns error: 404/Not Found
+            Gets user by his Id.
             </summary>
             <param name="id">The Id of the user.</param>
         </member>
         <member name="M:HurlingApi.Controllers.UsersController.GetUserByUsername(System.String)">
             <summary>
-            Returns success: 200/Ok with json user in response body 
-            Returns error: 404/Not Found
+            Gets user by his Username
             </summary>
             <param name="username">The Username of the user.</param>
         </member>
         <member name="M:HurlingApi.Controllers.UsersController.EditUser(System.Int32,HurlingApi.Models.UserDTO)">
             <summary>
-            Updates all user fields except Id. id from uri must match json user id in request body and existing user Id.
-            Returns success: 204/No Content
-            Returns error: 400/BadRequest with error message in response body
+            Updates all user fields except the Id.
             </summary>
             <param name="id">The Id of the user.</param>
         </member>
         <member name="M:HurlingApi.Controllers.UsersController.PostUser(HurlingApi.Models.UserDTO)">
             <summary>
-            Inserts a new user. Id value will be ignored or doesn't need to be included in json in request body
-            Returns success: 201/Created with user json in response body
-            Returns errorr: 400/BadRequest with some error message in response body
+            Inserts a new user. Id value will be ignored.
             </summary>
-            <param name="userDTO"></param>
-            <returns></returns>
+        </member>
+        <member name="M:HurlingApi.Controllers.UsersController.DeleteUser(System.Int32)">
+            <summary>
+            Deletes the user.
+            </summary>
         </member>
         <member name="T:HurlingApi.Models.IRepository`1">
             <summary>

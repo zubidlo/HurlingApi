@@ -8,25 +8,25 @@ namespace HurlingApi.Models
     public class UserFactoryDTO : AbstractFactoryDTO<User, UserDTO>
    
     {
-        public override UserDTO GetDTO(User user)
+        public override UserDTO GetDTO(User model)
         {
             return new UserDTO()
             {
-                Id = user.Id,
-                Email = user.Email,
-                Username = user.Username,
-                Password = user.Password,
+                Id = model.Id,
+                Email = model.Email,
+                Username = model.Username,
+                Password = model.Password,
             };
         }
 
-        public override User GeTModel(UserDTO userDTO)
+        public override User GeTModel(UserDTO dto)
         {
             return new User()
             {
-                Id = userDTO.Id,
-                Email = userDTO.Email,
-                Username = userDTO.Username,
-                Password = userDTO.Password
+                Id = dto.Id,
+                Email = dto.Email,
+                Username = dto.Username,
+                Password = dto.Password
             };
         }
     }

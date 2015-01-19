@@ -243,6 +243,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>HurlingModel.edmx</DependentUpon>
     </Compile>
+    <Compile Include="Models\PositionFactoryDTO.cs" />
     <Compile Include="Models\Repositiory.cs" />
     <Compile Include="Models\IRepository.cs" />
     <Compile Include="Models\League.cs">

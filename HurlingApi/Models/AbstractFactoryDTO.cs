@@ -6,8 +6,8 @@ using System.Web;
 namespace HurlingApi.Models
 {
     public abstract class AbstractFactoryDTO<MODEL,DTO>
-        where MODEL : User
-        where DTO : UserDTO
+        where MODEL : class
+        where DTO : class
     {
         public abstract DTO GetDTO(MODEL model);
         public abstract MODEL GeTModel(DTO dto);

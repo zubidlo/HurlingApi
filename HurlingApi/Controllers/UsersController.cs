@@ -22,11 +22,9 @@ namespace HurlingApi.Controllers
         private readonly Repositiory<User> _repository = new Repositiory<User>();
         private readonly UserFactoryDTO _factory = new UserFactoryDTO();
        
-        // GET: api/users
         /// <summary>
-        /// Returns json array of users in response body.
-        /// Can return empty array.
-        /// This method supports OData filters:
+        /// Gets all users.
+        /// This method supports OData filters, for example:
         /// /api/users?$orderby=Username : will return users sorted by username
         /// </summary>
         [Route("", Name = "DefaultRoute")]
@@ -38,10 +36,8 @@ namespace HurlingApi.Controllers
             return userDTOs;
         }
 
-        // GET: api/users/id{id}
         /// <summary>
-        /// Returns success: 200/OK with json user in response body
-        /// Returns error: 404/Not Found
+        /// Gets user by his Id.
         /// </summary>
         /// <param name="id">The Id of the user.</param>
         [Route("id/{id:int}")]
@@ -60,10 +56,8 @@ namespace HurlingApi.Controllers
             return Ok(userDTO);
         }
 
-        // GET : api/users/username{username}
         /// <summary>
-        /// Returns success: 200/Ok with json user in response body 
-        /// Returns error: 404/Not Found
+        /// Gets user by his Username
         /// </summary>
         /// <param name="username">The Username of the user.</param>
         [Route("username/{username}")]
@@ -71,8 +65,16 @@ namespace HurlingApi.Controllers
         [ResponseType(typeof(UserDTO))]
         public async Task<IHttpActionResult> GetUserByUsername([FromUri] string username)
         {
-            var user = await _repository.FindAsync(u => u.Username == username);
-           
+            User user = null;
+            try
+            {
+                user = await _repository.FindAsync(u => u.Username == username);
+            }
+            catch (InvalidOperationException e)
+            {
+                return BadRequest("There is more than one user with username:" + username + " in the repository...");
+            }
+            
             if (user == null)
             {
                 return NotFound();
@@ -82,21 +84,18 @@ namespace HurlingApi.Controllers
             return Ok(userDTO);
         }
 
-        // PUT: api/users/id/{id}
         /// <summary>
-        /// Updates all user fields except Id. id from uri must match json user id in request body and existing user Id.
-        /// Returns success: 204/No Content
-        /// Returns error: 400/BadRequest with error message in response body
+        /// Updates all user fields except the Id.
         /// </summary>
         /// <param name="id">The Id of the user.</param>
-        [Route("id/{id}")]
+        [Route("id/{id:int}")]
         [HttpPut]
         [ResponseType(typeof(void))]
         public async Task<IHttpActionResult> EditUser([FromUri] int id, [FromBody] UserDTO userDTO)
         {
             if (userDTO.Id != id)
             {
-                return BadRequest("user id from uri: " + id + " doesn't match json user id in request body: " + userDTO.Id);
+                return BadRequest("User Id from URI: " + id + " doesn't match JSON user Id in request body: " + userDTO.Id + "!");
             }
 
             if (!ModelState.IsValid)
@@ -108,7 +107,23 @@ namespace HurlingApi.Controllers
 
             if (user == null)
             {
-                return BadRequest("user with id:" + id + " doesn't exist" );
+                return BadRequest("User with Id:" + id + " doesn't exist in repository!" );
+            }
+
+            User user2 = null;
+
+            try
+            {
+                user2 = await _repository.FindAsync(u => u.Username == userDTO.Username);
+            }
+            catch (InvalidOperationException e)
+            {
+                return BadRequest("There is already more then one user with username:" + userDTO.Username + " in the repository...");
+            }
+
+            if ((user2 != null ) && (user2.Id != userDTO.Id) && (user2.Username == userDTO.Username))
+            {
+                return BadRequest("There is already an user with username:" + userDTO.Username + " in the repository...");
             }
 
             user.Email = userDTO.Email;
@@ -127,14 +142,9 @@ namespace HurlingApi.Controllers
             return StatusCode(HttpStatusCode.NoContent);
         }
 
-        // POST: api/users
         /// <summary>
-        /// Inserts a new user. Id value will be ignored or doesn't need to be included in json in request body
-        /// Returns success: 201/Created with user json in response body
-        /// Returns errorr: 400/BadRequest with some error message in response body
+        /// Inserts a new user. Id value will be ignored.
         /// </summary>
-        /// <param name="userDTO"></param>
-        /// <returns></returns>
         [Route("")]
         [HttpPost]
         [ResponseType(typeof(UserDTO))]
@@ -145,14 +155,33 @@ namespace HurlingApi.Controllers
                 return BadRequest(ModelState);
             }
 
-            var user = _factory.GeTModel(userDTO);
+            User user = null;
+
+            try
+            {
+                user = await _repository.FindAsync(u => u.Username == userDTO.Username);
+            }
+            catch(InvalidOperationException e) 
+            {
+                return BadRequest("There is more than one model with username:" + userDTO.Username + " in the repository...");
+            }
+
+            if (user != null)
+            {
+                return BadRequest("There is already an model with username:" + userDTO.Username + " in the repository...");
+            }
+
+            user = _factory.GeTModel(userDTO);
             await _repository.InsertAsync(user);
             userDTO = _factory.GetDTO(user);
 
             return CreatedAtRoute("DefaultRoute", new { id = userDTO.Id }, userDTO);
         }
 
-        // DELETE: api/Users/5
+        // DELETE: api/Users/id/5 (not implemented just yet)
+        /// <summary>
+        /// Deletes the user.
+        /// </summary>
         [ResponseType(typeof(User))]
         public async Task<IHttpActionResult> DeleteUser([FromUri] int id)
         {
@@ -179,7 +208,7 @@ namespace HurlingApi.Controllers
 
         private bool UserExists(int id)
         {
-            return _context.Users.Count(e => e.Id == id) > 0;
+            return _context.Users.Count(u => u.Id == id) > 0;
         }
     }
 }
