@@ -8,44 +8,33 @@ using System.Threading.Tasks;
 namespace HurlingApi.Models
 {
     /// <summary>
-    /// Generic repository per entity
+    /// Generic repository interface
     /// </summary>
-    /// <typeparam name="T">Entity</typeparam>
+    /// <typeparam name="T">A repository entity type.</typeparam>
     public interface IRepository<T> : IDisposable where T : class
     {
-        /// <summary>
-        /// select * from T
-        /// </summary>
-        /// <returns></returns>
+        /// <summary></summary>
+        /// <returns>List of requested entities.</returns>
         Task<IEnumerable<T>> GetAllAsync();
 
-        /// <summary>
-        /// select * from T where match
-        /// </summary>
-        /// <param name="match"></param>
-        /// <returns></returns>
+        /// <summary></summary>
+        /// <param name="match">Linq Expression.</param>
+        /// <returns>Single requested entity.</returns>
         Task<T> FindAsync(Expression<Func<T, bool>> match);
 
-        /// <summary>
-        /// update T set T where T id ...
-        /// </summary>
-        /// <param name="t"></param>
-        /// <returns></returns>
+        /// <summary></summary>
+        /// <param name="t">A repository entity type.</param>
+        /// <returns>Integer result code.</returns>
         Task<int> UpdateAsync(T t);
 
-        /// <summary>
-        /// Insert into t where id ...
-        /// </summary>
-        /// <param name="t"></param>
-        /// <returns></returns>
+        /// <summary></summary>
+        /// <param name="t">A repository entity type.</param>
+        /// <returns>Integer result code.</returns>
         Task<int> InsertAsync(T t);
 
-        /// <summary>
-        /// delete from t where t.Id ...
-        /// </summary>
-        /// <param name="t"></param>
-        /// <returns></returns>
+        /// <summary></summary>
+        /// <param name="t">A repository entity type.</param>
+        /// <returns>Integer result code.</returns>
         Task<int> RemoveAsync(T t);
-
     }
 }

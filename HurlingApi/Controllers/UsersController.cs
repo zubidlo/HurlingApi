@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Entity.Core;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
@@ -14,19 +15,17 @@ using System.Web.Http.Cors;
 
 namespace HurlingApi.Controllers
 {
+    /// <summary></summary>
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     [RoutePrefix("api/users")]
     public class UsersController : ApiController
     {
-        private readonly HurlingModelContext _context = new HurlingModelContext();
-        private readonly Repositiory<User> _repository = new Repositiory<User>();
+        private readonly Repositiory<User> _repository = new Repositiory<User>(new HurlingModelContext());
         private readonly UserFactoryDTO _factory = new UserFactoryDTO();
        
-        /// <summary>
-        /// Gets all users.
-        /// This method supports OData filters, for example:
-        /// /api/users?$orderby=Username : will return users sorted by username
-        /// </summary>
+        
+        /// <summary></summary>
+        /// <returns></returns>
         [Route("", Name = "DefaultRoute")]
         [HttpGet]
         public async Task<IQueryable<UserDTO>> GetUsers()
@@ -36,58 +35,56 @@ namespace HurlingApi.Controllers
             return userDTOs;
         }
 
-        /// <summary>
-        /// Gets user by his Id.
-        /// </summary>
-        /// <param name="id">The Id of the user.</param>
+        /// <summary></summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpGet]
         [ResponseType(typeof(UserDTO))]
         public async Task<IHttpActionResult> GetUserById([FromUri] int id)
         {
-            var user = await _repository.FindAsync(u => u.Id == id);
-
-            if (user == null)
+            try
             {
-                return NotFound();
+                var user = await _repository.FindAsync(u => u.Id == id);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+                return Ok(_factory.GetDTO(user));
             }
-
-            var userDTO = _factory.GetDTO(user);
-            return Ok(userDTO);
+            catch (InvalidOperationException e)
+            {
+                return InternalServerError(e);
+            }
         }
 
-        /// <summary>
-        /// Gets user by his Username
-        /// </summary>
-        /// <param name="username">The Username of the user.</param>
+        /// <summary></summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
         [Route("username/{username}")]
         [HttpGet]
         [ResponseType(typeof(UserDTO))]
         public async Task<IHttpActionResult> GetUserByUsername([FromUri] string username)
         {
-            User user = null;
             try
             {
-                user = await _repository.FindAsync(u => u.Username == username);
+                var user = await _repository.FindAsync(u => u.Username == username);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+                return Ok(_factory.GetDTO(user));
             }
             catch (InvalidOperationException e)
             {
-                return BadRequest("There is more than one user with username:" + username + " in the repository...");
+                return InternalServerError(e);
             }
-            
-            if (user == null)
-            {
-                return NotFound();
-            }
-            
-            var userDTO = _factory.GetDTO(user);
-            return Ok(userDTO);
         }
 
-        /// <summary>
-        /// Updates all user fields except the Id.
-        /// </summary>
-        /// <param name="id">The Id of the user.</param>
+        /// <summary></summary>
+        /// <param name="id"></param>
+        /// <param name="userDTO"></param>
+        /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpPut]
         [ResponseType(typeof(void))]
@@ -95,7 +92,7 @@ namespace HurlingApi.Controllers
         {
             if (userDTO.Id != id)
             {
-                return BadRequest("User Id from URI: " + id + " doesn't match JSON user Id in request body: " + userDTO.Id + "!");
+                return BadRequest("User Id from request URI: " + id + " doesn't match user Id from request body: " + userDTO.Id + "!");
             }
 
             if (!ModelState.IsValid)
@@ -103,48 +100,37 @@ namespace HurlingApi.Controllers
                 return BadRequest(ModelState);
             }
 
-            var user = await _repository.FindAsync(u => u.Id == id);
-
-            if (user == null)
-            {
-                return BadRequest("User with Id:" + id + " doesn't exist in repository!" );
-            }
-
-            User user2 = null;
-
+            User user,user1;
             try
             {
-                user2 = await _repository.FindAsync(u => u.Username == userDTO.Username);
+                user = await _repository.FindAsync(u => u.Id == id);
+                if (user == null)
+                {
+                    return BadRequest("The User with Id = " + id + " doesn't exists.");
+                }
+
+                user1 = await _repository.FindAsync(u => u.Username == userDTO.Username);
+                if ((user1 != null) && (user1.Id != userDTO.Id) && (user1.Username == userDTO.Username))
+                {
+                    return BadRequest("There is already an user with username:" + userDTO.Username + " in the repository!");
+                }
+
+                user.Username = userDTO.Username;
+                user.Password = userDTO.Password;
+                user.Email = userDTO.Email;
+
+                await _repository.UpdateAsync(user);
+                return StatusCode(HttpStatusCode.NoContent);
             }
             catch (InvalidOperationException e)
             {
-                return BadRequest("There is already more then one user with username:" + userDTO.Username + " in the repository...");
+                return InternalServerError(e);
             }
-
-            if ((user2 != null ) && (user2.Id != userDTO.Id) && (user2.Username == userDTO.Username))
-            {
-                return BadRequest("There is already an user with username:" + userDTO.Username + " in the repository...");
-            }
-
-            user.Email = userDTO.Email;
-            user.Username = userDTO.Username;
-            user.Password = userDTO.Password;
-
-            try
-            {
-                await _repository.UpdateAsync(user);
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                throw;
-            }
-
-            return StatusCode(HttpStatusCode.NoContent);
         }
 
-        /// <summary>
-        /// Inserts a new user. Id value will be ignored.
-        /// </summary>
+        /// <summary></summary>
+        /// <param name="userDTO"></param>
+        /// <returns></returns>
         [Route("")]
         [HttpPost]
         [ResponseType(typeof(UserDTO))]
@@ -155,60 +141,69 @@ namespace HurlingApi.Controllers
                 return BadRequest(ModelState);
             }
 
-            User user = null;
-
             try
             {
-                user = await _repository.FindAsync(u => u.Username == userDTO.Username);
+                var user = await _repository.FindAsync(u => u.Username == userDTO.Username);
+                if (user != null)
+                {
+                    return BadRequest("There is already an model with username:" + userDTO.Username + " in the repository...");
+                }
             }
             catch(InvalidOperationException e) 
             {
                 return BadRequest("There is more than one model with username:" + userDTO.Username + " in the repository...");
             }
 
-            if (user != null)
+            
+
+            var newUser = _factory.GeTModel(userDTO);
+
+            try
             {
-                return BadRequest("There is already an model with username:" + userDTO.Username + " in the repository...");
+                await _repository.InsertAsync(newUser);
+                return CreatedAtRoute("DefaultRoute", new { id = userDTO.Id }, _factory.GetDTO(newUser));
             }
-
-            user = _factory.GeTModel(userDTO);
-            await _repository.InsertAsync(user);
-            userDTO = _factory.GetDTO(user);
-
-            return CreatedAtRoute("DefaultRoute", new { id = userDTO.Id }, userDTO);
+            catch (InvalidOperationException e)
+            {
+                return InternalServerError(e);
+            }
         }
 
-        // DELETE: api/Users/id/5 (not implemented just yet)
-        /// <summary>
-        /// Deletes the user.
-        /// </summary>
+        /// <summary></summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [Route("id/{id:int}")]
+        [HttpDelete]
         [ResponseType(typeof(User))]
         public async Task<IHttpActionResult> DeleteUser([FromUri] int id)
         {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
+            try
             {
-                return NotFound();
+                var user = await _repository.FindAsync(u => u.Id == id);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+                await _repository.RemoveAsync(user);
+                return Ok(_factory.GetDTO(user));
             }
-
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
-
-            return Ok(user);
+            catch(InvalidOperationException e) 
+            {
+                return InternalServerError(e);
+            }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="disposing"></param>
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
-                _context.Dispose();
+                _repository.Dispose();
             }
             base.Dispose(disposing);
-        }
-
-        private bool UserExists(int id)
-        {
-            return _context.Users.Count(u => u.Id == id) > 0;
         }
     }
 }

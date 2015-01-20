@@ -14,109 +14,124 @@ using System.Web.Http.Cors;
 
 namespace HurlingApi.Controllers
 {
+    /// <summary></summary>
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     [RoutePrefix("api/positions")]
     public class PositionsController : ApiController
     {
-        private readonly HurlingModelContext _context = new HurlingModelContext();
-        private readonly Repositiory<Position> _repository = new Repositiory<Position>();
+        private readonly Repositiory<Position> _repository = new Repositiory<Position>(new HurlingModelContext());
         private readonly PositionFactoryDTO _factory = new PositionFactoryDTO();
 
-        /// <summary>
-        /// Gets all positions.
-        /// This method supports OData filters, for example:
-        /// /api/positions?$orderby=Name : will return positions sorted by username
-        /// </summary>
+        /// <summary></summary>
+        /// <returns></returns>
         [Route("")]
         [HttpGet]
         public async Task<IQueryable<PositionDTO>> GetPostions()
         {
             var positions = await _repository.GetAllAsync();
-            var positionDTOs = _factory.GetCollection(positions).AsQueryable<PositionDTO>();
-            return positionDTOs;
+            return _factory.GetCollection(positions).AsQueryable<PositionDTO>();
         }
 
-        /// <summary>
-        /// Gets position by his Id.
-        /// </summary>
-        /// <param name="id">The Id of the user.</param>
+        /// <summary></summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpGet]
         [ResponseType(typeof(PositionDTO))]
-        public async Task<IHttpActionResult> GetPosition(int id)
+        public async Task<IHttpActionResult> GetPositionById(int id)
         {
-            var position = await _repository.FindAsync(u => u.Id == id);
-
-            if (position == null)
+            try
             {
-                return NotFound();
+                var position = await _repository.FindAsync(u => u.Id == id);
+                if (position == null)
+                {
+                    return NotFound();
+                }
+                return Ok(_factory.GetDTO(position));
             }
-
-            var positionDTO = _factory.GetDTO(position);
-            return Ok(positionDTO);
+            catch (InvalidOperationException e)
+            {
+                return InternalServerError(e);
+            }
         }
 
-        /// <summary>
-        /// Gets position by it's Name
-        /// </summary>
-        /// <param name="username">The Name of the position.</param>
+        /// <summary></summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         [Route("name/{name}")]
         [HttpGet]
         [ResponseType(typeof(PositionDTO))]
-        public async Task<IHttpActionResult> GetUserByUsername([FromUri] string name)
+        public async Task<IHttpActionResult> GetPositionByName([FromUri] string name)
         {
             Position position = null;
             try
             {
                 position = await _repository.FindAsync(p => p.Name == name);
+                if (position == null)
+                {
+                    return NotFound();
+                }
+                return Ok(_factory.GetDTO(position));
             }
             catch (InvalidOperationException e)
             {
-                return BadRequest("There is more than one positon with name:" + name + " in the repository...");
+                return InternalServerError(e);
             }
-
-            if (position == null)
-            {
-                return NotFound();
-            }
-
-            var positionDTO = _factory.GetDTO(position);
-            return Ok(positionDTO);
         }
 
-        // PUT: api/Positions/5
+        /// <summary></summary>
+        /// <param name="id"></param>
+        /// <param name="positionDTO"></param>
+        /// <returns></returns>
+        [Route("id/{id:int}")]
+        [HttpPut]
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> PutPosition(int id, Position position)
+        public async Task<IHttpActionResult> EditPosition([FromUri] int id, [FromBody] PositionDTO positionDTO)
         {
-            throw new NotImplementedException();
+            if (positionDTO.Id != id)
+            {
+                return BadRequest("Position Id from request URI: " + id + " doesn't match position Id from request body: " + positionDTO.Id + "!");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            Position position, position1;
+            try
+            {
+                position = await _repository.FindAsync(p => p.Id == id);
+                if (position == null)
+                {
+                    return BadRequest("The position with Id = " + id + " doesn't exists.");
+                }
+
+                position1 = await _repository.FindAsync(p => p.Name == positionDTO.Name);
+                if ((position1 != null) && (position1.Id != positionDTO.Id) && (position1.Name == positionDTO.Name))
+                {
+                    return BadRequest("There is already a position with Name:" + positionDTO.Name + " in the repository!");
+                }
+
+                position.Name = positionDTO.Name;
+                await _repository.UpdateAsync(position);
+                return StatusCode(HttpStatusCode.NoContent);
+            }
+            catch (InvalidOperationException e)
+            {
+                return InternalServerError(e);
+            }
         }
 
-        // POST: api/Positions
-        [ResponseType(typeof(Position))]
-        public async Task<IHttpActionResult> PostPosition(Position position)
-        {
-            throw new NotImplementedException();
-        }
-
-        // DELETE: api/Positions/5
-        [ResponseType(typeof(Position))]
-        public async Task<IHttpActionResult> DeletePosition(int id)
-        {
-            throw new NotImplementedException();
-        }
-
+        /// <summary></summary>
+        /// <param name="disposing"></param>
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
-                _context.Dispose();
+                _repository.Dispose();
             }
             base.Dispose(disposing);
-        }
-
-        private bool PositionExists(int id)
-        {
-            return _context.Positions.Count(p => p.Id == id) > 0;
         }
     }
 }

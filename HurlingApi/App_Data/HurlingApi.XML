@@ -481,99 +481,139 @@
             </summary>
             <param name="documentPath">The physical path to XML document.</param>
         </member>
+        <member name="T:HurlingApi.Controllers.PositionsController">
+            <summary></summary>
+        </member>
         <member name="M:HurlingApi.Controllers.PositionsController.GetPostions">
-            <summary>
-            Gets all positions.
-            This method supports OData filters, for example:
-            /api/positions?$orderby=Name : will return positions sorted by username
-            </summary>
+            <summary></summary>
+            <returns></returns>
         </member>
-        <member name="M:HurlingApi.Controllers.PositionsController.GetPosition(System.Int32)">
-            <summary>
-            Gets position by his Id.
-            </summary>
-            <param name="id">The Id of the user.</param>
+        <member name="M:HurlingApi.Controllers.PositionsController.GetPositionById(System.Int32)">
+            <summary></summary>
+            <param name="id"></param>
+            <returns></returns>
         </member>
-        <member name="M:HurlingApi.Controllers.PositionsController.GetUserByUsername(System.String)">
-            <summary>
-            Gets position by it's Name
-            </summary>
-            <param name="username">The Name of the position.</param>
+        <member name="M:HurlingApi.Controllers.PositionsController.GetPositionByName(System.String)">
+            <summary></summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HurlingApi.Controllers.PositionsController.EditPosition(System.Int32,HurlingApi.Models.PositionDTO)">
+            <summary></summary>
+            <param name="id"></param>
+            <param name="positionDTO"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HurlingApi.Controllers.PositionsController.Dispose(System.Boolean)">
+            <summary></summary>
+            <param name="disposing"></param>
+        </member>
+        <member name="T:HurlingApi.Controllers.UsersController">
+            <summary></summary>
         </member>
         <member name="M:HurlingApi.Controllers.UsersController.GetUsers">
-            <summary>
-            Gets all users.
-            This method supports OData filters, for example:
-            /api/users?$orderby=Username : will return users sorted by username
-            </summary>
+            <summary></summary>
+            <returns></returns>
         </member>
         <member name="M:HurlingApi.Controllers.UsersController.GetUserById(System.Int32)">
-            <summary>
-            Gets user by his Id.
-            </summary>
-            <param name="id">The Id of the user.</param>
+            <summary></summary>
+            <param name="id"></param>
+            <returns></returns>
         </member>
         <member name="M:HurlingApi.Controllers.UsersController.GetUserByUsername(System.String)">
-            <summary>
-            Gets user by his Username
-            </summary>
-            <param name="username">The Username of the user.</param>
+            <summary></summary>
+            <param name="username"></param>
+            <returns></returns>
         </member>
         <member name="M:HurlingApi.Controllers.UsersController.EditUser(System.Int32,HurlingApi.Models.UserDTO)">
-            <summary>
-            Updates all user fields except the Id.
-            </summary>
-            <param name="id">The Id of the user.</param>
+            <summary></summary>
+            <param name="id"></param>
+            <param name="userDTO"></param>
+            <returns></returns>
         </member>
         <member name="M:HurlingApi.Controllers.UsersController.PostUser(HurlingApi.Models.UserDTO)">
-            <summary>
-            Inserts a new user. Id value will be ignored.
-            </summary>
+            <summary></summary>
+            <param name="userDTO"></param>
+            <returns></returns>
         </member>
         <member name="M:HurlingApi.Controllers.UsersController.DeleteUser(System.Int32)">
+            <summary></summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HurlingApi.Controllers.UsersController.Dispose(System.Boolean)">
             <summary>
-            Deletes the user.
+            
             </summary>
+            <param name="disposing"></param>
+        </member>
+        <member name="T:HurlingApi.Models.Repositiory`1">
+            <summary></summary>
+            <typeparam name="T">A repository entity type.</typeparam>
         </member>
         <member name="T:HurlingApi.Models.IRepository`1">
             <summary>
-            Generic repository per entity
+            Generic repository interface
             </summary>
-            <typeparam name="T">Entity</typeparam>
+            <typeparam name="T">A repository entity type.</typeparam>
         </member>
         <member name="M:HurlingApi.Models.IRepository`1.GetAllAsync">
-            <summary>
-            select * from T
-            </summary>
-            <returns></returns>
+            <summary></summary>
+            <returns>List of requested entities.</returns>
         </member>
         <member name="M:HurlingApi.Models.IRepository`1.FindAsync(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}})">
-            <summary>
-            select * from T where match
-            </summary>
-            <param name="match"></param>
-            <returns></returns>
+            <summary></summary>
+            <param name="match">Linq Expression.</param>
+            <returns>Single requested entity.</returns>
         </member>
         <member name="M:HurlingApi.Models.IRepository`1.UpdateAsync(`0)">
-            <summary>
-            update T set T where T id ...
-            </summary>
-            <param name="t"></param>
-            <returns></returns>
+            <summary></summary>
+            <param name="t">A repository entity type.</param>
+            <returns>Integer result code.</returns>
         </member>
         <member name="M:HurlingApi.Models.IRepository`1.InsertAsync(`0)">
-            <summary>
-            Insert into t where id ...
-            </summary>
-            <param name="t"></param>
-            <returns></returns>
+            <summary></summary>
+            <param name="t">A repository entity type.</param>
+            <returns>Integer result code.</returns>
         </member>
         <member name="M:HurlingApi.Models.IRepository`1.RemoveAsync(`0)">
-            <summary>
-            delete from t where t.Id ...
-            </summary>
-            <param name="t"></param>
-            <returns></returns>
+            <summary></summary>
+            <param name="t">A repository entity type.</param>
+            <returns>Integer result code.</returns>
+        </member>
+        <member name="M:HurlingApi.Models.Repositiory`1.#ctor(System.Data.Entity.DbContext)">
+            <summary></summary>
+        </member>
+        <member name="M:HurlingApi.Models.Repositiory`1.Dispose">
+            <summary></summary>
+        </member>
+        <member name="M:HurlingApi.Models.Repositiory`1.GetAllAsync">
+            <summary></summary>
+            <returns>List of requested entities.</returns>
+        </member>
+        <member name="M:HurlingApi.Models.Repositiory`1.FindAsync(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}})">
+            <summary></summary>
+            <param name="match">Linq Expression</param>
+            <returns>Single requested entity.</returns>
+            <exception cref="T:System.InvalidOperationException">More than one resouces found in the repository.</exception>
+        </member>
+        <member name="M:HurlingApi.Models.Repositiory`1.UpdateAsync(`0)">
+            <summary></summary>
+            <param name="t">A repository entity type.</param>
+            <returns>Integer result code.</returns>
+            <exception cref="T:System.InvalidOperationException">Error occured during repository modification.</exception>
+        </member>
+        <member name="M:HurlingApi.Models.Repositiory`1.InsertAsync(`0)">
+            <summary></summary>
+            <param name="t">A repository entity type.</param>
+            <returns>Integer result code.</returns>
+            <exception cref="T:System.InvalidOperationException">Error occured during adding to repository.</exception>
+        </member>
+        <member name="M:HurlingApi.Models.Repositiory`1.RemoveAsync(`0)">
+            <summary></summary>
+            <param name="t">A repository entity type.</param>
+            <returns>Integer result code.</returns>
+            <exception cref="T:System.InvalidOperationException">Error occured during deleting from repository.</exception>
         </member>
     </members>
 </doc>

@@ -21,7 +21,7 @@ namespace HurlingApiUnitTests
         [TestInitialize]
         public void Initialize()
         {
-            _repository = new Repositiory<User>();
+            _repository = new Repositiory<User>(new HurlingModelContext());
         }
 
         /// <summary>
