@@ -481,6 +481,16 @@
             </summary>
             <param name="documentPath">The physical path to XML document.</param>
         </member>
+        <member name="T:HurlingApi.Controllers.HomeController">
+            <summary></summary>
+        </member>
+        <member name="M:HurlingApi.Controllers.HomeController.Index">
+            <summary></summary>
+            <returns></returns>
+        </member>
+        <member name="T:HurlingApi.Controllers.PlayersController">
+            <summary></summary>
+        </member>
         <member name="T:HurlingApi.Controllers.PositionsController">
             <summary></summary>
         </member>
@@ -542,10 +552,50 @@
             <returns></returns>
         </member>
         <member name="M:HurlingApi.Controllers.UsersController.Dispose(System.Boolean)">
-            <summary>
-            
-            </summary>
+            <summary></summary>
             <param name="disposing"></param>
+        </member>
+        <member name="T:HurlingApi.Models.AbstractFactoryDTO`2">
+            <summary></summary>
+            <typeparam name="MODEL"></typeparam>
+            <typeparam name="DTO"></typeparam>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:HurlingApi.Models.AbstractFactoryDTO`2.GetDTO(`0)" -->
+        <member name="M:HurlingApi.Models.AbstractFactoryDTO`2.GeTModel(`1)">
+            <summary></summary>
+            <param name="dto"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HurlingApi.Models.AbstractFactoryDTO`2.GetCollection(System.Collections.Generic.IEnumerable{`0})">
+            <summary></summary>
+            <param name="models"></param>
+            <returns></returns>
+        </member>
+        <member name="T:HurlingApi.Models.PlayerDTOFactory">
+            <summary></summary>
+        </member>
+        <member name="M:HurlingApi.Models.PlayerDTOFactory.GetDTO(HurlingApi.Models.Player)">
+            <summary></summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HurlingApi.Models.PlayerDTOFactory.GeTModel(HurlingApi.Models.PlayerDTO)">
+            <summary></summary>
+            <param name="dto"></param>
+            <returns></returns>
+        </member>
+        <member name="T:HurlingApi.Models.PositionDTOFactory">
+            <summary></summary>
+        </member>
+        <member name="M:HurlingApi.Models.PositionDTOFactory.GetDTO(HurlingApi.Models.Position)">
+            <summary></summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HurlingApi.Models.PositionDTOFactory.GeTModel(HurlingApi.Models.PositionDTO)">
+            <summary></summary>
+            <param name="dto"></param>
+            <returns></returns>
         </member>
         <member name="T:HurlingApi.Models.Repositiory`1">
             <summary></summary>
@@ -614,6 +664,19 @@
             <param name="t">A repository entity type.</param>
             <returns>Integer result code.</returns>
             <exception cref="T:System.InvalidOperationException">Error occured during deleting from repository.</exception>
+        </member>
+        <member name="T:HurlingApi.Models.UserDTOFactory">
+            <summary></summary>
+        </member>
+        <member name="M:HurlingApi.Models.UserDTOFactory.GetDTO(HurlingApi.Models.User)">
+            <summary></summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HurlingApi.Models.UserDTOFactory.GeTModel(HurlingApi.Models.UserDTO)">
+            <summary></summary>
+            <param name="dto"></param>
+            <returns></returns>
         </member>
     </members>
 </doc>

@@ -21,7 +21,7 @@ namespace HurlingApi.Controllers
     public class UsersController : ApiController
     {
         private readonly Repositiory<User> _repository = new Repositiory<User>(new HurlingModelContext());
-        private readonly UserFactoryDTO _factory = new UserFactoryDTO();
+        private readonly UserDTOFactory _factory = new UserDTOFactory();
        
         
         /// <summary></summary>
@@ -31,8 +31,7 @@ namespace HurlingApi.Controllers
         public async Task<IQueryable<UserDTO>> GetUsers()
         {
             var users = await _repository.GetAllAsync();
-            var userDTOs = _factory.GetCollection(users).AsQueryable<UserDTO>();
-            return userDTOs;
+            return _factory.GetCollection(users).AsQueryable<UserDTO>();
         }
 
         /// <summary></summary>
@@ -193,9 +192,7 @@ namespace HurlingApi.Controllers
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
+        /// <summary></summary>
         /// <param name="disposing"></param>
         protected override void Dispose(bool disposing)
         {

@@ -8,12 +8,12 @@ namespace HurlingApiUnitTests
     [TestClass]
     public class FactoryTest
     {
-        private UserFactoryDTO _userFactory;
+        private UserDTOFactory _userFactory;
 
         [TestInitialize]
         public void Initialize()
         {
-            _userFactory = new UserFactoryDTO();
+            _userFactory = new UserDTOFactory();
         }
 
         [TestMethod]

@@ -20,7 +20,7 @@ namespace HurlingApi.Controllers
     public class PositionsController : ApiController
     {
         private readonly Repositiory<Position> _repository = new Repositiory<Position>(new HurlingModelContext());
-        private readonly PositionFactoryDTO _factory = new PositionFactoryDTO();
+        private readonly PositionDTOFactory _factory = new PositionDTOFactory();
 
         /// <summary></summary>
         /// <returns></returns>
