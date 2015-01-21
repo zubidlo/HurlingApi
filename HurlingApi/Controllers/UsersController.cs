@@ -23,7 +23,6 @@ namespace HurlingApi.Controllers
         private readonly Repositiory<User> _repository = new Repositiory<User>(new HurlingModelContext());
         private readonly UserDTOFactory _factory = new UserDTOFactory();
        
-        
         /// <summary></summary>
         /// <returns></returns>
         [Route("", Name = "DefaultRoute")]
@@ -51,9 +50,9 @@ namespace HurlingApi.Controllers
                 }
                 return Ok(_factory.GetDTO(user));
             }
-            catch (InvalidOperationException e)
+            catch (InvalidOperationException)
             {
-                return InternalServerError(e);
+                return InternalServerError(new Exception("Repository is broken! There is more than one user with Id=" + id + " in the repository"));
             }
         }
 
@@ -74,9 +73,9 @@ namespace HurlingApi.Controllers
                 }
                 return Ok(_factory.GetDTO(user));
             }
-            catch (InvalidOperationException e)
+            catch (InvalidOperationException)
             {
-                return InternalServerError(e);
+                return InternalServerError(new Exception("Repository is broken! There is more than one user with Username=" + username + " in the repository."));
             }
         }
 
@@ -99,32 +98,40 @@ namespace HurlingApi.Controllers
                 return BadRequest(ModelState);
             }
 
-            User user,user1;
+            User user;
+            
             try
             {
                 user = await _repository.FindAsync(u => u.Id == id);
                 if (user == null)
                 {
-                    return BadRequest("The User with Id = " + id + " doesn't exists.");
+                    return NotFound();
                 }
 
-                user1 = await _repository.FindAsync(u => u.Username == userDTO.Username);
+                var user1 = await _repository.FindAsync(u => u.Username == userDTO.Username);
                 if ((user1 != null) && (user1.Id != userDTO.Id) && (user1.Username == userDTO.Username))
                 {
                     return BadRequest("There is already an user with username:" + userDTO.Username + " in the repository!");
                 }
-
-                user.Username = userDTO.Username;
-                user.Password = userDTO.Password;
-                user.Email = userDTO.Email;
-
-                await _repository.UpdateAsync(user);
-                return StatusCode(HttpStatusCode.NoContent);
             }
-            catch (InvalidOperationException e)
+            catch (InvalidOperationException)
             {
-                return InternalServerError(e);
+                return InternalServerError(new Exception("Repository is broken! There is more than one user with Username=" + userDTO.Username + " in the repository."));
             }
+            
+            user.Username = userDTO.Username;
+            user.Password = userDTO.Password;
+            user.Email = userDTO.Email;
+
+		    try
+			{
+			    await _repository.UpdateAsync(user);
+				return StatusCode(HttpStatusCode.NoContent);
+			}
+			catch (InvalidOperationException e)
+			{
+				return InternalServerError(e);
+			}
         }
 
         /// <summary></summary>
@@ -145,18 +152,15 @@ namespace HurlingApi.Controllers
                 var user = await _repository.FindAsync(u => u.Username == userDTO.Username);
                 if (user != null)
                 {
-                    return BadRequest("There is already an model with username:" + userDTO.Username + " in the repository...");
+                    return BadRequest("There is already an user with username:" + userDTO.Username + " in the repository.");
                 }
             }
-            catch(InvalidOperationException e) 
+            catch(InvalidOperationException ) 
             {
-                return BadRequest("There is more than one model with username:" + userDTO.Username + " in the repository...");
+                return InternalServerError(new Exception("Repository is broken! There is more than one user with Username=" + userDTO.Username));
             }
 
-            
-
             var newUser = _factory.GeTModel(userDTO);
-
             try
             {
                 await _repository.InsertAsync(newUser);
@@ -173,7 +177,7 @@ namespace HurlingApi.Controllers
         /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpDelete]
-        [ResponseType(typeof(User))]
+        [ResponseType(typeof(UserDTO))]
         public async Task<IHttpActionResult> DeleteUser([FromUri] int id)
         {
             try
@@ -188,7 +192,7 @@ namespace HurlingApi.Controllers
             }
             catch(InvalidOperationException e) 
             {
-                return InternalServerError(e);
+                return BadRequest("Deleting user with Id=" + id + " would break referential integrity of the repository. Check the relations between this user and other entities.");
             }
         }
 

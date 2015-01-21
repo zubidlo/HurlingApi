@@ -514,6 +514,16 @@
             <param name="positionDTO"></param>
             <returns></returns>
         </member>
+        <member name="M:HurlingApi.Controllers.PositionsController.PostPosition(HurlingApi.Models.PositionDTO)">
+            <summary></summary>
+            <param name="positionDTO"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HurlingApi.Controllers.PositionsController.DeletePosition(System.Int32)">
+            <summary></summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="M:HurlingApi.Controllers.PositionsController.Dispose(System.Boolean)">
             <summary></summary>
             <param name="disposing"></param>
