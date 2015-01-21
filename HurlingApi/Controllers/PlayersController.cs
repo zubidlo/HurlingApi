@@ -30,5 +30,25 @@ namespace HurlingApi.Controllers
             var players = await _repository.GetAllAsync();
             return _factory.GetCollection(players).AsQueryable<PlayerDTO>();
         }
+
+        [Route("id/{id:int}")]
+        [HttpGet]
+        [ResponseType(typeof(PlayerDTO))]
+        public async Task<IHttpActionResult> GetPlayerById(int id)
+        {
+            try
+            {
+                var player = await _repository.FindAsync(p => p.Id == id);
+                if (player == null)
+                {
+                    return NotFound();
+                }
+                return Ok(_factory.GetDTO(player));
+            }
+            catch (InvalidOperationException)
+            {
+                return InternalServerError(new Exception("Repository is broken! There is more than one player with Id=" + id + " in the repository."));
+            }
+        }
     }
 }

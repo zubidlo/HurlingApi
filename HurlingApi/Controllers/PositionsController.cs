@@ -42,7 +42,7 @@ namespace HurlingApi.Controllers
         {
             try
             {
-                var position = await _repository.FindAsync(u => u.Id == id);
+                var position = await _repository.FindAsync(p => p.Id == id);
                 if (position == null)
                 {
                     return NotFound();
