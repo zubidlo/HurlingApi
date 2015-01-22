@@ -16,9 +16,10 @@ namespace HurlingApi.Models
         public string LastName { get; set; }
         [Required]
         public string GaaTeam { get; set; }
-
-        public Nullable<decimal> LastWeekPoints { get; set; }
-        public Nullable<decimal> OverallPoints { get; set; }
+        [Required]
+        public decimal LastWeekPoints { get; set; }
+        [Required]
+        public decimal OverallPoints { get; set; }
         [Required]
         public decimal Price { get; set; }
         [Required]

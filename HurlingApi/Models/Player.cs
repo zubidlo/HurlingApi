@@ -23,14 +23,14 @@ namespace HurlingApi.Models
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string GaaTeam { get; set; }
-        public Nullable<decimal> LastWeekPoints { get; set; }
-        public Nullable<decimal> OverallPoints { get; set; }
+        public decimal LastWeekPoints { get; set; }
+        public decimal OverallPoints { get; set; }
         public decimal Price { get; set; }
         public byte Rating { get; set; }
         public bool Injured { get; set; }
         public int PositionId { get; set; }
     
-        public Position Position { get; set; }
-        public ICollection<TeamPlayer> TeamPlayers { get; set; }
+        public virtual Position Position { get; set; }
+        public virtual ICollection<TeamPlayer> TeamPlayers { get; set; }
     }
 }

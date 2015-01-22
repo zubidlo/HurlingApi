@@ -491,6 +491,15 @@
         <member name="T:HurlingApi.Controllers.PlayersController">
             <summary></summary>
         </member>
+        <member name="M:HurlingApi.Controllers.PlayersController.GetPlayers">
+            <summary></summary>
+            <returns></returns>
+        </member>
+        <member name="M:HurlingApi.Controllers.PlayersController.GetPlayerById(System.Int32)">
+            <summary></summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="T:HurlingApi.Controllers.PositionsController">
             <summary></summary>
         </member>

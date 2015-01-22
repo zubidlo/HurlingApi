@@ -24,7 +24,7 @@ namespace HurlingApi.Models
         public string Username { get; set; }
         public string Password { get; set; }
     
-        public ICollection<Message> Messages { get; set; }
-        public Team Team { get; set; }
+        public virtual ICollection<Message> Messages { get; set; }
+        public virtual Team Team { get; set; }
     }
 }

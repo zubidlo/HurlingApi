@@ -83,8 +83,8 @@
     <Property Name="FirstName" Type="nvarchar(max)" Nullable="false" />
     <Property Name="LastName" Type="nvarchar(max)" Nullable="false" />
     <Property Name="GaaTeam" Type="nvarchar(max)" Nullable="false" />
-    <Property Name="LastWeekPoints" Type="decimal" Nullable="true" />
-    <Property Name="OverallPoints" Type="decimal" Nullable="true" />
+    <Property Name="LastWeekPoints" Type="decimal" Nullable="false" />
+    <Property Name="OverallPoints" Type="decimal" Nullable="false" />
     <Property Name="Price" Type="decimal" Nullable="false" />
     <Property Name="Rating" Type="tinyint" Nullable="false" />
     <Property Name="Injured" Type="bit" Nullable="false" />
@@ -301,12 +301,12 @@
               <Summary>Real GAA team name this player plays for, can't be omitted.</Summary>
             </Documentation>
           </Property>
-          <Property Name="LastWeekPoints" Type="Decimal" Nullable="true" >
+          <Property Name="LastWeekPoints" Type="Decimal" Nullable="false" >
             <Documentation>
               <Summary>Point acquired in real matches last week, can be omitted.</Summary>
             </Documentation>
           </Property>
-          <Property Name="OverallPoints" Type="Decimal" Nullable="true" >
+          <Property Name="OverallPoints" Type="Decimal" Nullable="false" >
             <Documentation>
               <Summary>Summary of all weekly points, can be omitted.</Summary>
             </Documentation>

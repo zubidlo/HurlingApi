@@ -23,6 +23,8 @@ namespace HurlingApi.Controllers
         private readonly Repositiory<Player> _repository = new Repositiory<Player>(new HurlingModelContext());
         private readonly PlayerDTOFactory _factory = new PlayerDTOFactory();
 
+        /// <summary></summary>
+        /// <returns></returns>
         [Route("")]
         [HttpGet]
         public async Task<IQueryable<PlayerDTO>> GetPlayers()
@@ -31,6 +33,9 @@ namespace HurlingApi.Controllers
             return _factory.GetCollection(players).AsQueryable<PlayerDTO>();
         }
 
+        /// <summary></summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpGet]
         [ResponseType(typeof(PlayerDTO))]
