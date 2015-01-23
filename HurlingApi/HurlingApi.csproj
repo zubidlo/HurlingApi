@@ -221,6 +221,7 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\LeaguesController.cs" />
     <Compile Include="Controllers\PlayersController.cs" />
     <Compile Include="Controllers\PositionsController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
@@ -244,6 +245,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>HurlingModel.edmx</DependentUpon>
     </Compile>
+    <Compile Include="Models\LeagueDTO.cs" />
+    <Compile Include="Models\LeagueDTOFactory.cs" />
     <Compile Include="Models\PlayerDTO.cs" />
     <Compile Include="Models\PlayerDTOFactory.cs" />
     <Compile Include="Models\PositionDTOFactory.cs" />

@@ -488,6 +488,18 @@
             <summary></summary>
             <returns></returns>
         </member>
+        <member name="T:HurlingApi.Controllers.LeaguesController">
+            <summary></summary>
+        </member>
+        <member name="M:HurlingApi.Controllers.LeaguesController.GetLeagues">
+            <summary></summary>
+            <returns></returns>
+        </member>
+        <member name="M:HurlingApi.Controllers.LeaguesController.GetLeagueById(System.Int32)">
+            <summary></summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="T:HurlingApi.Controllers.PlayersController">
             <summary></summary>
         </member>
@@ -608,6 +620,34 @@
         <member name="M:HurlingApi.Models.AbstractFactoryDTO`2.GetCollection(System.Collections.Generic.IEnumerable{`0})">
             <summary></summary>
             <param name="models"></param>
+            <returns></returns>
+        </member>
+        <member name="T:HurlingApi.Models.LeagueDTO">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.LeagueDTO.Id">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.LeagueDTO.Name">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.LeagueDTO.NextFixtures">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.LeagueDTO.Week">
+            <summary></summary>
+        </member>
+        <member name="T:HurlingApi.Models.LeagueDTOFactory">
+            <summary></summary>
+        </member>
+        <member name="M:HurlingApi.Models.LeagueDTOFactory.GetDTO(HurlingApi.Models.League)">
+            <summary></summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HurlingApi.Models.LeagueDTOFactory.GeTModel(HurlingApi.Models.LeagueDTO)">
+            <summary></summary>
+            <param name="dto"></param>
             <returns></returns>
         </member>
         <member name="T:HurlingApi.Models.PlayerDTO">
