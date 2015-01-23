@@ -12,18 +12,28 @@ namespace HurlingApi.Models
     using System;
     using System.Collections.Generic;
     
+    /// <summary></summary>
     public partial class League
     {
+        /// <summary></summary>
         public League()
         {
             this.Teams = new HashSet<Team>();
         }
     
+        /// <summary></summary>
         public int Id { get; set; }
+
+        /// <summary></summary>
         public string Name { get; set; }
-        public Nullable<System.DateTimeOffset> NextFixtures { get; set; }
-        public Nullable<byte> Week { get; set; }
+
+        /// <summary></summary>
+        public DateTime NextFixtures { get; set; }
+
+        /// <summary></summary>
+        public byte Week { get; set; }
     
+        /// <summary></summary>
         public virtual ICollection<Team> Teams { get; set; }
     }
 }

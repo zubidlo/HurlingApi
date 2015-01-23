@@ -610,6 +610,39 @@
             <param name="models"></param>
             <returns></returns>
         </member>
+        <member name="T:HurlingApi.Models.PlayerDTO">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.PlayerDTO.Id">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.PlayerDTO.FirstName">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.PlayerDTO.LastName">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.PlayerDTO.GaaTeam">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.PlayerDTO.LastWeekPoints">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.PlayerDTO.OverallPoints">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.PlayerDTO.Price">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.PlayerDTO.Rating">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.PlayerDTO.Injured">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.PlayerDTO.PositionId">
+            <summary></summary>
+        </member>
         <member name="T:HurlingApi.Models.PlayerDTOFactory">
             <summary></summary>
         </member>
@@ -703,6 +736,132 @@
             <param name="t">A repository entity type.</param>
             <returns>Integer result code.</returns>
             <exception cref="T:System.InvalidOperationException">Error occured during deleting from repository.</exception>
+        </member>
+        <member name="T:HurlingApi.Models.League">
+            <summary></summary>
+        </member>
+        <member name="M:HurlingApi.Models.League.#ctor">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.League.Id">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.League.Name">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.League.NextFixtures">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.League.Week">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.League.Teams">
+            <summary></summary>
+        </member>
+        <member name="T:HurlingApi.Models.Player">
+            <summary></summary>
+        </member>
+        <member name="M:HurlingApi.Models.Player.#ctor">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.Player.Id">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.Player.FirstName">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.Player.LastName">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.Player.GaaTeam">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.Player.LastWeekPoints">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.Player.OverallPoints">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.Player.Price">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.Player.Rating">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.Player.Injured">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.Player.PositionId">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.Player.Position">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.Player.TeamPlayers">
+            <summary></summary>
+        </member>
+        <member name="T:HurlingApi.Models.Position">
+            <summary></summary>
+        </member>
+        <member name="M:HurlingApi.Models.Position.#ctor">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.Position.Id">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.Position.Name">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.Position.Players">
+            <summary></summary>
+        </member>
+        <member name="T:HurlingApi.Models.PositionDTO">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.PositionDTO.Id">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.PositionDTO.Name">
+            <summary></summary>
+        </member>
+        <member name="T:HurlingApi.Models.User">
+            <summary></summary>
+        </member>
+        <member name="M:HurlingApi.Models.User.#ctor">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.User.Id">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.User.Email">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.User.Username">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.User.Password">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.User.Messages">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.User.Team">
+            <summary></summary>
+        </member>
+        <member name="T:HurlingApi.Models.UserDTO">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.UserDTO.Id">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.UserDTO.Email">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.UserDTO.Username">
+            <summary></summary>
+        </member>
+        <member name="P:HurlingApi.Models.UserDTO.Password">
+            <summary></summary>
         </member>
         <member name="T:HurlingApi.Models.UserDTOFactory">
             <summary></summary>

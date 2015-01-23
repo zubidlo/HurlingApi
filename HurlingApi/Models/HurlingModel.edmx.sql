@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 01/22/2015 00:02:49
+-- Date Created: 01/23/2015 20:57:04
 -- Generated from EDMX file: C:\Users\martin\Documents\Visual Studio 2013\Projects\HurlingApi\HurlingApi\Models\HurlingModel.edmx
 -- --------------------------------------------------
 
@@ -86,8 +86,8 @@ GO
 CREATE TABLE [dbo].[Leagues] (
     [Id] int IDENTITY(1,1) NOT NULL,
     [Name] nvarchar(max)  NOT NULL,
-    [NextFixtures] datetimeoffset  NULL,
-    [Week] tinyint  NULL
+    [NextFixtures] datetime  NOT NULL,
+    [Week] tinyint  NOT NULL
 );
 GO
 

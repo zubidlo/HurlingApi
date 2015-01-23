@@ -60,8 +60,8 @@
     </Key>
     <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
-    <Property Name="NextFixtures" Type="datetimeoffset" Nullable="true" />
-    <Property Name="Week" Type="tinyint" Nullable="true" />
+    <Property Name="NextFixtures" Type="datetime" Nullable="false" />
+    <Property Name="Week" Type="tinyint" Nullable="false" />
   </EntityType>
   <EntityType Name="Teams">
     <Key>
@@ -252,8 +252,8 @@
               <Summary>A name, can't be omitted.</Summary>
             </Documentation>
           </Property>
-          <Property Name="NextFixtures" Type="DateTimeOffset" Nullable="true" />
-          <Property Name="Week" Type="Byte" Nullable="true" >
+          <Property Name="NextFixtures" Type="DateTime" Nullable="false" />
+          <Property Name="Week" Type="Byte" Nullable="false" >
             <Documentation>
               <Summary>Current week the League is in.</Summary>
             </Documentation>
