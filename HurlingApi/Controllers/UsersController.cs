@@ -52,7 +52,7 @@ namespace HurlingApi.Controllers
             }
             catch (InvalidOperationException)
             {
-                return InternalServerError(new Exception("Repository is broken! There is more than one user with Id=" + id + " in the repository"));
+                return InternalServerError(new Exception("Repository is broken! There is more than one league with Id=" + id + " in the repository"));
             }
         }
 
@@ -75,13 +75,13 @@ namespace HurlingApi.Controllers
             }
             catch (InvalidOperationException)
             {
-                return InternalServerError(new Exception("Repository is broken! There is more than one user with Username=" + username + " in the repository."));
+                return InternalServerError(new Exception("Repository is broken! There is more than one league with Username=" + username + " in the repository."));
             }
         }
 
         /// <summary></summary>
         /// <param name="id"></param>
-        /// <param name="userDTO"></param>
+        /// <param name="leagueDTO"></param>
         /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpPut]
@@ -90,7 +90,7 @@ namespace HurlingApi.Controllers
         {
             if (userDTO.Id != id)
             {
-                return BadRequest("User Id from request URI: " + id + " doesn't match user Id from request body: " + userDTO.Id + "!");
+                return BadRequest("User Id from request URI: " + id + " doesn't match league Id from request body: " + userDTO.Id + "!");
             }
 
             if (!ModelState.IsValid)
@@ -111,12 +111,12 @@ namespace HurlingApi.Controllers
                 var user1 = await _repository.FindAsync(u => u.Username == userDTO.Username);
                 if ((user1 != null) && (user1.Id != userDTO.Id) && (user1.Username == userDTO.Username))
                 {
-                    return BadRequest("There is already an user with username:" + userDTO.Username + " in the repository!");
+                    return BadRequest("There is already an league with username:" + userDTO.Username + " in the repository!");
                 }
             }
             catch (InvalidOperationException)
             {
-                return InternalServerError(new Exception("Repository is broken! There is more than one user with Username=" + userDTO.Username + " in the repository."));
+                return InternalServerError(new Exception("Repository is broken! There is more than one league with Username=" + userDTO.Username + " in the repository."));
             }
             
             user.Username = userDTO.Username;
@@ -135,7 +135,7 @@ namespace HurlingApi.Controllers
         }
 
         /// <summary></summary>
-        /// <param name="userDTO"></param>
+        /// <param name="leagueDTO"></param>
         /// <returns></returns>
         [Route("")]
         [HttpPost]
@@ -152,12 +152,12 @@ namespace HurlingApi.Controllers
                 var user = await _repository.FindAsync(u => u.Username == userDTO.Username);
                 if (user != null)
                 {
-                    return BadRequest("There is already an user with username:" + userDTO.Username + " in the repository.");
+                    return BadRequest("There is already an league with username:" + userDTO.Username + " in the repository.");
                 }
             }
             catch(InvalidOperationException ) 
             {
-                return InternalServerError(new Exception("Repository is broken! There is more than one user with Username=" + userDTO.Username));
+                return InternalServerError(new Exception("Repository is broken! There is more than one league with Username=" + userDTO.Username));
             }
 
             var newUser = _factory.GeTModel(userDTO);
@@ -192,7 +192,7 @@ namespace HurlingApi.Controllers
             }
             catch(InvalidOperationException e) 
             {
-                return BadRequest("Deleting user with Id=" + id + " would break referential integrity of the repository. Check the relations between this user and other entities.");
+                return BadRequest("Deleting league with Id=" + id + " would break referential integrity of the repository. Check the relations between this league and other entities.");
             }
         }
 
