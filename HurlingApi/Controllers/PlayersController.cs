@@ -19,8 +19,10 @@ namespace HurlingApi.Controllers
     [RoutePrefix("api/players")]
     public class PlayersController : ApiController
     {
-        private readonly Repositiory<Player> _playersRepository = new Repositiory<Player>(new HurlingModelContext());
-        private readonly Repositiory<Position> _positionsRepository = new Repositiory<Position>(new HurlingModelContext());
+        private readonly Repositiory<Player> _playersRepository =
+            new Repositiory<Player>(new HurlingModelContext());
+        private readonly Repositiory<Position> _positionsRepository =
+            new Repositiory<Position>(new HurlingModelContext());
         private readonly PlayerDTOFactory _factory = new PlayerDTOFactory();
         private bool _disposed;
 
@@ -66,8 +68,8 @@ namespace HurlingApi.Controllers
             //if doesn't exist send not found response
             if (player == null) { return NotFound(); }
 
-            //send response
             PlayerDTO playerDTO = _factory.GetDTO(player);
+            //send ok response
             return Ok(playerDTO);
         }
 
@@ -77,7 +79,11 @@ namespace HurlingApi.Controllers
         public async Task<IHttpActionResult> EditPlayer([FromUri] int id, [FromBody] PlayerDTO playerDTO)
         {
             //if id from URI matches Id from request body send bad request response
-            if (id != playerDTO.Id) { return BadRequest("The id from URI: " + id + " doesn't match the Id from request body: " + playerDTO.Id + "!"); }
+            if (id != playerDTO.Id)
+            {
+                return BadRequest("The id from URI: " + id + " doesn't match the Id from " + 
+                                    "request body: " + playerDTO.Id + "!");
+            }
 
             //if model state is not valid send bad request response
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
@@ -95,7 +101,10 @@ namespace HurlingApi.Controllers
             bool exist = await _positionsRepository.ExistAsync(p => p.Id == playerDTO.PositionId);
 
             //if doesn't exists send bad request response
-            if (!exist) { return BadRequest("Postion with Id=" + playerDTO.PositionId + " doesn't exist in the repository."); }
+            if (!exist)
+            {
+                return BadRequest("Postion with Id=" + playerDTO.PositionId + " doesn't exist in the repository.");
+            }
 
             //now playerDTO is ok, set player's properties
             player.FirstName = playerDTO.FirstName;
@@ -128,7 +137,10 @@ namespace HurlingApi.Controllers
             bool exist = await _positionsRepository.ExistAsync(p => p.Id == playerDTO.PositionId);
 
             //if doesn't exists send bad request response
-            if (!exist) { return BadRequest("Postion with Id=" + playerDTO.PositionId + " doesn't exist in the repository."); }
+            if (!exist)
+            {
+                return BadRequest("Postion with Id=" + playerDTO.PositionId + " doesn't exist in the repository.");
+            }
 
             //playerDTO is ok, make new player
             Player player = _factory.GeTModel(playerDTO);
@@ -160,10 +172,13 @@ namespace HurlingApi.Controllers
 
             //try to delete the player
             try { int result = await _playersRepository.RemoveAsync(player); }
-            catch (Exception) { return BadRequest("Deleting player with Id=" + id + " would break referential integrity of the repository. Check PlayersInTeams entity for references."); }
+            catch (Exception)
+            {
+                return BadRequest("Deleting player with Id=" + id + " would break referential integrity " +
+                                    "of the repository. Check PlayersInTeams entity for references.");
+            }
 
             PlayerDTO playerDTO = _factory.GetDTO(player);
-
             //send ok response
             return Ok(playerDTO);
         }

@@ -18,8 +18,10 @@ namespace HurlingApi.Controllers
     [RoutePrefix("api/positions")]
     public class PositionsController : ApiController
     {
-        private readonly Repositiory<Position> _positionsRepository = new Repositiory<Position>(new HurlingModelContext());
-        private readonly Repositiory<Player> _playersRepository = new Repositiory<Player>(new HurlingModelContext());
+        private readonly Repositiory<Position> _positionsRepository =
+            new Repositiory<Position>(new HurlingModelContext());
+        private readonly Repositiory<Player> _playersRepository =
+            new Repositiory<Player>(new HurlingModelContext());
         private readonly PositionDTOFactory _factory = new PositionDTOFactory();
         private bool _disposed;
 
@@ -56,25 +58,19 @@ namespace HurlingApi.Controllers
         [ResponseType(typeof(PositionDTO))]
         public async Task<IHttpActionResult> GetPositionById(int id)
         {
-            try
-            {
-                //get requested position
-                Position position = await _positionsRepository.FindSingleAsync(p => p.Id == id);
+            Position position;
 
-                //check if exists
-                if (position == null)
-                {
-                    return NotFound();
-                }
+            //try to get requested position
+            try { position = await _positionsRepository.FindSingleAsync(p => p.Id == id); }
+            catch (InvalidOperationException) { throw; }
 
-                PositionDTO positionDTO = _factory.GetDTO(position);
-                return Ok(positionDTO);
-            }
-            catch (InvalidOperationException)
-            {
-                //internal server error
-                throw;
-            }
+            //if doesn't exist send not found response
+            if (position == null) { return NotFound(); }
+
+            PositionDTO positionDTO = _factory.GetDTO(position);
+            //send ok response
+            return Ok(positionDTO);
+            
         }
 
         [Route("name/{name}")]
@@ -82,25 +78,18 @@ namespace HurlingApi.Controllers
         [ResponseType(typeof(PositionDTO))]
         public async Task<IHttpActionResult> GetPositionByName([FromUri] string name)
         {
-            try
-            {
-                //get requested position
-                Position position = await _positionsRepository.FindSingleAsync(p => p.Name == name);
+            Position position;
 
-                //check if exists
-                if (position == null)
-                {
-                    return NotFound();
-                }
+            //try to get requested position
+            try { position = await _positionsRepository.FindSingleAsync(p => p.Name == name); }
+            catch (InvalidOperationException) { throw; }
 
-                PositionDTO positionDTO = _factory.GetDTO(position);
-                return Ok(positionDTO);
-            }
-            catch (InvalidOperationException)
-            {
-                //internal server error
-                throw;
-            }
+            //if doesn't exist send not found response
+            if (position == null) { return NotFound(); }
+
+            PositionDTO positionDTO = _factory.GetDTO(position);
+            //send ok response
+            return Ok(positionDTO);
         }
 
         [Route("id/{id:int}")]
@@ -108,51 +97,45 @@ namespace HurlingApi.Controllers
         [ResponseType(typeof(void))]
         public async Task<IHttpActionResult> EditPosition([FromUri] int id, [FromBody] PositionDTO positionDTO)
         {
-            //check if id from URI matches Id from request body
-            if (id != positionDTO.Id)
-            {
-                return BadRequest("The id from URI: " + id + " doesn'singleItem match the Id from request body: " + positionDTO.Id + "!");
+            //if id from URI matches Id from request body send bad request response
+            if (id != positionDTO.Id) 
+            { 
+                return BadRequest("The id from URI: " + id + " doesn'singleItem match " +
+                                "the Id from request body: " + positionDTO.Id + "!"); 
             }
 
-            //check if model state is valid
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
+            //if model state is not valid send bad request response
+            if (!ModelState.IsValid) { return BadRequest(ModelState); }
+
+            Position position, position1;
+
+            //try to get requested position
+            try { position = await _positionsRepository.FindSingleAsync(p => p.Id == id); }
+            catch (InvalidOperationException) { throw; }
+                
+            //if doesn't exists send not found response
+            if (position == null) { return NotFound(); }
+                
+            //try to get a position with same name
+            try { position1 = await _positionsRepository.FindSingleAsync(p => p.Name == positionDTO.Name); }
+            catch (InvalidOperationException) { throw; }
+                
+            //if that exist and if it is different that one we are editing send bad request response
+            if (position1 != null && position1.Id != id) 
+            { 
+                return BadRequest("There is already a position with Name:" + positionDTO.Name + " in " +
+                                    "the repository! We allow only unique position names.");
             }
 
-            try
-            {
-                //get requested position
-                var position = await _positionsRepository.FindSingleAsync(p => p.Id == id);
+            //positionDTO is ok, update the position
+            position.Name = positionDTO.Name;
 
-                //check if exists
-                if (position == null)
-                {
-                    return NotFound();
-                }
+            //try to update the position in the repository
+            try { int result = await _positionsRepository.UpdateAsync(position); }
+            catch (Exception) { throw; }
 
-                //get a position with same name
-                var position1 = await _positionsRepository.FindSingleAsync(p => p.Name == positionDTO.Name);
-
-                //check if exist and if it is different that one we are editing
-                if (position1 != null && position1.Id != id)
-                {
-                    return BadRequest("There is already a position with Name:" + positionDTO.Name + " in the repository! We allow only unique positio names.");
-                }
-
-                //positionDTO is ok, update the position
-                position.Name = positionDTO.Name;
-
-                //position must be the reference to actual position in the repository. UpdateAsync will throw exception otherwise.
-                //I can'singleItem just UpdateAsync(new Position());
-                await _positionsRepository.UpdateAsync(position);
-                return StatusCode(HttpStatusCode.NoContent);
-            }
-            catch (Exception)
-            {
-                //internal server error
-                throw;
-            }
+            //send no content response
+            return StatusCode(HttpStatusCode.NoContent);
         }
 
         [Route("")]
@@ -160,37 +143,33 @@ namespace HurlingApi.Controllers
         [ResponseType(typeof(PositionDTO))]
         public async Task<IHttpActionResult> PostPosition([FromBody] PositionDTO positionDTO)
         {
-            //check if model state is valid
-            if (!ModelState.IsValid)
+            //if model state is not valid send bad request response
+            if (!ModelState.IsValid) { return BadRequest(ModelState); }
+
+            Position position;
+
+            //try to get a position with same name
+            try { position = await _positionsRepository.FindSingleAsync(p => p.Name == positionDTO.Name); }
+            catch (InvalidOperationException) { throw; }
+                
+            //if exists send bad request response
+            if (position != null) 
             {
-                return BadRequest(ModelState);
+                return BadRequest("There is already a position with Name:" + positionDTO.Name + " in " +
+                                    "the repository! We allow only unique position names.");
             }
 
-            try
-            {
-                //get a position with same name
-                Position position = await _positionsRepository.FindSingleAsync(p => p.Name == positionDTO.Name);
+            position = _factory.GeTModel(positionDTO);
 
-                //check if exists
-                if (position != null)
-                {
-                    return BadRequest("There is already a position with Name:" + positionDTO.Name + " in the repository! We allow only unique position names.");
-                }
+            //try to insert the position into the repository
+            try { int result = await _positionsRepository.InsertAsync(position); }
+            catch (Exception) { throw; }    
 
-                //positionDTO is ok, insert the position
-                position = _factory.GeTModel(positionDTO);
-                await _positionsRepository.InsertAsync(position);
+            //InsertAsync(position) created new id, so positionDTO must reflect that
+            positionDTO = _factory.GetDTO(position);
 
-                //InsertAsync(position) created new id, so positionDTO must reflect that
-                positionDTO = _factory.GetDTO(position);
-
-                return CreatedAtRoute("DefaultRoute", new { id = position.Id }, positionDTO);
-            }
-            catch (Exception)
-            {
-                //internal server error
-                throw;
-            }
+            //send created at route response
+            return CreatedAtRoute("DefaultRoute", new { id = position.Id }, positionDTO);
         }
 
         [Route("id/{id:int}")]
@@ -198,36 +177,33 @@ namespace HurlingApi.Controllers
         [ResponseType(typeof(PositionDTO))]
         public async Task<IHttpActionResult> DeletePosition([FromUri] int id)
         {
-            try
+            Position position;
+
+            //try to get requested position
+            try { position = await _positionsRepository.FindSingleAsync(p => p.Id == id); }
+            catch (InvalidOperationException) { throw; }
+            
+            //if doesn't exists send not found response
+            if (position == null) { return NotFound(); }
+
+            //check if any player references this position
+            bool exist = await _playersRepository.ExistAsync(p => p.PositionId == id);
+
+            //if exists send bad request response
+            if (exist)
             {
-                //get requested position
-                Position position = await _positionsRepository.FindSingleAsync(p => p.Id == id);
-
-                //check if exists
-                if (position == null)
-                {
-                    return NotFound();
-                }
-
-                //check if any player references this position
-                bool exist = await _playersRepository.ExistAsync(p => p.PositionId == id);
-
-                //check if exists
-                if (exist)
-                {
-                    return BadRequest("Can't delete this position, because there are still some players referencing the position!");
-                }
-
-                //everything is ok, let's remove the position
-                await _positionsRepository.RemoveAsync(position);
-                PositionDTO positionDTO = _factory.GetDTO(position);
-                return Ok(positionDTO);
+                return BadRequest("Can't delete this position, because there are " +
+                                "still some players referencing the position!");
             }
-            catch (Exception)
-            {
-                //internal server error
-                throw;
-            }
+
+            //try to remove the position from the repository
+            try {int result = await _positionsRepository.RemoveAsync(position); }
+            catch (Exception) { throw; }    
+            
+            PositionDTO positionDTO = _factory.GetDTO(position);
+            
+            //send ok response
+            return Ok(positionDTO);
         }
     }
 }
