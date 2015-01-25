@@ -52,7 +52,8 @@ namespace HurlingApi.Controllers
         {
             IEnumerable<League> leagues = await _leaguesRepository.GetAllAsync();
             IEnumerable<LeagueDTO> leagueDTOs = _factory.GetDTOCollection(leagues);
-            return leagueDTOs.AsQueryable<LeagueDTO>();
+            IQueryable<LeagueDTO> oDataLeagueDTOs = leagueDTOs.AsQueryable<LeagueDTO>();
+            return oDataLeagueDTOs;
         }
 
         [Route("id/{id:int}")]

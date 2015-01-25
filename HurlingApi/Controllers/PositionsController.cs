@@ -50,7 +50,8 @@ namespace HurlingApi.Controllers
         {
             IEnumerable<Position> positions = await _positionsRepository.GetAllAsync();
             IEnumerable<PositionDTO> positionDTOs = _factory.GetDTOCollection(positions);
-            return positionDTOs.AsQueryable<PositionDTO>();
+            IQueryable<PositionDTO> oDataPositionDTOs = positionDTOs.AsQueryable<PositionDTO>();
+            return oDataPositionDTOs;
         }
 
         [Route("id/{id:int}")]
