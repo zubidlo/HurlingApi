@@ -19,8 +19,10 @@ namespace HurlingApi.Controllers
     [RoutePrefix("api/users")]
     public class UsersController : ApiController
     {
-        private readonly Repositiory<User> _usersRepository = new Repositiory<User>(new HurlingModelContext());
-        private readonly Repositiory<Team> _teamsRepository = new Repositiory<Team>(new HurlingModelContext());
+        private readonly Repositiory<User> _usersRepository = 
+            new Repositiory<User>(new HurlingModelContext());
+        private readonly Repositiory<Team> _teamsRepository = 
+            new Repositiory<Team>(new HurlingModelContext());
         private readonly UserDTOFactory _factory = new UserDTOFactory();
         private bool _disposed;
 
@@ -49,7 +51,8 @@ namespace HurlingApi.Controllers
         {
             IEnumerable<User> users = await _usersRepository.GetAllAsync();
             IEnumerable<UserDTO> userDTOs = _factory.GetDTOCollection(users);
-            return userDTOs.AsQueryable<UserDTO>();
+            IQueryable<UserDTO> oDataUserDTOs = userDTOs.AsQueryable<UserDTO>();
+            return oDataUserDTOs;
         }
 
         [Route("id/{id:int}")]
@@ -57,25 +60,17 @@ namespace HurlingApi.Controllers
         [ResponseType(typeof(UserDTO))]
         public async Task<IHttpActionResult> GetUserById([FromUri] int id)
         {
-            try
-            {
-                //get requested user
-                User user = await _usersRepository.FindSingleAsync(u => u.Id == id);
+            User user;
+            //try to get requested user
+            try { user = await _usersRepository.FindSingleAsync(u => u.Id == id); }
+            catch (InvalidOperationException) { throw; }
 
-                //check if exists
-                if (user == null)
-                {
-                    return NotFound();
-                }
+            //if doesn't exist send not found response
+            if (user == null) { return NotFound(); }
 
-                UserDTO userDTO = _factory.GetDTO(user);
-                return Ok(userDTO);
-            }
-            catch (InvalidOperationException)
-            {
-                //internal server error
-                throw;
-            }
+            UserDTO userDTO = _factory.GetDTO(user);
+            //send ok response
+            return Ok(userDTO);
         }
 
         [Route("username/{username}")]
@@ -83,25 +78,17 @@ namespace HurlingApi.Controllers
         [ResponseType(typeof(UserDTO))]
         public async Task<IHttpActionResult> GetUserByUsername([FromUri] string username)
         {
-            try
-            {
-                //get requested user
-                User user = await _usersRepository.FindSingleAsync(u => u.Username == username);
+            User user;
+            //try to get requested user
+            try { user = await _usersRepository.FindSingleAsync(u => u.Username == username); }
+            catch (InvalidOperationException) { throw; }
 
-                //check if exists
-                if (user == null)
-                {
-                    return NotFound();
-                }
+            //if doesn't exist send not found response
+            if (user == null) { return NotFound(); }
 
-                UserDTO userDTO = _factory.GetDTO(user);
-                return Ok(userDTO);
-            }
-            catch (InvalidOperationException)
-            {
-                //internal server error
-                throw;
-            }
+            UserDTO userDTO = _factory.GetDTO(user);
+            //send ok response
+            return Ok(userDTO);
         }
 
         [Route("id/{id:int}")]
@@ -109,53 +96,47 @@ namespace HurlingApi.Controllers
         [ResponseType(typeof(void))]
         public async Task<IHttpActionResult> EditUser([FromUri] int id, [FromBody] UserDTO userDTO)
         {
-            //check if id from URI matches Id from request body
+            //if id from URI matches Id from request body send bad request response
             if (id != userDTO.Id)
             {
-                return BadRequest("The id from URI: " + id + " doesn'singleItem match the Id from request body: " + userDTO.Id + "!");
+                return BadRequest("The id from URI: " + id + " doesn't match " +
+                                "the Id from request body: " + userDTO.Id + "!");
             }
 
-            //check if model state is valid
-            if (!ModelState.IsValid)
+            //if model state is not valid send bad request response
+            if (!ModelState.IsValid) { return BadRequest(ModelState); }
+
+            User user, user1;
+
+            //try to get requested user
+            try { user = await _usersRepository.FindSingleAsync(u => u.Id == id); }
+            catch (InvalidOperationException) { throw; }
+
+            //if doesn't exist send not found response
+            if (user == null) { return NotFound(); }
+
+            // try to get user with same username
+            try { user1 = await _usersRepository.FindSingleAsync(u => u.Username == userDTO.Username); }
+            catch (InvalidOperationException) { throw; }   
+
+            //if exists and if it is different that one we are editing send bad request response
+            if (user1 != null && user1.Id != id)
             {
-                return BadRequest(ModelState);
+                return BadRequest("There is already an user with name:" + userDTO.Username + " in the " +
+                                    "repository! We allow only unique usernames.");
             }
 
-            try
-            {
-                //get requested user
-                User user = await _usersRepository.FindSingleAsync(u => u.Id == id);
+            //userDTO seems ok, update the user's properties
+            user.Username = userDTO.Username;
+            user.Password = userDTO.Password;
+            user.Email = userDTO.Email;
 
-                //check if exists
-                if (user == null)
-                {
-                    return NotFound();
-                }
+            //try to update the user in the repository
+            try { int result = await _usersRepository.UpdateAsync(user); }
+            catch (Exception) { throw; }
 
-                //get user with same username
-                var user1 = await _usersRepository.FindSingleAsync(u => u.Username == userDTO.Username);
-
-                //check if exists and if it is different that one we are editing
-                if (user1 != null && user1.Id != id)
-                {
-                    return BadRequest("There is already an user with name:" + userDTO.Username + " in the repository! We allow only unique usernames.");
-                }
-
-                //userDTO seems ok, update the user
-                user.Username = userDTO.Username;
-                user.Password = userDTO.Password;
-                user.Email = userDTO.Email;
-
-                //user must be the reference to actual user in the repository. UpdateAsync will throw exception otherwise.
-                //I can'singleItem just UpdateAsync(new User());
-                await _usersRepository.UpdateAsync(user);
-                return StatusCode(HttpStatusCode.NoContent);
-            }
-            catch (Exception)
-            {
-                //internal server error
-                throw;
-            }
+            //send no content response
+            return StatusCode(HttpStatusCode.NoContent);
         }
 
         [Route("")]
@@ -163,37 +144,30 @@ namespace HurlingApi.Controllers
         [ResponseType(typeof(UserDTO))]
         public async Task<IHttpActionResult> PostUser([FromBody] UserDTO userDTO)
         {
-            //check if model state is valid
-            if (!ModelState.IsValid)
+            //if model state is not valid send bad request response
+            if (!ModelState.IsValid) { return BadRequest(ModelState); }
+
+            //find out if there is an user with the same username
+            bool exist = await _usersRepository.ExistAsync(u => u.Username == userDTO.Username);
+
+            //if exists send bad request response
+            if (exist)
             {
-                return BadRequest(ModelState);
+                return BadRequest("There is already an user with name:" + userDTO.Username + " in " +
+                                    "the repository. We allow only unique usernames.");
             }
 
-            try
-            {
-                //get a user with same username
-                User user = await _usersRepository.FindSingleAsync(u => u.Username == userDTO.Username);
+            User user = _factory.GeTModel(userDTO);
 
-                //check if exists
-                if (user != null)
-                {
-                    return BadRequest("There is already an user with name:" + userDTO.Username + " in the repository. We allow only unique usernames.");
-                }
-
-                //userDTO is ok, insert new user
-                user = _factory.GeTModel(userDTO);
-                await _usersRepository.InsertAsync(user);
+            //try to insert the user into the repository
+            try { int result = await _usersRepository.InsertAsync(user); }
+            catch(Exception ) { throw; }
                 
-                //InsertAsync(user) created new id, so userDTO must reflect that
-                userDTO = _factory.GetDTO(user);
+            //InsertAsync(user) created new id, so userDTO must reflect that
+            userDTO = _factory.GetDTO(user);
                 
-                return CreatedAtRoute("DefaultRoute", new { id = user.Id }, userDTO);
-            }
-            catch(Exception ) 
-            {
-                //internal server error
-                throw;
-            }
+            //send created at route response
+            return CreatedAtRoute("DefaultRoute", new { id = user.Id }, userDTO);
         }
 
         [Route("id/{id:int}")]
@@ -201,43 +175,32 @@ namespace HurlingApi.Controllers
         [ResponseType(typeof(UserDTO))]
         public async Task<IHttpActionResult> DeleteUser([FromUri] int id)
         {
-            try
+            User user;
+
+            //try to get requested user
+            try { user = await _usersRepository.FindSingleAsync(u => u.Id == id); }
+            catch (InvalidOperationException) { throw; }
+
+            //if doesn't exist send not found response
+            if (user == null) { return NotFound(); }
+
+            //find out if a the team referencing this user exist
+            bool exist = await _teamsRepository.ExistAsync(t => t.UserId == id);
+
+            //if exists send bad request response
+            if (exist)
             {
-                //get requested user
-                User user = await _usersRepository.FindSingleAsync(u => u.Id == id);
-
-                //check if exists
-                if (user == null)
-                {
-                    return NotFound();
-                }
-
-                try
-                {
-                    //find a team referencing this user
-                    Team team = await _teamsRepository.FindSingleAsync(t => t.UserId == id);
-
-                    //check if exists
-                    if (team != null)
-                    {
-                        return BadRequest("Can'singleItem delete this user, because team id=" + team.Id + " still referencing the user!");
-                    }
-                }
-                catch (InvalidOperationException)
-                {
-                    return BadRequest("Can'singleItem delete this user, because there are still some teams referencing the user!");
-                }
-
-                //everything is ok, remove the user
-                await _usersRepository.RemoveAsync(user);
-                UserDTO userDTO = _factory.GetDTO(user);
-                return Ok(userDTO);
+                return BadRequest("Can't delete this user, because some team still referencing the user!");
             }
-            catch(Exception) 
-            {
-                //internal server errror
-                throw;
-            }
+
+            //try to remove the user
+            try { int result = await _usersRepository.RemoveAsync(user); }
+            catch(Exception) { throw; }
+
+            UserDTO userDTO = _factory.GetDTO(user);
+
+            //send ok response
+            return Ok(userDTO);
         }
     }
 }
