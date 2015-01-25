@@ -59,7 +59,7 @@ namespace HurlingApi.Controllers
             try
             {
                 //get requested position
-                Position position = await _positionsRepository.FindAsync(p => p.Id == id);
+                Position position = await _positionsRepository.FindSingleAsync(p => p.Id == id);
 
                 //check if exists
                 if (position == null)
@@ -85,7 +85,7 @@ namespace HurlingApi.Controllers
             try
             {
                 //get requested position
-                Position position = await _positionsRepository.FindAsync(p => p.Name == name);
+                Position position = await _positionsRepository.FindSingleAsync(p => p.Name == name);
 
                 //check if exists
                 if (position == null)
@@ -111,7 +111,7 @@ namespace HurlingApi.Controllers
             //check if id from URI matches Id from request body
             if (id != positionDTO.Id)
             {
-                return BadRequest("The id from URI: " + id + " doesn't match the Id from request body: " + positionDTO.Id + "!");
+                return BadRequest("The id from URI: " + id + " doesn'singleItem match the Id from request body: " + positionDTO.Id + "!");
             }
 
             //check if model state is valid
@@ -123,7 +123,7 @@ namespace HurlingApi.Controllers
             try
             {
                 //get requested position
-                var position = await _positionsRepository.FindAsync(p => p.Id == id);
+                var position = await _positionsRepository.FindSingleAsync(p => p.Id == id);
 
                 //check if exists
                 if (position == null)
@@ -132,7 +132,7 @@ namespace HurlingApi.Controllers
                 }
 
                 //get a position with same name
-                var position1 = await _positionsRepository.FindAsync(p => p.Name == positionDTO.Name);
+                var position1 = await _positionsRepository.FindSingleAsync(p => p.Name == positionDTO.Name);
 
                 //check if exist and if it is different that one we are editing
                 if (position1 != null && position1.Id != id)
@@ -144,11 +144,11 @@ namespace HurlingApi.Controllers
                 position.Name = positionDTO.Name;
 
                 //position must be the reference to actual position in the repository. UpdateAsync will throw exception otherwise.
-                //I can't just UpdateAsync(new Position());
+                //I can'singleItem just UpdateAsync(new Position());
                 await _positionsRepository.UpdateAsync(position);
                 return StatusCode(HttpStatusCode.NoContent);
             }
-            catch (InvalidOperationException)
+            catch (Exception)
             {
                 //internal server error
                 throw;
@@ -169,7 +169,7 @@ namespace HurlingApi.Controllers
             try
             {
                 //get a position with same name
-                Position position = await _positionsRepository.FindAsync(p => p.Name == positionDTO.Name);
+                Position position = await _positionsRepository.FindSingleAsync(p => p.Name == positionDTO.Name);
 
                 //check if exists
                 if (position != null)
@@ -186,7 +186,7 @@ namespace HurlingApi.Controllers
 
                 return CreatedAtRoute("DefaultRoute", new { id = position.Id }, positionDTO);
             }
-            catch (InvalidOperationException)
+            catch (Exception)
             {
                 //internal server error
                 throw;
@@ -201,7 +201,7 @@ namespace HurlingApi.Controllers
             try
             {
                 //get requested position
-                var position = await _positionsRepository.FindAsync(p => p.Id == id);
+                Position position = await _positionsRepository.FindSingleAsync(p => p.Id == id);
 
                 //check if exists
                 if (position == null)
@@ -209,18 +209,11 @@ namespace HurlingApi.Controllers
                     return NotFound();
                 }
 
-                try
-                {
-                    //find a player referencing this position
-                    Player player = await _playersRepository.FindAsync(p => p.PositionId == id);
+                //check if any player references this position
+                bool exist = await _playersRepository.ExistAsync(p => p.PositionId == id);
 
-                    //check if exists
-                    if (player != null)
-                    {
-                        return BadRequest("Can't delete this position, because player id=" + player.Id + " still referencing the position!");
-                    }
-                }
-                catch (InvalidOperationException)
+                //check if exists
+                if (exist)
                 {
                     return BadRequest("Can't delete this position, because there are still some players referencing the position!");
                 }
@@ -230,7 +223,7 @@ namespace HurlingApi.Controllers
                 PositionDTO positionDTO = _factory.GetDTO(position);
                 return Ok(positionDTO);
             }
-            catch (InvalidOperationException)
+            catch (Exception)
             {
                 //internal server error
                 throw;

@@ -57,7 +57,7 @@ namespace HurlingApiUnitTests
         public async Task GetUserById()
         {
             int id = 1;
-            var user = await _repository.FindAsync(u => u.Id == id);
+            var user = await _repository.FindSingleAsync(u => u.Id == id);
             Assert.AreEqual(user.Id, id);
         }
 
@@ -65,7 +65,7 @@ namespace HurlingApiUnitTests
         public async Task GetUserByUsername()
         {
             string username = "zubidlo";
-            var user = await _repository.FindAsync(u => u.Username == username);
+            var user = await _repository.FindSingleAsync(u => u.Username == username);
             Assert.AreEqual(user.Username, username);
         }
 
@@ -81,7 +81,7 @@ namespace HurlingApiUnitTests
             };
 
             await _repository.InsertAsync(newUser);
-            var userBack = await _repository.FindAsync(u => u.Username == newUser.Username);
+            var userBack = await _repository.FindSingleAsync(u => u.Username == newUser.Username);
             Assert.AreEqual(newUser, userBack);
 
         }
@@ -91,7 +91,7 @@ namespace HurlingApiUnitTests
         public async Task DeleteAUser()
         {
             var id = 5;
-            var user = await _repository.FindAsync(u => u.Id == id);
+            var user = await _repository.FindSingleAsync(u => u.Id == id);
             var result = await _repository.RemoveAsync(user);
             Assert.AreEqual(result, 1);
         }

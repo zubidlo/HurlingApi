@@ -356,7 +356,7 @@ namespace HurlingApi.Areas.HelpPage
                 ConstructorInfo defaultCtor = type.GetConstructor(Type.EmptyTypes);
                 if (defaultCtor == null)
                 {
-                    // Cannot instantiate the type because it doesn't have a default constructor
+                    // Cannot instantiate the type because it doesn'singleItem have a default constructor
                     return null;
                 }
 

@@ -107,8 +107,8 @@ namespace HurlingApi.Areas.HelpPage
                 samples.Add(actionSample.Key.MediaType, WrapSampleIfString(actionSample.Value));
             }
 
-            // Do the sample generation based on formatters only if an action doesn't return an HttpResponseMessage.
-            // Here we cannot rely on formatters because we don't know what's in the HttpResponseMessage, it might not even use formatters.
+            // Do the sample generation based on formatters only if an action doesn'singleItem return an HttpResponseMessage.
+            // Here we cannot rely on formatters because we don'singleItem know what's in the HttpResponseMessage, it might not even use formatters.
             if (type != null && !typeof(HttpResponseMessage).IsAssignableFrom(type))
             {
                 object sampleObject = GetSampleObject(type);
@@ -382,7 +382,7 @@ namespace HurlingApi.Areas.HelpPage
             }
             catch
             {
-                // can't parse JSON, return the original string
+                // can'singleItem parse JSON, return the original string
                 return str;
             }
         }
@@ -397,7 +397,7 @@ namespace HurlingApi.Areas.HelpPage
             }
             catch
             {
-                // can't parse XML, return the original string
+                // can'singleItem parse XML, return the original string
                 return str;
             }
         }

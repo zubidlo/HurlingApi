@@ -26,8 +26,8 @@ namespace HurlingApi.Controllers
 
         protected override void Dispose(bool disposing)
         {
-            if (!_disposed)
-            {
+            if (!_disposed) 
+            { 
                 if (disposing)
                 {
                     _playersRepository.Dispose();
@@ -57,25 +57,18 @@ namespace HurlingApi.Controllers
         [ResponseType(typeof(PlayerDTO))]
         public async Task<IHttpActionResult> GetPlayerById(int id)
         {
-            try
-            {
-                //get requested player
-                Player player = await _playersRepository.FindAsync(p => p.Id == id);
+            Player player;
 
-                //check if exists
-                if (player == null)
-                {
-                    return NotFound();
-                }
+            //try to get requested player
+            try { player = await _playersRepository.FindSingleAsync(p => p.Id == id); }
+            catch (InvalidOperationException) { throw; }
 
-                PlayerDTO playerDTO = _factory.GetDTO(player);
-                return Ok(playerDTO);
-            }
-            catch (InvalidOperationException)
-            {
-                //internal server error
-                throw;
-            }
+            //if doesn't exist send not found response
+            if (player == null) { return NotFound(); }
+
+            //send response
+            PlayerDTO playerDTO = _factory.GetDTO(player);
+            return Ok(playerDTO);
         }
 
         [Route("id/{id:int}")]
@@ -83,59 +76,44 @@ namespace HurlingApi.Controllers
         [ResponseType(typeof(void))]
         public async Task<IHttpActionResult> EditPlayer([FromUri] int id, [FromBody] PlayerDTO playerDTO)
         {
-            //check if id from URI matches Id from request body
-            if (id != playerDTO.Id)
-            {
-                return BadRequest("The id from URI: " + id + " doesn't match the Id from request body: " + playerDTO.Id + "!");
-            }
+            //if id from URI matches Id from request body send bad request response
+            if (id != playerDTO.Id) { return BadRequest("The id from URI: " + id + " doesn't match the Id from request body: " + playerDTO.Id + "!"); }
 
-            //check if the model state is valid
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            //if model state is not valid send bad request response
+            if (!ModelState.IsValid) { return BadRequest(ModelState); }
 
-            try
-            {
-                //get requested player
-                Player player = await _playersRepository.FindAsync(p => p.Id == id);
+            Player player;
 
-                //check if exists
-                if (player == null)
-                {
-                    return NotFound();
-                }
+            //try to get requested player
+            try { player = await _playersRepository.FindSingleAsync(p => p.Id == id); }
+            catch (InvalidOperationException) { throw; }
 
-                //get a position the player is referencing
-                Position position = await _positionsRepository.FindAsync(p => p.Id == playerDTO.PositionId);
+            //if doesn't exists send not found response
+            if (player == null) { return NotFound(); }
 
-                //check if exists
-                if (position == null)
-                {
-                    return BadRequest("Postion with Id=" + playerDTO.PositionId + " doesn't exist in the repository.");
-                }
+            //find out if position with given id exists in the repository
+            bool exist = await _positionsRepository.ExistAsync(p => p.Id == playerDTO.PositionId);
 
-                //playerDTO is ok, update the player
-                player.FirstName = playerDTO.FirstName;
-                player.LastName = playerDTO.LastName;
-                player.GaaTeam = playerDTO.GaaTeam;
-                player.LastWeekPoints = playerDTO.LastWeekPoints;
-                player.OverallPoints = playerDTO.OverallPoints;
-                player.Price = playerDTO.Price;
-                player.Rating = playerDTO.Rating;
-                player.Injured = playerDTO.Injured;
-                player.PositionId = playerDTO.PositionId;
+            //if doesn't exists send bad request response
+            if (!exist) { return BadRequest("Postion with Id=" + playerDTO.PositionId + " doesn't exist in the repository."); }
 
-                //player must be the reference to actual player in the repository. UpdateAsync will throw exception otherwise.
-                //I can't just UpdateAsync(new Player());
-                await _playersRepository.UpdateAsync(player);
-                return StatusCode(HttpStatusCode.NoContent);
-            }
-            catch (InvalidOperationException)
-            {
-                //internal server error
-                throw;
-            }
+            //now playerDTO is ok, set player's properties
+            player.FirstName = playerDTO.FirstName;
+            player.LastName = playerDTO.LastName;
+            player.GaaTeam = playerDTO.GaaTeam;
+            player.LastWeekPoints = playerDTO.LastWeekPoints;
+            player.OverallPoints = playerDTO.OverallPoints;
+            player.Price = playerDTO.Price;
+            player.Rating = playerDTO.Rating;
+            player.Injured = playerDTO.Injured;
+            player.PositionId = playerDTO.PositionId;
+
+            //try to update repository
+            try { int result = await _playersRepository.UpdateAsync(player); }
+            catch (Exception) { throw; }
+
+            //send no content response
+            return StatusCode(HttpStatusCode.NoContent);
         }
 
         [Route("")]
@@ -143,37 +121,27 @@ namespace HurlingApi.Controllers
         [ResponseType(typeof(PlayerDTO))]
         public async Task<IHttpActionResult> PostPlayer([FromBody] PlayerDTO playerDTO)
         {
-            //check if the model state is valit
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            
-            try
-            {
-                //get a position the player is referencing
-                Position position = await _positionsRepository.FindAsync(p => p.Id == playerDTO.PositionId);
+            //if the model state is not valit send bad request response
+            if (!ModelState.IsValid) { return BadRequest(ModelState); }
 
-                //check if exists
-                if (position == null)
-                {
-                    return BadRequest("Postion with Id=" + playerDTO.PositionId + " doesn't exist in the repository.");
-                }
+            //find out if a position with given id exists in the repository
+            bool exist = await _positionsRepository.ExistAsync(p => p.Id == playerDTO.PositionId);
 
-                //playerDTO is ok, insert the player
-                Player player = _factory.GeTModel(playerDTO);
-                await _playersRepository.InsertAsync(player);
-                
-                //InsertAsync(player) created new id, so playerDTO must reflect that
-                playerDTO = _factory.GetDTO(player);
-               
-                return CreatedAtRoute("DefaultRoute", new { id = player.Id }, playerDTO);
-            }
-            catch (InvalidOperationException)
-            {
-                //internal server error
-                throw;
-            }
+            //if doesn't exists send bad request response
+            if (!exist) { return BadRequest("Postion with Id=" + playerDTO.PositionId + " doesn't exist in the repository."); }
+
+            //playerDTO is ok, make new player
+            Player player = _factory.GeTModel(playerDTO);
+
+            //try to insert player into repository
+            try { int result = await _playersRepository.InsertAsync(player); }
+            catch (Exception) { throw; }
+
+            //InsertAsync(player) created new id, so playerDTO must reflect that
+            playerDTO = _factory.GetDTO(player);
+
+            //send created at route response
+            return CreatedAtRoute("DefaultRoute", new { id = player.Id }, playerDTO);
         }
 
         [Route("id/{id:int}")]
@@ -181,26 +149,23 @@ namespace HurlingApi.Controllers
         [ResponseType(typeof(PlayerDTO))]
         public async Task<IHttpActionResult> DeletePlayer([FromUri] int id)
         {
-            try
-            {
-                //get requested player
-                var player = await _playersRepository.FindAsync(p => p.Id == id);
+            Player player;
 
-                //check if exists
-                if (player == null)
-                {
-                    return NotFound();
-                }
+            //try to get a player with given id
+            try { player = await _playersRepository.FindSingleAsync(p => p.Id == id); }
+            catch (InvalidOperationException) { throw; }
 
-                //everything is ok, delete the player
-                await _playersRepository.RemoveAsync(player);
-                PlayerDTO playerDTO = _factory.GetDTO(player);
-                return Ok(playerDTO);
-            }
-            catch (InvalidOperationException)
-            {
-                return BadRequest("Deleting player with Id=" + id + " would break referential integrity of the repository. Check PlayersInTeams entity for references.");
-            }
+            //if doesn't exists send not found response
+            if (player == null) { return NotFound(); }
+
+            //try to delete the player
+            try { int result = await _playersRepository.RemoveAsync(player); }
+            catch (Exception) { return BadRequest("Deleting player with Id=" + id + " would break referential integrity of the repository. Check PlayersInTeams entity for references."); }
+
+            PlayerDTO playerDTO = _factory.GetDTO(player);
+
+            //send ok response
+            return Ok(playerDTO);
         }
     }
 }

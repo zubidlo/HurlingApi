@@ -10,20 +10,16 @@ using System.Threading.Tasks;
 
 namespace HurlingApi.Models
 {
-    /// <summary></summary>
-    /// <typeparam name="T">A repository entity type.</typeparam>
     public class Repositiory<T> : IRepository<T> where T : class
     {
         private readonly DbContext _context;
         bool _disposed;
 
-        /// <summary></summary>
         public Repositiory(DbContext context)
         {
             _context = context;
         }
 
-        /// <summary></summary>
         public void Dispose()
         {
             Dispose(true);
@@ -50,79 +46,75 @@ namespace HurlingApi.Models
             Dispose(false);
         }
 
-        /// <summary></summary>
-        /// <returns>List of requested entities.</returns>
         public async Task<IEnumerable<T>> GetAllAsync()
         {
-            return await _context.Set<T>().ToListAsync<T>();
+            IEnumerable<T> items = await _context.Set<T>().ToListAsync<T>();
+            return items;
         }
 
-        /// <summary></summary>
-        /// <param name="match">Linq Expression</param>
-        /// <returns>Single requested entity.</returns>
-        /// <exception cref="System.InvalidOperationException">If more than one resouce found in the repository.</exception>
-        public async Task<T> FindAsync(Expression<Func<T, bool>> match)
+        /// <exception cref="System.InvalidOperationException"></exception>
+        public async Task<T> FindSingleAsync(Expression<Func<T, bool>> match)
         {
-            T t = null;
+            T singleItem = null;
             try
             {
-                t = await _context.Set<T>().SingleOrDefaultAsync(match);
-                return t;
+                singleItem = await _context.Set<T>().SingleOrDefaultAsync(match);
+                return singleItem;
             }
-            catch (InvalidOperationException e)
+            catch (InvalidOperationException)
             {
-                throw new Exception("More than one requested " + t.GetType().Name + " found in the repository.", e);
+                throw new InvalidOperationException("More than one requested " + singleItem.GetType().Name + " found in the repository.");
             }
         }
 
-        /// <summary></summary>
-        /// <param name="t">A repository entity type.</param>
-        /// <returns>Integer result code.</returns>
-        /// <exception cref="System.InvalidOperationException">Error occured during repository modification.</exception>
+        public async Task<bool> ExistAsync(Expression<Func<T, bool>> match)
+        {
+            bool exist = await _context.Set<T>().AnyAsync(match);
+            return exist;
+        }
+
+        /// <exception cref="System.Exception"></exception>
         public async Task<int> UpdateAsync(T t)
         {
             try
             {
                 _context.Entry(t).State = EntityState.Modified;
-                return await _context.SaveChangesAsync();
+                int result = await _context.SaveChangesAsync();
+                return result;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                throw new Exception("An error occured during " + t.GetType().Name + " repository modification.", e);
+                throw new Exception("An error occured during " + t.GetType().Name + " repository modification.");
             }
         }
 
-        /// <summary></summary>
-        /// <param name="t">A repository entity type.</param>
-        /// <returns>Integer result code.</returns>
-        /// <exception cref="System.InvalidOperationException">Error occured during adding to repository.</exception>
+        /// <exception cref="System.Exception"></exception>
         public async Task<int> InsertAsync(T t)
         {
             try
             {
                 _context.Set<T>().Add(t);
-                return await _context.SaveChangesAsync();
+                int result = await _context.SaveChangesAsync();
+                return result;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                throw new Exception("Error occured during adding " + t.GetType().Name + " to repository.", e);
+                throw new Exception("Error occured during adding " + t.GetType().Name + " to repository.");
             }
         }
 
-        /// <summary></summary>
-        /// <param name="t">A repository entity type.</param>
-        /// <returns>Integer result code.</returns>
-        /// <exception cref="System.InvalidOperationException">Error occured during deleting from repository.</exception>
+        /// <exception cref="System.Exception"></exception>
         public async Task<int> RemoveAsync(T t)
         {
             try
             {
                 _context.Entry(t).State = EntityState.Deleted;
-                return await _context.SaveChangesAsync();
+                int result = await _context.SaveChangesAsync();
+                return result;
             }
             catch (Exception e)
             {
-                throw new Exception("Error occured during deleting " + t.GetType().Name + " from repository.", e);
+                throw new Exception("Error occured during deleting " + t.GetType().Name + " from repository.");
             }
         }
     }

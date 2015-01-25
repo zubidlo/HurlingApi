@@ -60,7 +60,7 @@ namespace HurlingApi.Controllers
             try
             {
                 //get requested user
-                User user = await _usersRepository.FindAsync(u => u.Id == id);
+                User user = await _usersRepository.FindSingleAsync(u => u.Id == id);
 
                 //check if exists
                 if (user == null)
@@ -78,7 +78,7 @@ namespace HurlingApi.Controllers
             }
         }
 
-        [Route("name/{name}")]
+        [Route("username/{username}")]
         [HttpGet]
         [ResponseType(typeof(UserDTO))]
         public async Task<IHttpActionResult> GetUserByUsername([FromUri] string username)
@@ -86,7 +86,7 @@ namespace HurlingApi.Controllers
             try
             {
                 //get requested user
-                User user = await _usersRepository.FindAsync(u => u.Username == username);
+                User user = await _usersRepository.FindSingleAsync(u => u.Username == username);
 
                 //check if exists
                 if (user == null)
@@ -112,7 +112,7 @@ namespace HurlingApi.Controllers
             //check if id from URI matches Id from request body
             if (id != userDTO.Id)
             {
-                return BadRequest("The id from URI: " + id + " doesn't match the Id from request body: " + userDTO.Id + "!");
+                return BadRequest("The id from URI: " + id + " doesn'singleItem match the Id from request body: " + userDTO.Id + "!");
             }
 
             //check if model state is valid
@@ -124,7 +124,7 @@ namespace HurlingApi.Controllers
             try
             {
                 //get requested user
-                User user = await _usersRepository.FindAsync(u => u.Id == id);
+                User user = await _usersRepository.FindSingleAsync(u => u.Id == id);
 
                 //check if exists
                 if (user == null)
@@ -133,7 +133,7 @@ namespace HurlingApi.Controllers
                 }
 
                 //get user with same username
-                var user1 = await _usersRepository.FindAsync(u => u.Username == userDTO.Username);
+                var user1 = await _usersRepository.FindSingleAsync(u => u.Username == userDTO.Username);
 
                 //check if exists and if it is different that one we are editing
                 if (user1 != null && user1.Id != id)
@@ -147,11 +147,11 @@ namespace HurlingApi.Controllers
                 user.Email = userDTO.Email;
 
                 //user must be the reference to actual user in the repository. UpdateAsync will throw exception otherwise.
-                //I can't just UpdateAsync(new User());
+                //I can'singleItem just UpdateAsync(new User());
                 await _usersRepository.UpdateAsync(user);
                 return StatusCode(HttpStatusCode.NoContent);
             }
-            catch (InvalidOperationException)
+            catch (Exception)
             {
                 //internal server error
                 throw;
@@ -172,7 +172,7 @@ namespace HurlingApi.Controllers
             try
             {
                 //get a user with same username
-                User user = await _usersRepository.FindAsync(u => u.Username == userDTO.Username);
+                User user = await _usersRepository.FindSingleAsync(u => u.Username == userDTO.Username);
 
                 //check if exists
                 if (user != null)
@@ -189,7 +189,7 @@ namespace HurlingApi.Controllers
                 
                 return CreatedAtRoute("DefaultRoute", new { id = user.Id }, userDTO);
             }
-            catch(InvalidOperationException ) 
+            catch(Exception ) 
             {
                 //internal server error
                 throw;
@@ -204,7 +204,7 @@ namespace HurlingApi.Controllers
             try
             {
                 //get requested user
-                User user = await _usersRepository.FindAsync(u => u.Id == id);
+                User user = await _usersRepository.FindSingleAsync(u => u.Id == id);
 
                 //check if exists
                 if (user == null)
@@ -215,17 +215,17 @@ namespace HurlingApi.Controllers
                 try
                 {
                     //find a team referencing this user
-                    Team team = await _teamsRepository.FindAsync(t => t.UserId == id);
+                    Team team = await _teamsRepository.FindSingleAsync(t => t.UserId == id);
 
                     //check if exists
                     if (team != null)
                     {
-                        return BadRequest("Can't delete this user, because team id=" + team.Id + " still referencing the user!");
+                        return BadRequest("Can'singleItem delete this user, because team id=" + team.Id + " still referencing the user!");
                     }
                 }
                 catch (InvalidOperationException)
                 {
-                    return BadRequest("Can't delete this user, because there are still some teams referencing the user!");
+                    return BadRequest("Can'singleItem delete this user, because there are still some teams referencing the user!");
                 }
 
                 //everything is ok, remove the user
@@ -233,7 +233,7 @@ namespace HurlingApi.Controllers
                 UserDTO userDTO = _factory.GetDTO(user);
                 return Ok(userDTO);
             }
-            catch(InvalidOperationException) 
+            catch(Exception) 
             {
                 //internal server errror
                 throw;
