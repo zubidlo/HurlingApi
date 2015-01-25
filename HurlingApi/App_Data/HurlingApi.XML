@@ -488,10 +488,6 @@
             <summary></summary>
             <returns></returns>
         </member>
-        <member name="M:HurlingApi.Controllers.PlayersController.Dispose(System.Boolean)">
-            <summary></summary>
-            <param name="disposing"></param>
-        </member>
         <member name="T:HurlingApi.Models.AbstractFactoryDTO`2">
             <summary></summary>
             <typeparam name="MODEL"></typeparam>
@@ -503,7 +499,7 @@
             <param name="dto"></param>
             <returns></returns>
         </member>
-        <member name="M:HurlingApi.Models.AbstractFactoryDTO`2.GetCollection(System.Collections.Generic.IEnumerable{`0})">
+        <member name="M:HurlingApi.Models.AbstractFactoryDTO`2.GetDTOCollection(System.Collections.Generic.IEnumerable{`0})">
             <summary></summary>
             <param name="models"></param>
             <returns></returns>
@@ -610,7 +606,7 @@
             <summary></summary>
             <param name="match">Linq Expression</param>
             <returns>Single requested entity.</returns>
-            <exception cref="T:System.InvalidOperationException">More than one resouces found in the repository.</exception>
+            <exception cref="T:System.InvalidOperationException">If more than one resouce found in the repository.</exception>
         </member>
         <member name="M:HurlingApi.Models.Repositiory`1.UpdateAsync(`0)">
             <summary></summary>

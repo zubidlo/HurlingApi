@@ -22,14 +22,34 @@ namespace HurlingApi.Controllers
         private readonly Repositiory<Player> _playersRepository = new Repositiory<Player>(new HurlingModelContext());
         private readonly Repositiory<Position> _positionsRepository = new Repositiory<Position>(new HurlingModelContext());
         private readonly PlayerDTOFactory _factory = new PlayerDTOFactory();
+        private bool _disposed;
+
+        protected override void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    _playersRepository.Dispose();
+                    _positionsRepository.Dispose();
+                }
+
+                // release any unmanaged objects
+                // set object references to null
+
+                _disposed = true;
+            }
+
+            base.Dispose(disposing);
+        }
 
         [Route("")]
         [HttpGet]
         public async Task<IQueryable<PlayerDTO>> GetPlayers()
         {
-            //find all players
-            var players = await _playersRepository.GetAllAsync();
-            return _factory.GetCollection(players).AsQueryable<PlayerDTO>();
+            IEnumerable<Player> players = await _playersRepository.GetAllAsync();
+            IEnumerable<PlayerDTO> playerDTOs = _factory.GetDTOCollection(players);
+            return playerDTOs.AsQueryable<PlayerDTO>();
         }
 
         [Route("id/{id:int}")]
@@ -39,8 +59,8 @@ namespace HurlingApi.Controllers
         {
             try
             {
-                //find a player with given id
-                var player = await _playersRepository.FindAsync(p => p.Id == id);
+                //get requested player
+                Player player = await _playersRepository.FindAsync(p => p.Id == id);
 
                 //check if exists
                 if (player == null)
@@ -48,7 +68,8 @@ namespace HurlingApi.Controllers
                     return NotFound();
                 }
 
-                return Ok(_factory.GetDTO(player));
+                PlayerDTO playerDTO = _factory.GetDTO(player);
+                return Ok(playerDTO);
             }
             catch (InvalidOperationException)
             {
@@ -62,10 +83,10 @@ namespace HurlingApi.Controllers
         [ResponseType(typeof(void))]
         public async Task<IHttpActionResult> EditPlayer([FromUri] int id, [FromBody] PlayerDTO playerDTO)
         {
-            //check if id from URI is the same as id from request body
-            if (playerDTO.Id != id)
+            //check if id from URI matches Id from request body
+            if (id != playerDTO.Id)
             {
-                return BadRequest("Player Id from request URI: " + id + " doesn't match player Id from request body: " + playerDTO.Id + "!");
+                return BadRequest("The id from URI: " + id + " doesn't match the Id from request body: " + playerDTO.Id + "!");
             }
 
             //check if the model state is valid
@@ -76,8 +97,17 @@ namespace HurlingApi.Controllers
 
             try
             {
-                //find a position the player is referencing
-                var position = await _positionsRepository.FindAsync(p => p.Id == playerDTO.PositionId);
+                //get requested player
+                Player player = await _playersRepository.FindAsync(p => p.Id == id);
+
+                //check if exists
+                if (player == null)
+                {
+                    return NotFound();
+                }
+
+                //get a position the player is referencing
+                Position position = await _positionsRepository.FindAsync(p => p.Id == playerDTO.PositionId);
 
                 //check if exists
                 if (position == null)
@@ -85,8 +115,20 @@ namespace HurlingApi.Controllers
                     return BadRequest("Postion with Id=" + playerDTO.PositionId + " doesn't exist in the repository.");
                 }
 
-                //playerDTO is ok, let's update the position
-                await _playersRepository.UpdateAsync(_factory.GeTModel(playerDTO));
+                //playerDTO is ok, update the player
+                player.FirstName = playerDTO.FirstName;
+                player.LastName = playerDTO.LastName;
+                player.GaaTeam = playerDTO.GaaTeam;
+                player.LastWeekPoints = playerDTO.LastWeekPoints;
+                player.OverallPoints = playerDTO.OverallPoints;
+                player.Price = playerDTO.Price;
+                player.Rating = playerDTO.Rating;
+                player.Injured = playerDTO.Injured;
+                player.PositionId = playerDTO.PositionId;
+
+                //player must be the reference to actual player in the repository. UpdateAsync will throw exception otherwise.
+                //I can't just UpdateAsync(new Player());
+                await _playersRepository.UpdateAsync(player);
                 return StatusCode(HttpStatusCode.NoContent);
             }
             catch (InvalidOperationException)
@@ -109,8 +151,8 @@ namespace HurlingApi.Controllers
             
             try
             {
-                //find a position the player is referencing
-                var position = await _positionsRepository.FindAsync(p => p.Id == playerDTO.PositionId);
+                //get a position the player is referencing
+                Position position = await _positionsRepository.FindAsync(p => p.Id == playerDTO.PositionId);
 
                 //check if exists
                 if (position == null)
@@ -118,10 +160,14 @@ namespace HurlingApi.Controllers
                     return BadRequest("Postion with Id=" + playerDTO.PositionId + " doesn't exist in the repository.");
                 }
 
-                //playerDTO is ok, let's insert it
-                var player = _factory.GeTModel(playerDTO);
+                //playerDTO is ok, insert the player
+                Player player = _factory.GeTModel(playerDTO);
                 await _playersRepository.InsertAsync(player);
-                return CreatedAtRoute("DefaultRoute", new { id = playerDTO.Id }, _factory.GetDTO(player));
+                
+                //InsertAsync(player) created new id, so playerDTO must reflect that
+                playerDTO = _factory.GetDTO(player);
+               
+                return CreatedAtRoute("DefaultRoute", new { id = player.Id }, playerDTO);
             }
             catch (InvalidOperationException)
             {
@@ -137,34 +183,24 @@ namespace HurlingApi.Controllers
         {
             try
             {
-                //find a player with given id
+                //get requested player
                 var player = await _playersRepository.FindAsync(p => p.Id == id);
 
                 //check if exists
                 if (player == null)
                 {
-                    return BadRequest("Player with id=" + id + "doesn't exist in the repository.");
+                    return NotFound();
                 }
 
-                //everything is ok, let's delete the player
+                //everything is ok, delete the player
                 await _playersRepository.RemoveAsync(player);
-                return Ok(_factory.GetDTO(player));
+                PlayerDTO playerDTO = _factory.GetDTO(player);
+                return Ok(playerDTO);
             }
-            catch (InvalidOperationException e)
+            catch (InvalidOperationException)
             {
-                return BadRequest("Deleting player with Id=" + id + " would break referential integrity of the repository. Check the relations between this player and other entities.");
+                return BadRequest("Deleting player with Id=" + id + " would break referential integrity of the repository. Check PlayersInTeams entity for references.");
             }
-        }
-
-        /// <summary></summary>
-        /// <param name="disposing"></param>
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                _playersRepository.Dispose();
-            }
-            base.Dispose(disposing);
         }
     }
 }

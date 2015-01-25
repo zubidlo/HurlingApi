@@ -23,14 +23,35 @@ namespace HurlingApi.Controllers
         private readonly Repositiory<User> _usersRepository = new Repositiory<User>(new HurlingModelContext());
         private readonly Repositiory<League> _leaguesRepository = new Repositiory<League>(new HurlingModelContext());
         private readonly TeamDTOFactory _factory = new TeamDTOFactory();
+        private bool _disposed;
+
+        protected override void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    _teamsRepository.Dispose();
+                    _usersRepository.Dispose();
+                    _leaguesRepository.Dispose();
+                }
+
+                // release any unmanaged objects
+                // set object references to null
+
+                _disposed = true;
+            }
+
+            base.Dispose(disposing);
+        }
 
         [Route("")]
         [HttpGet]
         public async Task<IQueryable<TeamDTO>> GetTeams()
         {
-            //find all teams
-            var teams = await _teamsRepository.GetAllAsync();
-            return _factory.GetCollection(teams).AsQueryable<TeamDTO>();
+            IEnumerable<Team> teams = await _teamsRepository.GetAllAsync();
+            IEnumerable<TeamDTO> teamDTOs = _factory.GetDTOCollection(teams);
+            return teamDTOs.AsQueryable<TeamDTO>();
         }
 
         [Route("id/{id:int}")]
@@ -40,16 +61,17 @@ namespace HurlingApi.Controllers
         {
             try
             {
-                //find a team with given id
-                var team = await _teamsRepository.FindAsync(t => t.Id == id);
+                //get requested team
+                Team team = await _teamsRepository.FindAsync(t => t.Id == id);
 
-                //check if there is no team with given id
+                //check if exists
                 if (team == null)
                 {
                     return NotFound();
                 }
 
-                return Ok(_factory.GetDTO(team));
+                TeamDTO teamDTO = _factory.GetDTO(team);
+                return Ok(teamDTO);
             }
             catch (InvalidOperationException)
             {
@@ -65,16 +87,17 @@ namespace HurlingApi.Controllers
         {
             try
             {
-                //find a team with given name
-                var team = await _teamsRepository.FindAsync(t => t.Name == name);
+                //find requested team
+                Team team = await _teamsRepository.FindAsync(t => t.Name == name);
 
-                //check if there is no team with given name
+                //check if exists
                 if (team == null)
                 {
                     return NotFound();
                 }
 
-                return Ok(_factory.GetDTO(team));
+                TeamDTO teamDTO = _factory.GetDTO(team);
+                return Ok(teamDTO);
             }
             catch (InvalidOperationException)
             {
@@ -88,13 +111,13 @@ namespace HurlingApi.Controllers
         [ResponseType(typeof(void))]
         public async Task<IHttpActionResult> EditTeam([FromUri] int id, [FromBody] TeamDTO teamDTO)
         {
-            //check if id from URL and id from request body are the same
-            if (teamDTO.Id != id)
+            //check if id from URI match Id from request body
+            if (id != teamDTO.Id)
             {
-                return BadRequest("The team Id from request URI: " + id + " doesn't match team Id from request body: " + teamDTO.Id + "!");
+                return BadRequest("The id from URI: " + id + " doesn't match the Id from request body: " + teamDTO.Id + "!");
             }
 
-            //check if model is ok
+            //check if model is valid
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -102,52 +125,52 @@ namespace HurlingApi.Controllers
 
             try
             {
-                //find a team with given id (team to edit)
-                var team = await _teamsRepository.FindAsync(t => t.Id == id);
+                //get requested team
+                Team team = await _teamsRepository.FindAsync(t => t.Id == id);
 
-                //check if there is one
+                //check if exists
                 if (team == null)
                 {
-                    return BadRequest("Team with id=" + id + "doesn't exist in the repository.");
+                    return NotFound();
                 }
 
-                //find some other team with same name (which is not allowed)
-                var team1 = await _teamsRepository.FindAsync(t => t.Name == teamDTO.Name);
+                //get a team with same name
+                Team team1 = await _teamsRepository.FindAsync(t => t.Name == teamDTO.Name);
 
-                //check if there is some other team with the same name as edited team (which is not allowed)
-                if (team1 != null && team1.Id != teamDTO.Id)
+                //check if exists and if it is different that one we are editing
+                if (team1 != null && team1.Id != id)
                 {
-                    return BadRequest("There is already an team with name:" + teamDTO.Name + " in the repository!");
+                    return BadRequest("There is already a team with name:" + teamDTO.Name + " in the repository! We allow only unique team names.");
                 }
 
-                //find a user with given id
-                var user = await _usersRepository.FindAsync(u => u.Id == teamDTO.UserId);
+                //get the user this team is referencing
+                User user = await _usersRepository.FindAsync(u => u.Id == teamDTO.UserId);
 
-                //check if there is one
+                //check if exists
                 if (user == null)
                 {
-                    return BadRequest("The user with Id=" + teamDTO.UserId + " doesn't exist in the repository");
+                    return BadRequest("The user with Id=" + teamDTO.UserId + " doesn't exist in the repository!");
                 }
 
-                //find some other team with the same user id
+                //get some other team with the same user id
                 team1 = await _teamsRepository.FindAsync(t => t.UserId == teamDTO.UserId);
 
-                //check if found team is different from edited one (we allow only one team per user)
-                if (team1 != null && team1.Id != teamDTO.Id)
+                //check if found team is different from one we are editing
+                if (team1 != null && team1.Id != id)
                 {
-                    return BadRequest("User with Id=" + teamDTO.UserId + " already has a team. We allow only one team per user.");
+                    return BadRequest("User with Id=" + teamDTO.UserId + " already has a team! We allow only one team per user.");
                 }
 
-                //find league with given id
-                var league = await _leaguesRepository.FindAsync(l => l.Id == teamDTO.LeagueId);
+                //get league with id this team is referencing
+                League league = await _leaguesRepository.FindAsync(l => l.Id == teamDTO.LeagueId);
 
-                //check if there is one
+                //check if exists
                 if (league == null)
                 {
-                    return BadRequest("The league with Id=" + teamDTO.LeagueId + " doesn't exist in the repository.");
+                    return BadRequest("The league with Id=" + teamDTO.LeagueId + " doesn't exist in the repository!");
                 }
 
-                //teamDTO is valid let's update the team
+                //teamDTO is ok, update the team
                 team.Name = teamDTO.Name;
                 team.OverAllPoints = teamDTO.OverAllPoints;
                 team.LastWeekPoints = teamDTO.LastWeekPoints;
@@ -155,6 +178,8 @@ namespace HurlingApi.Controllers
                 team.LeagueId = teamDTO.LeagueId;
                 team.UserId = teamDTO.UserId;
 
+                //team must be the reference to actual team in the repository. UpdateAsync will throw exception otherwise.
+                //I can't just UpdateAsync(new Team());
                 await _teamsRepository.UpdateAsync(team);
                 return StatusCode(HttpStatusCode.NoContent);
             }
@@ -178,46 +203,49 @@ namespace HurlingApi.Controllers
 
             try
             {
-                //find a team with the same name as our new team
-                var team = await _teamsRepository.FindAsync(t => t.Name == teamDTO.Name);
+                //get a team with the same name
+                Team team = await _teamsRepository.FindAsync(t => t.Name == teamDTO.Name);
 
-                //check if there is already a team with given name
+                //check if exists
                 if (team != null)
                 {
-                    return BadRequest("There is already an team with name:" + teamDTO.Name + " in the repository.");
+                    return BadRequest("There is already an team with name:" + teamDTO.Name + " in the repository!. We allow only unique team names.");
                 }
 
-                //find user with given id
-                var user = await _usersRepository.FindAsync(u => u.Id == teamDTO.UserId);
+                //get user the team is referencing
+                User user = await _usersRepository.FindAsync(u => u.Id == teamDTO.UserId);
 
-                //check if user with given id exists
+                //check if exists
                 if (user == null)
                 {
-                    return BadRequest("User with Id=" + teamDTO.UserId + " doesn't exist.");
+                    return BadRequest("User with Id=" + teamDTO.UserId + " doesn't exist in the repository!");
                 }
 
-                //find a team with same userId as our new team
+                //get a team with same userId as our new team
                 team = await _teamsRepository.FindAsync(t => t.UserId == teamDTO.UserId);
 
                 //check if team exists
                 if (team != null)
                 {
-                    return BadRequest("User with id=" + teamDTO.UserId + " already has a team. We allow only one team per user.");
+                    return BadRequest("User with id=" + teamDTO.UserId + " already has a team! We allow only one team per user.");
                 }
 
-                //find league with given id
-                var league = await _leaguesRepository.FindAsync(l => l.Id == teamDTO.LeagueId);
+                //get the league this team is referencing
+                League league = await _leaguesRepository.FindAsync(l => l.Id == teamDTO.LeagueId);
 
-                //check if league with given id exists
+                //check if exists
                 if (league == null)
                 {
-                    return BadRequest("League with Id=" + teamDTO.LeagueId + " doesn't exist in the repository.");
+                    return BadRequest("League with Id=" + teamDTO.LeagueId + " doesn't exist in the repository!");
                 }
 
-                //teamDTO is valid let's insert the team into repository
+                //teamDTO is ok, insert the team
                 team = _factory.GeTModel(teamDTO);
                 await _teamsRepository.InsertAsync(team);
-                return CreatedAtRoute("DefaultRoute", new { id = teamDTO.Id }, _factory.GetDTO(team));
+
+                //InsertAsync(team) created new id, so teamDTO must reflect that
+                teamDTO = _factory.GetDTO(team);
+                return CreatedAtRoute("DefaultRoute", new { id = team.Id }, teamDTO);
             }
             catch (InvalidOperationException)
             {
@@ -233,32 +261,24 @@ namespace HurlingApi.Controllers
         {
             try
             {
-                //find a team with given id
-                var team = await _teamsRepository.FindAsync(t => t.Id == id);
+                //get requested team
+                Team team = await _teamsRepository.FindAsync(t => t.Id == id);
 
-                //check if the team exists
+                //check if exists
                 if (team == null)
                 {
-                    return BadRequest("Team with id=" + id + "doesn't exist in the repository.");
+                    return NotFound();
                 }
 
-                //team exists, let's delete it
+                //everything is ok, let's remove the team
                 await _teamsRepository.RemoveAsync(team);
-                return Ok(_factory.GetDTO(team));
+                TeamDTO teamDTO = _factory.GetDTO(team);
+                return Ok(teamDTO);
             }
             catch (InvalidOperationException e)
             {
                 return BadRequest("Deleting team with Id=" + id + " would break referential integrity of the repository. There must be still some references to this team in the repository. PlayersInTeams maybe?");
             }
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                _teamsRepository.Dispose();
-            }
-            base.Dispose(disposing);
         }
     }
 }

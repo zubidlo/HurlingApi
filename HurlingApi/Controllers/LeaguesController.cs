@@ -22,14 +22,34 @@ namespace HurlingApi.Controllers
         private readonly Repositiory<League> _leaguesRepository = new Repositiory<League>(new HurlingModelContext());
         private readonly Repositiory<Team> _teamsRepository = new Repositiory<Team>(new HurlingModelContext());
         private readonly LeagueDTOFactory _factory = new LeagueDTOFactory();
+        private bool _disposed;
+
+        protected override void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    _leaguesRepository.Dispose();
+                    _teamsRepository.Dispose();
+                }
+
+                // release any unmanaged objects
+                // set object references to null
+
+                _disposed = true;
+            }
+
+            base.Dispose(disposing);
+        }
 
         [Route("")]
         [HttpGet]
         public async Task<IQueryable<LeagueDTO>> GetLeagues()
         {
-            //find all leagues in the repository
-            var leagues = await _leaguesRepository.GetAllAsync();
-            return _factory.GetCollection(leagues).AsQueryable<LeagueDTO>();
+            IEnumerable<League> leagues = await _leaguesRepository.GetAllAsync();
+            IEnumerable<LeagueDTO> leagueDTOs = _factory.GetDTOCollection(leagues);
+            return leagueDTOs.AsQueryable<LeagueDTO>();
         }
 
         [Route("id/{id:int}")]
@@ -39,16 +59,17 @@ namespace HurlingApi.Controllers
         {
             try
             {
-                //find a league with given id
-                var league = await _leaguesRepository.FindAsync(l => l.Id == id);
+                //get requested league
+                League league = await _leaguesRepository.FindAsync(l => l.Id == id);
 
-                //check if one found in the repository
+                //check if exists
                 if (league == null)
                 {
                     return NotFound();
                 }
 
-                return Ok(_factory.GetDTO(league));
+                LeagueDTO leagueDTO = _factory.GetDTO(league);
+                return Ok();
             }
             catch (InvalidOperationException)
             {
@@ -62,10 +83,10 @@ namespace HurlingApi.Controllers
         [ResponseType(typeof(void))]
         public async Task<IHttpActionResult> EditLeague([FromUri] int id, [FromBody] LeagueDTO leagueDTO)
         {
-            //check if id from URI is the same as id from request body
-            if (leagueDTO.Id != id)
+            //check if id from URI match Id from request body
+            if (id != leagueDTO.Id)
             {
-                return BadRequest("League Id from request URI: " + id + " doesn't match team Id from request body: " + leagueDTO.Id + "!");
+                return BadRequest("The id from URI: " + id + " doesn't match the Id from request body: " + leagueDTO.Id + "!");
             }
 
             //check if the model is valid
@@ -76,20 +97,22 @@ namespace HurlingApi.Controllers
 
             try
             {
-                //find a league with given id
-                var league = await _leaguesRepository.FindAsync(l => l.Id == id);
+                //get requested league
+                League league = await _leaguesRepository.FindAsync(l => l.Id == id);
 
-                //check if the league exists in the repository
+                //check if exists
                 if (league == null)
                 {
-                    return BadRequest("League with id=" + id + "doesn't exist in the repository.");
+                    return NotFound();
                 }
 
-                //leagueDTO is valid, let's update the update the repository
+                //leagueDTO is ok, update the league
                 league.Name = leagueDTO.Name;
                 league.NextFixtures = leagueDTO.NextFixtures;
                 league.Week = leagueDTO.Week;
 
+                //league must be the reference to actual league in the repository. UpdateAsync will throw exception otherwise.
+                //I can't just UpdateAsync(new League());
                 await _leaguesRepository.UpdateAsync(league);
                 return StatusCode(HttpStatusCode.NoContent);
             }
@@ -115,18 +138,21 @@ namespace HurlingApi.Controllers
             try
             {
                 //get all leagues
-                var leagues = await _leaguesRepository.GetAllAsync();
+                IEnumerable<League> leagues = await _leaguesRepository.GetAllAsync();
 
                 //check if there is more then zero
                 if (leagues.Count() > 0)
                 {
-                    return BadRequest("There is already a league in the repository. We allow only one league to exist.");
+                    return BadRequest("There is already a league in the repository! We allow only one league to exist.");
                 }
 
-                //the leagueDTO is valid, let's insert it into repository
-                var league = _factory.GeTModel(leagueDTO);
+                //leagueDTO is ok, insert the league
+                League league = _factory.GeTModel(leagueDTO);
                 await _leaguesRepository.InsertAsync(league);
-                return CreatedAtRoute("DefaultRoute", new { id = leagueDTO.Id }, _factory.GetDTO(league));
+
+                //InsertAsync(league) created new id, so leagueDTO must reflect that
+                leagueDTO = _factory.GetDTO(league);
+                return CreatedAtRoute("DefaultRoute", new { id = league.Id }, leagueDTO);
 
             }
             catch (InvalidOperationException)
@@ -143,34 +169,35 @@ namespace HurlingApi.Controllers
         {
             try
             {
-                //find a league with given id
-                var league = await _leaguesRepository.FindAsync(l => l.Id == id);
+                //get requested league
+                League league = await _leaguesRepository.FindAsync(l => l.Id == id);
 
-                //check if the league exists in the repository
+                //check if exists
                 if (league == null)
                 {
-                    return BadRequest("League with id=" + id + "doesn't exist in the repository.");
+                    return NotFound();
                 }
 
                 try
                 {
-                    //find a team references this league
-                    var team = await _teamsRepository.FindAsync(t => t.LeagueId == id);
+                    //find a team referencing this league
+                    Team team = await _teamsRepository.FindAsync(t => t.LeagueId == id);
 
-                    //check if found
+                    //check if exists
                     if (team != null)
                     {
-                        return BadRequest("Can't delete this league, because there is still one team which still have a reference to it.");
+                        return BadRequest("Can't delete this league, because team id=" + team.Id + " still referencing the league!");
                     }
                 }
                 catch (InvalidOperationException)
                 {
-                    return BadRequest("Can't delete this league, because there are still some teams which still have a reference to it.");
+                    return BadRequest("Can't delete this league, because there are still some teams referencing the league!");
                 }
-                
-                //everything is checked, so let's remove the league
+
+                //everything is ok, let's remove the league
                 await _leaguesRepository.RemoveAsync(league);
-                return Ok(_factory.GetDTO(league));
+                LeagueDTO leagueDTO = _factory.GetDTO(league);
+                return Ok(leagueDTO);
             }
             catch (InvalidOperationException)
             {

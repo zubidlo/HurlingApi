@@ -61,7 +61,7 @@ namespace HurlingApiUnitTests
 
             set.Add(user);
 
-            var setDTOs = _userFactory.GetCollection(set);
+            var setDTOs = _userFactory.GetDTOCollection(set);
 
             Assert.IsNotNull(setDTOs);
         }

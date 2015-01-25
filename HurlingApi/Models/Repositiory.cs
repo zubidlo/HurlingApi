@@ -15,6 +15,7 @@ namespace HurlingApi.Models
     public class Repositiory<T> : IRepository<T> where T : class
     {
         private readonly DbContext _context;
+        bool _disposed;
 
         /// <summary></summary>
         public Repositiory(DbContext context)
@@ -25,7 +26,28 @@ namespace HurlingApi.Models
         /// <summary></summary>
         public void Dispose()
         {
-            if (_context != null) _context.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed) return;
+
+            if (disposing)
+            {
+                _context.Dispose();
+            }
+
+            // release any unmanaged objects
+            // set the object references to null
+
+            _disposed = true;
+        }
+
+        ~Repositiory()
+        {
+            Dispose(false);
         }
 
         /// <summary></summary>
@@ -38,19 +60,19 @@ namespace HurlingApi.Models
         /// <summary></summary>
         /// <param name="match">Linq Expression</param>
         /// <returns>Single requested entity.</returns>
-        /// <exception cref="System.InvalidOperationException">More than one resouces found in the repository.</exception>
+        /// <exception cref="System.InvalidOperationException">If more than one resouce found in the repository.</exception>
         public async Task<T> FindAsync(Expression<Func<T, bool>> match)
         {
-            T t;
+            T t = null;
             try
             {
                 t = await _context.Set<T>().SingleOrDefaultAsync(match);
+                return t;
             }
-            catch (InvalidOperationException)
+            catch (InvalidOperationException e)
             {
-                throw new InvalidOperationException("More than one resouces found in the repository.");
+                throw new Exception("More than one requested " + t.GetType().Name + " found in the repository.", e);
             }
-            return t;
         }
 
         /// <summary></summary>
@@ -66,7 +88,7 @@ namespace HurlingApi.Models
             }
             catch (Exception e)
             {
-                throw new InvalidOperationException("Error occured during repository modification.");
+                throw new Exception("An error occured during " + t.GetType().Name + " repository modification.", e);
             }
         }
 
@@ -83,7 +105,7 @@ namespace HurlingApi.Models
             }
             catch (Exception e)
             {
-                throw new InvalidOperationException("Error occured during adding to repository.");
+                throw new Exception("Error occured during adding " + t.GetType().Name + " to repository.", e);
             }
         }
 
@@ -100,7 +122,7 @@ namespace HurlingApi.Models
             }
             catch (Exception e)
             {
-                throw new InvalidOperationException("Error occured during deleting from repository.");
+                throw new Exception("Error occured during deleting " + t.GetType().Name + " from repository.", e);
             }
         }
     }

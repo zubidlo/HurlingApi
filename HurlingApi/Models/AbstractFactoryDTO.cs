@@ -25,7 +25,7 @@ namespace HurlingApi.Models
         /// <summary></summary>
         /// <param name="models"></param>
         /// <returns></returns>
-        public IEnumerable<DTO> GetCollection(IEnumerable<MODEL> models)
+        public IEnumerable<DTO> GetDTOCollection(IEnumerable<MODEL> models)
         {
             var DTOs = new HashSet<DTO>();
             foreach (var model in models)

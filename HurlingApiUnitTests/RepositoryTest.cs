@@ -7,28 +7,45 @@ using System.Threading.Tasks;
 
 namespace HurlingApiUnitTests
 {
-    /// <summary>
-    /// Tests model repository
-    /// </summary>
     [TestClass]
-    public class UserRepositoryTest
+    public class UserRepositoryTest : IDisposable
     {
         private IRepository<User> _repository;
+        bool _disposed;
 
-        /// <summary>
-        /// initializes repository
-        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        ~UserRepositoryTest()
+        {
+            Dispose(false);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+                return;
+
+            if (disposing)
+            {
+                _repository.Dispose();
+            }
+
+            // release any unmanaged objects
+            // set the object references to null
+
+            _disposed = true;
+        }
+
         [TestInitialize]
         public void Initialize()
         {
             _repository = new Repositiory<User>(new HurlingModelContext());
         }
 
-        /// <summary>
-        /// test: get all users and then count them.
-        /// pass: when count = 4.
-        /// </summary>
-        /// <returns></returns>
         [TestMethod]
         public async Task QueryAllUsers()
         {
@@ -36,11 +53,6 @@ namespace HurlingApiUnitTests
             Assert.AreEqual(allUsers.Count(), 4);
         }
 
-        /// <summary>
-        /// test: find model with id=1.
-        /// pass: if model.Id == 1.
-        /// </summary>
-        /// <returns></returns>
         [TestMethod]
         public async Task GetUserById()
         {
@@ -49,11 +61,6 @@ namespace HurlingApiUnitTests
             Assert.AreEqual(user.Id, id);
         }
 
-        /// <summary>
-        /// test: find model with name="zubidlo".
-        /// pass: if model.Username == "zubidlo".
-        /// </summary>
-        /// <returns></returns>
         [TestMethod]
         public async Task GetUserByUsername()
         {
@@ -62,11 +69,6 @@ namespace HurlingApiUnitTests
             Assert.AreEqual(user.Username, username);
         }
 
-        /// <summary>
-        /// test: insert new model and then find that model back
-        /// pass: if new model and model returned back are the same
-        /// </summary>
-        /// <returns></returns>
         [TestMethod]
         [Ignore]
         public async Task InsertNewUser()
@@ -84,11 +86,6 @@ namespace HurlingApiUnitTests
 
         }
 
-        /// <summary>
-        /// test: delete model with id=5
-        /// pass: if one row in table affected result came back
-        /// </summary>
-        /// <returns></returns>
         [TestMethod]
         [Ignore]
         public async Task DeleteAUser()

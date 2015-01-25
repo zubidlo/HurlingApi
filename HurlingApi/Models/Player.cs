@@ -30,7 +30,7 @@ namespace HurlingApi.Models
         public bool Injured { get; set; }
         public int PositionId { get; set; }
     
-        public virtual Position Position { get; set; }
-        public virtual ICollection<TeamPlayer> TeamPlayers { get; set; }
+        public Position Position { get; set; }
+        public ICollection<TeamPlayer> TeamPlayers { get; set; }
     }
 }
