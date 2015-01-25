@@ -11,23 +11,17 @@ namespace HurlingApi.Models
 {
     using System;
     using System.Collections.Generic;
-
-    /// <summary></summary>
+    
     public partial class Position
     {
-        /// <summary></summary>
         public Position()
         {
             this.Players = new HashSet<Player>();
         }
-
-        /// <summary></summary>
+    
         public int Id { get; set; }
-
-        /// <summary></summary>
         public string Name { get; set; }
-
-        /// <summary></summary>
+    
         public virtual ICollection<Player> Players { get; set; }
     }
 }

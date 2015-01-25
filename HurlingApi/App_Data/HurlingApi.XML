@@ -488,137 +488,7 @@
             <summary></summary>
             <returns></returns>
         </member>
-        <member name="T:HurlingApi.Controllers.LeaguesController">
-            <summary></summary>
-        </member>
-        <member name="M:HurlingApi.Controllers.LeaguesController.GetLeagues">
-            <summary></summary>
-            <returns></returns>
-        </member>
-        <member name="M:HurlingApi.Controllers.LeaguesController.GetLeagueById(System.Int32)">
-            <summary></summary>
-            <param name="id"></param>
-            <returns></returns>
-        </member>
-        <member name="M:HurlingApi.Controllers.LeaguesController.EditLeague(System.Int32,HurlingApi.Models.LeagueDTO)">
-            <summary></summary>
-            <param name="id"></param>
-            <param name="leagueDTO"></param>
-            <returns></returns>
-        </member>
-        <member name="M:HurlingApi.Controllers.LeaguesController.PostLeague(HurlingApi.Models.LeagueDTO)">
-            <summary></summary>
-            <param name="leagueDTO"></param>
-            <returns></returns>
-        </member>
-        <member name="M:HurlingApi.Controllers.LeaguesController.DeleteLeague(System.Int32)">
-            <summary></summary>
-            <param name="id"></param>
-            <returns></returns>
-        </member>
-        <member name="T:HurlingApi.Controllers.PlayersController">
-            <summary></summary>
-        </member>
-        <member name="M:HurlingApi.Controllers.PlayersController.GetPlayers">
-            <summary></summary>
-            <returns></returns>
-        </member>
-        <member name="M:HurlingApi.Controllers.PlayersController.GetPlayerById(System.Int32)">
-            <summary></summary>
-            <param name="id"></param>
-            <returns></returns>
-        </member>
-        <member name="M:HurlingApi.Controllers.PlayersController.EditPlayer(System.Int32,HurlingApi.Models.PlayerDTO)">
-            <summary></summary>
-            <param name="id"></param>
-            <param name="playerDTO"></param>
-            <returns></returns>
-        </member>
-        <member name="M:HurlingApi.Controllers.PlayersController.PostPlayer(HurlingApi.Models.PlayerDTO)">
-            <summary></summary>
-            <param name="playerDTO"></param>
-            <returns></returns>
-        </member>
-        <member name="M:HurlingApi.Controllers.PlayersController.DeletePlayer(System.Int32)">
-            <summary></summary>
-            <param name="id"></param>
-            <returns></returns>
-        </member>
         <member name="M:HurlingApi.Controllers.PlayersController.Dispose(System.Boolean)">
-            <summary></summary>
-            <param name="disposing"></param>
-        </member>
-        <member name="T:HurlingApi.Controllers.PositionsController">
-            <summary></summary>
-        </member>
-        <member name="M:HurlingApi.Controllers.PositionsController.GetPostions">
-            <summary></summary>
-            <returns></returns>
-        </member>
-        <member name="M:HurlingApi.Controllers.PositionsController.GetPositionById(System.Int32)">
-            <summary></summary>
-            <param name="id"></param>
-            <returns></returns>
-        </member>
-        <member name="M:HurlingApi.Controllers.PositionsController.GetPositionByName(System.String)">
-            <summary></summary>
-            <param name="name"></param>
-            <returns></returns>
-        </member>
-        <member name="M:HurlingApi.Controllers.PositionsController.EditPosition(System.Int32,HurlingApi.Models.PositionDTO)">
-            <summary></summary>
-            <param name="id"></param>
-            <param name="positionDTO"></param>
-            <returns></returns>
-        </member>
-        <member name="M:HurlingApi.Controllers.PositionsController.PostPosition(HurlingApi.Models.PositionDTO)">
-            <summary></summary>
-            <param name="positionDTO"></param>
-            <returns></returns>
-        </member>
-        <member name="M:HurlingApi.Controllers.PositionsController.DeletePosition(System.Int32)">
-            <summary></summary>
-            <param name="id"></param>
-            <returns></returns>
-        </member>
-        <member name="M:HurlingApi.Controllers.PositionsController.Dispose(System.Boolean)">
-            <summary></summary>
-            <param name="disposing"></param>
-        </member>
-        <member name="T:HurlingApi.Controllers.UsersController">
-            <summary></summary>
-        </member>
-        <member name="M:HurlingApi.Controllers.UsersController.GetUsers">
-            <summary></summary>
-            <returns></returns>
-        </member>
-        <member name="M:HurlingApi.Controllers.UsersController.GetUserById(System.Int32)">
-            <summary></summary>
-            <param name="id"></param>
-            <returns></returns>
-        </member>
-        <member name="M:HurlingApi.Controllers.UsersController.GetUserByUsername(System.String)">
-            <summary></summary>
-            <param name="username"></param>
-            <returns></returns>
-        </member>
-        <member name="M:HurlingApi.Controllers.UsersController.EditUser(System.Int32,HurlingApi.Models.UserDTO)">
-            <summary></summary>
-            <param name="id"></param>
-            <param name="leagueDTO"></param>
-            <returns></returns>
-        </member>
-        <member name="M:HurlingApi.Controllers.UsersController.PostUser(HurlingApi.Models.UserDTO)">
-            <summary></summary>
-            <param name="leagueDTO"></param>
-            <returns></returns>
-        </member>
-        <member name="M:HurlingApi.Controllers.UsersController.DeleteUser(System.Int32)">
-            <summary></summary>
-            <param name="id"></param>
-            <returns></returns>
-        </member>
-        <member name="M:HurlingApi.Controllers.UsersController.Dispose(System.Boolean)">
             <summary></summary>
             <param name="disposing"></param>
         </member>
@@ -665,39 +535,6 @@
             <summary></summary>
             <param name="dto"></param>
             <returns></returns>
-        </member>
-        <member name="T:HurlingApi.Models.PlayerDTO">
-            <summary></summary>
-        </member>
-        <member name="P:HurlingApi.Models.PlayerDTO.Id">
-            <summary></summary>
-        </member>
-        <member name="P:HurlingApi.Models.PlayerDTO.FirstName">
-            <summary></summary>
-        </member>
-        <member name="P:HurlingApi.Models.PlayerDTO.LastName">
-            <summary></summary>
-        </member>
-        <member name="P:HurlingApi.Models.PlayerDTO.GaaTeam">
-            <summary></summary>
-        </member>
-        <member name="P:HurlingApi.Models.PlayerDTO.LastWeekPoints">
-            <summary></summary>
-        </member>
-        <member name="P:HurlingApi.Models.PlayerDTO.OverallPoints">
-            <summary></summary>
-        </member>
-        <member name="P:HurlingApi.Models.PlayerDTO.Price">
-            <summary></summary>
-        </member>
-        <member name="P:HurlingApi.Models.PlayerDTO.Rating">
-            <summary></summary>
-        </member>
-        <member name="P:HurlingApi.Models.PlayerDTO.Injured">
-            <summary></summary>
-        </member>
-        <member name="P:HurlingApi.Models.PlayerDTO.PositionId">
-            <summary></summary>
         </member>
         <member name="T:HurlingApi.Models.PlayerDTOFactory">
             <summary></summary>
@@ -793,84 +630,6 @@
             <returns>Integer result code.</returns>
             <exception cref="T:System.InvalidOperationException">Error occured during deleting from repository.</exception>
         </member>
-        <member name="T:HurlingApi.Models.League">
-            <summary></summary>
-        </member>
-        <member name="M:HurlingApi.Models.League.#ctor">
-            <summary></summary>
-        </member>
-        <member name="P:HurlingApi.Models.League.Id">
-            <summary></summary>
-        </member>
-        <member name="P:HurlingApi.Models.League.Name">
-            <summary></summary>
-        </member>
-        <member name="P:HurlingApi.Models.League.NextFixtures">
-            <summary></summary>
-        </member>
-        <member name="P:HurlingApi.Models.League.Week">
-            <summary></summary>
-        </member>
-        <member name="P:HurlingApi.Models.League.Teams">
-            <summary></summary>
-        </member>
-        <member name="T:HurlingApi.Models.Player">
-            <summary></summary>
-        </member>
-        <member name="M:HurlingApi.Models.Player.#ctor">
-            <summary></summary>
-        </member>
-        <member name="P:HurlingApi.Models.Player.Id">
-            <summary></summary>
-        </member>
-        <member name="P:HurlingApi.Models.Player.FirstName">
-            <summary></summary>
-        </member>
-        <member name="P:HurlingApi.Models.Player.LastName">
-            <summary></summary>
-        </member>
-        <member name="P:HurlingApi.Models.Player.GaaTeam">
-            <summary></summary>
-        </member>
-        <member name="P:HurlingApi.Models.Player.LastWeekPoints">
-            <summary></summary>
-        </member>
-        <member name="P:HurlingApi.Models.Player.OverallPoints">
-            <summary></summary>
-        </member>
-        <member name="P:HurlingApi.Models.Player.Price">
-            <summary></summary>
-        </member>
-        <member name="P:HurlingApi.Models.Player.Rating">
-            <summary></summary>
-        </member>
-        <member name="P:HurlingApi.Models.Player.Injured">
-            <summary></summary>
-        </member>
-        <member name="P:HurlingApi.Models.Player.PositionId">
-            <summary></summary>
-        </member>
-        <member name="P:HurlingApi.Models.Player.Position">
-            <summary></summary>
-        </member>
-        <member name="P:HurlingApi.Models.Player.TeamPlayers">
-            <summary></summary>
-        </member>
-        <member name="T:HurlingApi.Models.Position">
-            <summary></summary>
-        </member>
-        <member name="M:HurlingApi.Models.Position.#ctor">
-            <summary></summary>
-        </member>
-        <member name="P:HurlingApi.Models.Position.Id">
-            <summary></summary>
-        </member>
-        <member name="P:HurlingApi.Models.Position.Name">
-            <summary></summary>
-        </member>
-        <member name="P:HurlingApi.Models.Position.Players">
-            <summary></summary>
-        </member>
         <member name="T:HurlingApi.Models.PositionDTO">
             <summary></summary>
         </member>
@@ -880,29 +639,42 @@
         <member name="P:HurlingApi.Models.PositionDTO.Name">
             <summary></summary>
         </member>
-        <member name="T:HurlingApi.Models.User">
+        <member name="T:HurlingApi.Models.TeamDTO">
             <summary></summary>
         </member>
-        <member name="M:HurlingApi.Models.User.#ctor">
+        <member name="P:HurlingApi.Models.TeamDTO.Id">
             <summary></summary>
         </member>
-        <member name="P:HurlingApi.Models.User.Id">
+        <member name="P:HurlingApi.Models.TeamDTO.Name">
             <summary></summary>
         </member>
-        <member name="P:HurlingApi.Models.User.Email">
+        <member name="P:HurlingApi.Models.TeamDTO.OverAllPoints">
             <summary></summary>
         </member>
-        <member name="P:HurlingApi.Models.User.Username">
+        <member name="P:HurlingApi.Models.TeamDTO.LastWeekPoints">
             <summary></summary>
         </member>
-        <member name="P:HurlingApi.Models.User.Password">
+        <member name="P:HurlingApi.Models.TeamDTO.Budget">
             <summary></summary>
         </member>
-        <member name="P:HurlingApi.Models.User.Messages">
+        <member name="P:HurlingApi.Models.TeamDTO.LeagueId">
             <summary></summary>
         </member>
-        <member name="P:HurlingApi.Models.User.Team">
+        <member name="P:HurlingApi.Models.TeamDTO.UserId">
             <summary></summary>
+        </member>
+        <member name="T:HurlingApi.Models.TeamDTOFactory">
+            <summary></summary>
+        </member>
+        <member name="M:HurlingApi.Models.TeamDTOFactory.GetDTO(HurlingApi.Models.Team)">
+            <summary></summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HurlingApi.Models.TeamDTOFactory.GeTModel(HurlingApi.Models.TeamDTO)">
+            <summary></summary>
+            <param name="dto"></param>
+            <returns></returns>
         </member>
         <member name="T:HurlingApi.Models.UserDTO">
             <summary></summary>

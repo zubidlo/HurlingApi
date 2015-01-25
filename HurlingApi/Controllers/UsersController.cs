@@ -15,27 +15,23 @@ using System.Web.Http.Cors;
 
 namespace HurlingApi.Controllers
 {
-    /// <summary></summary>
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     [RoutePrefix("api/users")]
     public class UsersController : ApiController
     {
-        private readonly Repositiory<User> _repository = new Repositiory<User>(new HurlingModelContext());
+        private readonly Repositiory<User> _usersRepository = new Repositiory<User>(new HurlingModelContext());
+        private readonly Repositiory<Team> _teamsRepository = new Repositiory<Team>(new HurlingModelContext());
         private readonly UserDTOFactory _factory = new UserDTOFactory();
        
-        /// <summary></summary>
-        /// <returns></returns>
         [Route("", Name = "DefaultRoute")]
         [HttpGet]
         public async Task<IQueryable<UserDTO>> GetUsers()
         {
-            var users = await _repository.GetAllAsync();
+            //find all users
+            var users = await _usersRepository.GetAllAsync();
             return _factory.GetCollection(users).AsQueryable<UserDTO>();
         }
 
-        /// <summary></summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpGet]
         [ResponseType(typeof(UserDTO))]
@@ -43,105 +39,107 @@ namespace HurlingApi.Controllers
         {
             try
             {
-                var user = await _repository.FindAsync(u => u.Id == id);
+                //find user with given id
+                var user = await _usersRepository.FindAsync(u => u.Id == id);
+
+                //check if exists
                 if (user == null)
                 {
                     return NotFound();
                 }
+
                 return Ok(_factory.GetDTO(user));
             }
             catch (InvalidOperationException)
             {
-                return InternalServerError(new Exception("Repository is broken! There is more than one league with Id=" + id + " in the repository"));
+                //internal server error
+                throw;
             }
         }
 
-        /// <summary></summary>
-        /// <param name="username"></param>
-        /// <returns></returns>
-        [Route("username/{username}")]
+        [Route("name/{name}")]
         [HttpGet]
         [ResponseType(typeof(UserDTO))]
         public async Task<IHttpActionResult> GetUserByUsername([FromUri] string username)
         {
             try
             {
-                var user = await _repository.FindAsync(u => u.Username == username);
+                //find user with given username
+                var user = await _usersRepository.FindAsync(u => u.Username == username);
+
+                //check if exists
                 if (user == null)
                 {
                     return NotFound();
                 }
+
                 return Ok(_factory.GetDTO(user));
             }
             catch (InvalidOperationException)
             {
-                return InternalServerError(new Exception("Repository is broken! There is more than one league with Username=" + username + " in the repository."));
+                //internal server error
+                throw;
             }
         }
 
-        /// <summary></summary>
-        /// <param name="id"></param>
-        /// <param name="leagueDTO"></param>
-        /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpPut]
         [ResponseType(typeof(void))]
         public async Task<IHttpActionResult> EditUser([FromUri] int id, [FromBody] UserDTO userDTO)
         {
+            //check if id from URI is the same as id from request body
             if (userDTO.Id != id)
             {
-                return BadRequest("User Id from request URI: " + id + " doesn't match league Id from request body: " + userDTO.Id + "!");
+                return BadRequest("User Id from request URI: " + id + " doesn't match team Id from request body: " + userDTO.Id + "!");
             }
 
+            //check if model state is valid
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            User user;
-            
             try
             {
-                user = await _repository.FindAsync(u => u.Id == id);
+                //find user with given id
+                var user = await _usersRepository.FindAsync(u => u.Id == id);
+
+                //check if exists
                 if (user == null)
                 {
-                    return NotFound();
+                    return BadRequest("User with id=" + id + "doesn't exist in the repository");
                 }
 
-                var user1 = await _repository.FindAsync(u => u.Username == userDTO.Username);
-                if ((user1 != null) && (user1.Id != userDTO.Id) && (user1.Username == userDTO.Username))
+                //find some other user with the same username
+                var user1 = await _usersRepository.FindAsync(u => u.Username == userDTO.Username);
+
+                //check if user id is different from edited user
+                if (user1 != null && user1.Id != userDTO.Id)
                 {
-                    return BadRequest("There is already an league with username:" + userDTO.Username + " in the repository!");
+                    return BadRequest("There is already an user with name:" + userDTO.Username + " in the repository!");
                 }
+
+                //userDTO is ok, let's update the user
+                user.Username = userDTO.Username;
+                user.Password = userDTO.Password;
+                user.Email = userDTO.Email;
+
+                await _usersRepository.UpdateAsync(user);
+                return StatusCode(HttpStatusCode.NoContent);
             }
             catch (InvalidOperationException)
             {
-                return InternalServerError(new Exception("Repository is broken! There is more than one league with Username=" + userDTO.Username + " in the repository."));
+                //internal server error
+                throw;
             }
-            
-            user.Username = userDTO.Username;
-            user.Password = userDTO.Password;
-            user.Email = userDTO.Email;
-
-		    try
-			{
-			    await _repository.UpdateAsync(user);
-				return StatusCode(HttpStatusCode.NoContent);
-			}
-			catch (InvalidOperationException e)
-			{
-				return InternalServerError(e);
-			}
         }
 
-        /// <summary></summary>
-        /// <param name="leagueDTO"></param>
-        /// <returns></returns>
         [Route("")]
         [HttpPost]
         [ResponseType(typeof(UserDTO))]
         public async Task<IHttpActionResult> PostUser([FromBody] UserDTO userDTO)
         {
+            //check if model state is valid
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -149,32 +147,27 @@ namespace HurlingApi.Controllers
 
             try
             {
-                var user = await _repository.FindAsync(u => u.Username == userDTO.Username);
+                //find a user with same username
+                var user = await _usersRepository.FindAsync(u => u.Username == userDTO.Username);
+
+                //check if exists
                 if (user != null)
                 {
-                    return BadRequest("There is already an league with username:" + userDTO.Username + " in the repository.");
+                    return BadRequest("There is already an team with name:" + userDTO.Username + " in the repository.");
                 }
+
+                //userDTO is ok, let's insert user
+                user = _factory.GeTModel(userDTO);
+                await _usersRepository.InsertAsync(user);
+                return CreatedAtRoute("DefaultRoute", new { id = userDTO.Id }, _factory.GetDTO(user));
             }
             catch(InvalidOperationException ) 
             {
-                return InternalServerError(new Exception("Repository is broken! There is more than one league with Username=" + userDTO.Username));
-            }
-
-            var newUser = _factory.GeTModel(userDTO);
-            try
-            {
-                await _repository.InsertAsync(newUser);
-                return CreatedAtRoute("DefaultRoute", new { id = userDTO.Id }, _factory.GetDTO(newUser));
-            }
-            catch (InvalidOperationException e)
-            {
-                return InternalServerError(e);
+                //internal server error
+                throw;
             }
         }
 
-        /// <summary></summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpDelete]
         [ResponseType(typeof(UserDTO))]
@@ -182,27 +175,47 @@ namespace HurlingApi.Controllers
         {
             try
             {
-                var user = await _repository.FindAsync(u => u.Id == id);
+                //find user with given id
+                var user = await _usersRepository.FindAsync(u => u.Id == id);
+
+                //check if exists
                 if (user == null)
                 {
-                    return NotFound();
+                    return BadRequest("User with id=" + id + "doesn't exist in the repository");
                 }
-                await _repository.RemoveAsync(user);
+
+                try
+                {
+                    //find a team referencing this user
+                    var team = await _teamsRepository.FindAsync(t => t.UserId == id);
+
+                    //check if found
+                    if (team != null)
+                    {
+                        return BadRequest("Can't delete this user, because there is still one team which still have a reference to it.");
+                    }
+                }
+                catch (InvalidOperationException)
+                {
+                    return BadRequest("Can't delete this user, because there are still some teams which still have a reference to it.");
+                }
+
+                //everything ok, let's remove user
+                await _usersRepository.RemoveAsync(user);
                 return Ok(_factory.GetDTO(user));
             }
-            catch(InvalidOperationException e) 
+            catch(InvalidOperationException) 
             {
-                return BadRequest("Deleting league with Id=" + id + " would break referential integrity of the repository. Check the relations between this league and other entities.");
+                //internal server errror
+                throw;
             }
         }
 
-        /// <summary></summary>
-        /// <param name="disposing"></param>
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
-                _repository.Dispose();
+                _usersRepository.Dispose();
             }
             base.Dispose(disposing);
         }

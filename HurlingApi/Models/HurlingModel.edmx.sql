@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 01/23/2015 20:57:04
+-- Date Created: 01/24/2015 21:30:17
 -- Generated from EDMX file: C:\Users\martin\Documents\Visual Studio 2013\Projects\HurlingApi\HurlingApi\Models\HurlingModel.edmx
 -- --------------------------------------------------
 
@@ -20,20 +20,20 @@ GO
 IF OBJECT_ID(N'[dbo].[FK_UserMessage]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[Messages] DROP CONSTRAINT [FK_UserMessage];
 GO
-IF OBJECT_ID(N'[dbo].[FK_TeamLeague]', 'F') IS NOT NULL
-    ALTER TABLE [dbo].[Teams] DROP CONSTRAINT [FK_TeamLeague];
-GO
 IF OBJECT_ID(N'[dbo].[FK_PositionPlayer]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[Players] DROP CONSTRAINT [FK_PositionPlayer];
-GO
-IF OBJECT_ID(N'[dbo].[FK_UserTeam]', 'F') IS NOT NULL
-    ALTER TABLE [dbo].[Teams] DROP CONSTRAINT [FK_UserTeam];
 GO
 IF OBJECT_ID(N'[dbo].[FK_TeamTeamPlayer]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[TeamPlayers] DROP CONSTRAINT [FK_TeamTeamPlayer];
 GO
 IF OBJECT_ID(N'[dbo].[FK_PlayerTeamPlayer]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[TeamPlayers] DROP CONSTRAINT [FK_PlayerTeamPlayer];
+GO
+IF OBJECT_ID(N'[dbo].[FK_TeamLeague]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[Teams] DROP CONSTRAINT [FK_TeamLeague];
+GO
+IF OBJECT_ID(N'[dbo].[FK_UserTeam]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[Users] DROP CONSTRAINT [FK_UserTeam];
 GO
 
 -- --------------------------------------------------
@@ -95,11 +95,11 @@ GO
 CREATE TABLE [dbo].[Teams] (
     [Id] int IDENTITY(1,1) NOT NULL,
     [Name] nvarchar(max)  NOT NULL,
-    [OverAllPoints] decimal(18,0)  NULL,
-    [LastWeekPoints] decimal(18,0)  NULL,
-    [Budget] decimal(18,0)  NULL,
-    [League_Id] int  NULL,
-    [User_Id] int  NOT NULL
+    [OverAllPoints] decimal(18,0)  NOT NULL,
+    [LastWeekPoints] decimal(18,0)  NOT NULL,
+    [Budget] decimal(18,0)  NOT NULL,
+    [LeagueId] int  NOT NULL,
+    [UserId] int  NOT NULL
 );
 GO
 
@@ -200,21 +200,6 @@ ON [dbo].[Messages]
     ([UserId]);
 GO
 
--- Creating foreign key on [League_Id] in table 'Teams'
-ALTER TABLE [dbo].[Teams]
-ADD CONSTRAINT [FK_TeamLeague]
-    FOREIGN KEY ([League_Id])
-    REFERENCES [dbo].[Leagues]
-        ([Id])
-    ON DELETE NO ACTION ON UPDATE NO ACTION;
-GO
-
--- Creating non-clustered index for FOREIGN KEY 'FK_TeamLeague'
-CREATE INDEX [IX_FK_TeamLeague]
-ON [dbo].[Teams]
-    ([League_Id]);
-GO
-
 -- Creating foreign key on [PositionId] in table 'Players'
 ALTER TABLE [dbo].[Players]
 ADD CONSTRAINT [FK_PositionPlayer]
@@ -228,21 +213,6 @@ GO
 CREATE INDEX [IX_FK_PositionPlayer]
 ON [dbo].[Players]
     ([PositionId]);
-GO
-
--- Creating foreign key on [User_Id] in table 'Teams'
-ALTER TABLE [dbo].[Teams]
-ADD CONSTRAINT [FK_UserTeam]
-    FOREIGN KEY ([User_Id])
-    REFERENCES [dbo].[Users]
-        ([Id])
-    ON DELETE NO ACTION ON UPDATE NO ACTION;
-GO
-
--- Creating non-clustered index for FOREIGN KEY 'FK_UserTeam'
-CREATE INDEX [IX_FK_UserTeam]
-ON [dbo].[Teams]
-    ([User_Id]);
 GO
 
 -- Creating foreign key on [TeamId] in table 'TeamPlayers'
@@ -273,6 +243,36 @@ GO
 CREATE INDEX [IX_FK_PlayerTeamPlayer]
 ON [dbo].[TeamPlayers]
     ([PlayerId]);
+GO
+
+-- Creating foreign key on [LeagueId] in table 'Teams'
+ALTER TABLE [dbo].[Teams]
+ADD CONSTRAINT [FK_TeamLeague]
+    FOREIGN KEY ([LeagueId])
+    REFERENCES [dbo].[Leagues]
+        ([Id])
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
+
+-- Creating non-clustered index for FOREIGN KEY 'FK_TeamLeague'
+CREATE INDEX [IX_FK_TeamLeague]
+ON [dbo].[Teams]
+    ([LeagueId]);
+GO
+
+-- Creating foreign key on [UserId] in table 'Teams'
+ALTER TABLE [dbo].[Teams]
+ADD CONSTRAINT [FK_UserTeam]
+    FOREIGN KEY ([UserId])
+    REFERENCES [dbo].[Users]
+        ([Id])
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
+
+-- Creating non-clustered index for FOREIGN KEY 'FK_UserTeam'
+CREATE INDEX [IX_FK_UserTeam]
+ON [dbo].[Teams]
+    ([UserId]);
 GO
 
 -- --------------------------------------------------

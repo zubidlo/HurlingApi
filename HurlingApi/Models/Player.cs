@@ -12,49 +12,25 @@ namespace HurlingApi.Models
     using System;
     using System.Collections.Generic;
     
-    /// <summary></summary>
     public partial class Player
     {
-        /// <summary></summary>
         public Player()
         {
             this.TeamPlayers = new HashSet<TeamPlayer>();
         }
-
-        /// <summary></summary>
+    
         public int Id { get; set; }
-
-        /// <summary></summary>
         public string FirstName { get; set; }
-
-        /// <summary></summary>
         public string LastName { get; set; }
-
-        /// <summary></summary>
         public string GaaTeam { get; set; }
-
-        /// <summary></summary>
         public decimal LastWeekPoints { get; set; }
-
-        /// <summary></summary>
         public decimal OverallPoints { get; set; }
-
-        /// <summary></summary>
         public decimal Price { get; set; }
-
-        /// <summary></summary>
         public byte Rating { get; set; }
-
-        /// <summary></summary>
         public bool Injured { get; set; }
-
-        /// <summary></summary>
         public int PositionId { get; set; }
-
-        /// <summary></summary>
+    
         public virtual Position Position { get; set; }
-
-        /// <summary></summary>
         public virtual ICollection<TeamPlayer> TeamPlayers { get; set; }
     }
 }

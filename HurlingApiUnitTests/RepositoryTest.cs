@@ -50,7 +50,7 @@ namespace HurlingApiUnitTests
         }
 
         /// <summary>
-        /// test: find model with username="zubidlo".
+        /// test: find model with name="zubidlo".
         /// pass: if model.Username == "zubidlo".
         /// </summary>
         /// <returns></returns>

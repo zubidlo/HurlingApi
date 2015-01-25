@@ -14,27 +14,23 @@ using System.Web.Http.Cors;
 
 namespace HurlingApi.Controllers
 {
-    /// <summary></summary>
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     [RoutePrefix("api/positions")]
     public class PositionsController : ApiController
     {
-        private readonly Repositiory<Position> _repository = new Repositiory<Position>(new HurlingModelContext());
+        private readonly Repositiory<Position> _positionsRepository = new Repositiory<Position>(new HurlingModelContext());
+        private readonly Repositiory<Player> _playersRepository = new Repositiory<Player>(new HurlingModelContext());
         private readonly PositionDTOFactory _factory = new PositionDTOFactory();
 
-        /// <summary></summary>
-        /// <returns></returns>
         [Route("")]
         [HttpGet]
         public async Task<IQueryable<PositionDTO>> GetPostions()
         {
-            var positions = await _repository.GetAllAsync();
+            //find all positions
+            var positions = await _positionsRepository.GetAllAsync();
             return _factory.GetCollection(positions).AsQueryable<PositionDTO>();
         }
 
-        /// <summary></summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpGet]
         [ResponseType(typeof(PositionDTO))]
@@ -42,104 +38,104 @@ namespace HurlingApi.Controllers
         {
             try
             {
-                var position = await _repository.FindAsync(p => p.Id == id);
+                //find position with given id
+                var position = await _positionsRepository.FindAsync(p => p.Id == id);
+
+                //check if exists
                 if (position == null)
                 {
                     return NotFound();
                 }
+
                 return Ok(_factory.GetDTO(position));
             }
             catch (InvalidOperationException)
             {
-                return InternalServerError(new Exception("Repository is broken! There is more than one position with Id=" + id + " in the repository."));
+                //internal server error
+                throw;
             }
         }
 
-        /// <summary></summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
         [Route("name/{name}")]
         [HttpGet]
         [ResponseType(typeof(PositionDTO))]
         public async Task<IHttpActionResult> GetPositionByName([FromUri] string name)
         {
-            Position position = null;
             try
             {
-                position = await _repository.FindAsync(p => p.Name == name);
+                //find position with given name
+                var position = await _positionsRepository.FindAsync(p => p.Name == name);
+
+                //check if exists
                 if (position == null)
                 {
                     return NotFound();
                 }
+
                 return Ok(_factory.GetDTO(position));
             }
             catch (InvalidOperationException)
             {
-                return InternalServerError(new Exception("Repository is broken! There is more than one position with Name=" + name + " in the repository."));
+                //internal server error
+                throw;
             }
         }
 
-        /// <summary></summary>
-        /// <param name="id"></param>
-        /// <param name="positionDTO"></param>
-        /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpPut]
         [ResponseType(typeof(void))]
         public async Task<IHttpActionResult> EditPosition([FromUri] int id, [FromBody] PositionDTO positionDTO)
         {
+            //check if id from URI match position if from request body
             if (positionDTO.Id != id)
             {
                 return BadRequest("Position Id from request URI: " + id + " doesn't match position Id from request body: " + positionDTO.Id + "!");
             }
 
+            //check if model state is valid
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            Position position;
-
             try
             {
-                position = await _repository.FindAsync(p => p.Id == id);
+                //find position with given id
+                var position = await _positionsRepository.FindAsync(p => p.Id == id);
+
+                //check if exists
                 if (position == null)
                 {
                     return NotFound();
                 }
 
-                var position1 = await _repository.FindAsync(p => p.Name == positionDTO.Name);
-                if ((position1 != null) && (position1.Id != positionDTO.Id) && (position1.Name == positionDTO.Name))
+                //find some other position with same name
+                var position1 = await _positionsRepository.FindAsync(p => p.Name == positionDTO.Name);
+
+                //check if found position is different that edited one
+                if (position1 != null && position1.Id != positionDTO.Id)
                 {
                     return BadRequest("There is already a position with Name:" + positionDTO.Name + " in the repository!");
                 }
+
+                //positionDTO is ok, let's update the position
+                position.Name = positionDTO.Name;
+                await _positionsRepository.UpdateAsync(position);
+                return StatusCode(HttpStatusCode.NoContent);
             }
             catch (InvalidOperationException)
             {
-                return InternalServerError(new Exception("Repository is broken. There is more than one position with Name=" + positionDTO.Name + " in the repository."));
-            }
-
-            position.Name = positionDTO.Name;
-
-            try
-            {
-                await _repository.UpdateAsync(position);
-                return StatusCode(HttpStatusCode.NoContent);
-            }
-            catch (InvalidOperationException e)
-            {
-                return InternalServerError(e);
+                //internal server error
+                throw;
             }
         }
 
-        /// <summary></summary>
-        /// <param name="positionDTO"></param>
-        /// <returns></returns>
         [Route("")]
         [HttpPost]
         [ResponseType(typeof(PositionDTO))]
         public async Task<IHttpActionResult> PostPosition([FromBody] PositionDTO positionDTO)
         {
+            //check if model state is valid
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -147,32 +143,26 @@ namespace HurlingApi.Controllers
 
             try
             {
-                var position = await _repository.FindAsync(p => p.Name == positionDTO.Name);
+                //find a position with the same name
+                var position = await _positionsRepository.FindAsync(p => p.Name == positionDTO.Name);
+
+                //check if exists
                 if (position != null)
                 {
                     return BadRequest("There is already a position with Name:" + positionDTO.Name + " in the repository.");
                 }
+
+                position = _factory.GeTModel(positionDTO);
+                await _positionsRepository.InsertAsync(position);
+                return CreatedAtRoute("DefaultRoute", new { id = positionDTO.Id }, _factory.GetDTO(position));
             }
             catch (InvalidOperationException)
             {
-                return InternalServerError(new Exception("Repository is broken! There is more than one position with Name=" + positionDTO.Name));
-            }
-
-            var newPosition = _factory.GeTModel(positionDTO);
-            try
-            {
-                await _repository.InsertAsync(newPosition);
-                return CreatedAtRoute("DefaultRoute", new { id = positionDTO.Id }, _factory.GetDTO(newPosition));
-            }
-            catch (InvalidOperationException e)
-            {
-                return InternalServerError(e);
+                //internal server error
+                throw;
             }
         }
 
-        /// <summary></summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpDelete]
         [ResponseType(typeof(PositionDTO))]
@@ -180,27 +170,47 @@ namespace HurlingApi.Controllers
         {
             try
             {
-                var position = await _repository.FindAsync(p => p.Id == id);
+                //find a position with given id
+                var position = await _positionsRepository.FindAsync(p => p.Id == id);
+
+                //check if exists
                 if (position == null)
                 {
                     return NotFound();
                 }
-                await _repository.RemoveAsync(position);
+
+                try
+                {
+                    //find player referencing this position
+                    var player = await _playersRepository.FindAsync(p => p.PositionId == position.Id);
+
+                    //check if exists
+                    if (player != null)
+                    {
+                        return BadRequest("Can't delete this position, because there is still one player which still have a reference to it.");
+                    }
+                }
+                catch (InvalidOperationException)
+                {
+                    return BadRequest("Can't delete this position, because there are still some players which still have a reference to it.");
+                }
+
+                //everything is ok, let's remove the position
+                await _positionsRepository.RemoveAsync(position);
                 return Ok(_factory.GetDTO(position));
             }
-            catch (InvalidOperationException e)
+            catch (InvalidOperationException)
             {
-                return BadRequest("Deleting position with Id=" + id + " would break referential integrity of the repository. Check the relations between this position and other entities.");
+                //internal server error
+                throw;
             }
         }
 
-        /// <summary></summary>
-        /// <param name="disposing"></param>
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
-                _repository.Dispose();
+                _positionsRepository.Dispose();
             }
             base.Dispose(disposing);
         }

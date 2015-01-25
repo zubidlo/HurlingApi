@@ -15,27 +15,23 @@ using System.Web.Http.Cors;
 
 namespace HurlingApi.Controllers
 {
-    /// <summary></summary>
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     [RoutePrefix("api/players")]
     public class PlayersController : ApiController
     {
-        private readonly Repositiory<Player> _repository = new Repositiory<Player>(new HurlingModelContext());
+        private readonly Repositiory<Player> _playersRepository = new Repositiory<Player>(new HurlingModelContext());
+        private readonly Repositiory<Position> _positionsRepository = new Repositiory<Position>(new HurlingModelContext());
         private readonly PlayerDTOFactory _factory = new PlayerDTOFactory();
 
-        /// <summary></summary>
-        /// <returns></returns>
         [Route("")]
         [HttpGet]
         public async Task<IQueryable<PlayerDTO>> GetPlayers()
         {
-            var players = await _repository.GetAllAsync();
+            //find all players
+            var players = await _playersRepository.GetAllAsync();
             return _factory.GetCollection(players).AsQueryable<PlayerDTO>();
         }
 
-        /// <summary></summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpGet]
         [ResponseType(typeof(PlayerDTO))]
@@ -43,33 +39,36 @@ namespace HurlingApi.Controllers
         {
             try
             {
-                var player = await _repository.FindAsync(p => p.Id == id);
+                //find a player with given id
+                var player = await _playersRepository.FindAsync(p => p.Id == id);
+
+                //check if exists
                 if (player == null)
                 {
                     return NotFound();
                 }
+
                 return Ok(_factory.GetDTO(player));
             }
             catch (InvalidOperationException)
             {
-                return InternalServerError(new Exception("Repository is broken! There is more than one player with Id=" + id + " in the repository."));
+                //internal server error
+                throw;
             }
         }
 
-        /// <summary></summary>
-        /// <param name="id"></param>
-        /// <param name="playerDTO"></param>
-        /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpPut]
         [ResponseType(typeof(void))]
         public async Task<IHttpActionResult> EditPlayer([FromUri] int id, [FromBody] PlayerDTO playerDTO)
         {
+            //check if id from URI is the same as id from request body
             if (playerDTO.Id != id)
             {
                 return BadRequest("Player Id from request URI: " + id + " doesn't match player Id from request body: " + playerDTO.Id + "!");
             }
 
+            //check if the model state is valid
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -77,44 +76,60 @@ namespace HurlingApi.Controllers
 
             try
             {
-                await _repository.UpdateAsync(_factory.GeTModel(playerDTO));
+                //find a position the player is referencing
+                var position = await _positionsRepository.FindAsync(p => p.Id == playerDTO.PositionId);
+
+                //check if exists
+                if (position == null)
+                {
+                    return BadRequest("Postion with Id=" + playerDTO.PositionId + " doesn't exist in the repository.");
+                }
+
+                //playerDTO is ok, let's update the position
+                await _playersRepository.UpdateAsync(_factory.GeTModel(playerDTO));
                 return StatusCode(HttpStatusCode.NoContent);
             }
-            catch (InvalidOperationException e)
+            catch (InvalidOperationException)
             {
-                return InternalServerError(e);
+                //internal server error
+                throw;
             }
         }
 
-        /// <summary></summary>
-        /// <param name="playerDTO"></param>
-        /// <returns></returns>
         [Route("")]
         [HttpPost]
         [ResponseType(typeof(PlayerDTO))]
         public async Task<IHttpActionResult> PostPlayer([FromBody] PlayerDTO playerDTO)
         {
+            //check if the model state is valit
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-
-            var newPlayer = _factory.GeTModel(playerDTO);
-
+            
             try
             {
-                await _repository.InsertAsync(newPlayer);
-                return CreatedAtRoute("DefaultRoute", new { id = playerDTO.Id }, _factory.GetDTO(newPlayer));
+                //find a position the player is referencing
+                var position = await _positionsRepository.FindAsync(p => p.Id == playerDTO.PositionId);
+
+                //check if exists
+                if (position == null)
+                {
+                    return BadRequest("Postion with Id=" + playerDTO.PositionId + " doesn't exist in the repository.");
+                }
+
+                //playerDTO is ok, let's insert it
+                var player = _factory.GeTModel(playerDTO);
+                await _playersRepository.InsertAsync(player);
+                return CreatedAtRoute("DefaultRoute", new { id = playerDTO.Id }, _factory.GetDTO(player));
             }
-            catch (InvalidOperationException e)
+            catch (InvalidOperationException)
             {
-                return InternalServerError(e);
+                //internal server error
+                throw;
             }
         }
 
-        /// <summary></summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpDelete]
         [ResponseType(typeof(PlayerDTO))]
@@ -122,12 +137,17 @@ namespace HurlingApi.Controllers
         {
             try
             {
-                var player = await _repository.FindAsync(p => p.Id == id);
+                //find a player with given id
+                var player = await _playersRepository.FindAsync(p => p.Id == id);
+
+                //check if exists
                 if (player == null)
                 {
-                    return NotFound();
+                    return BadRequest("Player with id=" + id + "doesn't exist in the repository.");
                 }
-                await _repository.RemoveAsync(player);
+
+                //everything is ok, let's delete the player
+                await _playersRepository.RemoveAsync(player);
                 return Ok(_factory.GetDTO(player));
             }
             catch (InvalidOperationException e)
@@ -142,7 +162,7 @@ namespace HurlingApi.Controllers
         {
             if (disposing)
             {
-                _repository.Dispose();
+                _playersRepository.Dispose();
             }
             base.Dispose(disposing);
         }

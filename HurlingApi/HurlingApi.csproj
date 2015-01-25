@@ -224,6 +224,7 @@
     <Compile Include="Controllers\LeaguesController.cs" />
     <Compile Include="Controllers\PlayersController.cs" />
     <Compile Include="Controllers\PositionsController.cs" />
+    <Compile Include="Controllers\TeamsController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -268,6 +269,8 @@
     <Compile Include="Models\Team.cs">
       <DependentUpon>HurlingModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\TeamDTO.cs" />
+    <Compile Include="Models\TeamDTOFactory.cs" />
     <Compile Include="Models\TeamPlayer.cs">
       <DependentUpon>HurlingModel.tt</DependentUpon>
     </Compile>
