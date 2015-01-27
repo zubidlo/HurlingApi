@@ -10,10 +10,18 @@ using System.Web.Http.Cors;
 
 namespace HurlingApi
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public static class WebApiConfig
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="config"></param>
         public static void Register(HttpConfiguration config)
         {
+            //enable cross origin requests
             var cors = new EnableCorsAttribute("*", "*", "*");
             config.EnableCors();
 
@@ -38,10 +46,9 @@ namespace HurlingApi
             traceWriter.IsVerbose = true;
             traceWriter.MinimumLevel = TraceLevel.Debug;
 
+            //json formatter setting
             config.Formatters.Remove(config.Formatters.XmlFormatter);
             var json_settings = config.Formatters.JsonFormatter.SerializerSettings;
-            //var  defaultResorlver =  (DefaultContractResolver) json_settings.ContractResolver;
-            //defaultResorlver.IgnoreSerializableAttribute = true;
             json_settings.PreserveReferencesHandling = PreserveReferencesHandling.None;
             json_settings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             json_settings.Formatting = Formatting.Indented;

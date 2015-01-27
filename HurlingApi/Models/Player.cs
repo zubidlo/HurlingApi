@@ -16,7 +16,7 @@ namespace HurlingApi.Models
     {
         public Player()
         {
-            this.TeamPlayers = new HashSet<TeamPlayer>();
+            this.Teams = new HashSet<Team>();
         }
     
         public int Id { get; set; }
@@ -30,7 +30,7 @@ namespace HurlingApi.Models
         public bool Injured { get; set; }
         public int PositionId { get; set; }
     
-        public Position Position { get; set; }
-        public ICollection<TeamPlayer> TeamPlayers { get; set; }
+        public virtual Position Position { get; set; }
+        public virtual ICollection<Team> Teams { get; set; }
     }
 }

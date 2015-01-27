@@ -31,6 +31,5 @@ namespace HurlingApi.Models
         public virtual DbSet<Team> Teams { get; set; }
         public virtual DbSet<Player> Players { get; set; }
         public virtual DbSet<Message> Messages { get; set; }
-        public virtual DbSet<TeamPlayer> TeamPlayers { get; set; }
     }
 }

@@ -24,6 +24,6 @@ namespace HurlingApi.Models
         public System.DateTime NextFixtures { get; set; }
         public byte Week { get; set; }
     
-        public ICollection<Team> Teams { get; set; }
+        public virtual ICollection<Team> Teams { get; set; }
     }
 }

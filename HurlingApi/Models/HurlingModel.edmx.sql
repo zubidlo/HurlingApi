@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 01/24/2015 21:30:17
+-- Date Created: 01/26/2015 15:39:02
 -- Generated from EDMX file: C:\Users\martin\Documents\Visual Studio 2013\Projects\HurlingApi\HurlingApi\Models\HurlingModel.edmx
 -- --------------------------------------------------
 
@@ -23,17 +23,11 @@ GO
 IF OBJECT_ID(N'[dbo].[FK_PositionPlayer]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[Players] DROP CONSTRAINT [FK_PositionPlayer];
 GO
-IF OBJECT_ID(N'[dbo].[FK_TeamTeamPlayer]', 'F') IS NOT NULL
-    ALTER TABLE [dbo].[TeamPlayers] DROP CONSTRAINT [FK_TeamTeamPlayer];
-GO
-IF OBJECT_ID(N'[dbo].[FK_PlayerTeamPlayer]', 'F') IS NOT NULL
-    ALTER TABLE [dbo].[TeamPlayers] DROP CONSTRAINT [FK_PlayerTeamPlayer];
-GO
 IF OBJECT_ID(N'[dbo].[FK_TeamLeague]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[Teams] DROP CONSTRAINT [FK_TeamLeague];
 GO
 IF OBJECT_ID(N'[dbo].[FK_UserTeam]', 'F') IS NOT NULL
-    ALTER TABLE [dbo].[Users] DROP CONSTRAINT [FK_UserTeam];
+    ALTER TABLE [dbo].[Teams] DROP CONSTRAINT [FK_UserTeam];
 GO
 
 -- --------------------------------------------------
@@ -57,9 +51,6 @@ IF OBJECT_ID(N'[dbo].[Players]', 'U') IS NOT NULL
 GO
 IF OBJECT_ID(N'[dbo].[Messages]', 'U') IS NOT NULL
     DROP TABLE [dbo].[Messages];
-GO
-IF OBJECT_ID(N'[dbo].[TeamPlayers]', 'U') IS NOT NULL
-    DROP TABLE [dbo].[TeamPlayers];
 GO
 
 -- --------------------------------------------------
@@ -127,11 +118,10 @@ CREATE TABLE [dbo].[Messages] (
 );
 GO
 
--- Creating table 'TeamPlayers'
-CREATE TABLE [dbo].[TeamPlayers] (
-    [Id] int IDENTITY(1,1) NOT NULL,
-    [TeamId] int  NULL,
-    [PlayerId] int  NULL
+-- Creating table 'TeamPlayer'
+CREATE TABLE [dbo].[TeamPlayer] (
+    [Teams_Id] int  NOT NULL,
+    [Players_Id] int  NOT NULL
 );
 GO
 
@@ -175,10 +165,10 @@ ADD CONSTRAINT [PK_Messages]
     PRIMARY KEY CLUSTERED ([Id] ASC);
 GO
 
--- Creating primary key on [Id] in table 'TeamPlayers'
-ALTER TABLE [dbo].[TeamPlayers]
-ADD CONSTRAINT [PK_TeamPlayers]
-    PRIMARY KEY CLUSTERED ([Id] ASC);
+-- Creating primary key on [Teams_Id], [Players_Id] in table 'TeamPlayer'
+ALTER TABLE [dbo].[TeamPlayer]
+ADD CONSTRAINT [PK_TeamPlayer]
+    PRIMARY KEY CLUSTERED ([Teams_Id], [Players_Id] ASC);
 GO
 
 -- --------------------------------------------------
@@ -215,36 +205,6 @@ ON [dbo].[Players]
     ([PositionId]);
 GO
 
--- Creating foreign key on [TeamId] in table 'TeamPlayers'
-ALTER TABLE [dbo].[TeamPlayers]
-ADD CONSTRAINT [FK_TeamTeamPlayer]
-    FOREIGN KEY ([TeamId])
-    REFERENCES [dbo].[Teams]
-        ([Id])
-    ON DELETE NO ACTION ON UPDATE NO ACTION;
-GO
-
--- Creating non-clustered index for FOREIGN KEY 'FK_TeamTeamPlayer'
-CREATE INDEX [IX_FK_TeamTeamPlayer]
-ON [dbo].[TeamPlayers]
-    ([TeamId]);
-GO
-
--- Creating foreign key on [PlayerId] in table 'TeamPlayers'
-ALTER TABLE [dbo].[TeamPlayers]
-ADD CONSTRAINT [FK_PlayerTeamPlayer]
-    FOREIGN KEY ([PlayerId])
-    REFERENCES [dbo].[Players]
-        ([Id])
-    ON DELETE NO ACTION ON UPDATE NO ACTION;
-GO
-
--- Creating non-clustered index for FOREIGN KEY 'FK_PlayerTeamPlayer'
-CREATE INDEX [IX_FK_PlayerTeamPlayer]
-ON [dbo].[TeamPlayers]
-    ([PlayerId]);
-GO
-
 -- Creating foreign key on [LeagueId] in table 'Teams'
 ALTER TABLE [dbo].[Teams]
 ADD CONSTRAINT [FK_TeamLeague]
@@ -273,6 +233,30 @@ GO
 CREATE INDEX [IX_FK_UserTeam]
 ON [dbo].[Teams]
     ([UserId]);
+GO
+
+-- Creating foreign key on [Teams_Id] in table 'TeamPlayer'
+ALTER TABLE [dbo].[TeamPlayer]
+ADD CONSTRAINT [FK_TeamPlayer_Team]
+    FOREIGN KEY ([Teams_Id])
+    REFERENCES [dbo].[Teams]
+        ([Id])
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
+
+-- Creating foreign key on [Players_Id] in table 'TeamPlayer'
+ALTER TABLE [dbo].[TeamPlayer]
+ADD CONSTRAINT [FK_TeamPlayer_Player]
+    FOREIGN KEY ([Players_Id])
+    REFERENCES [dbo].[Players]
+        ([Id])
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
+
+-- Creating non-clustered index for FOREIGN KEY 'FK_TeamPlayer_Player'
+CREATE INDEX [IX_FK_TeamPlayer_Player]
+ON [dbo].[TeamPlayer]
+    ([Players_Id]);
 GO
 
 -- --------------------------------------------------

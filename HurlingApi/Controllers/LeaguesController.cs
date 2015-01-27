@@ -15,47 +15,37 @@ using System.Web.Http.Cors;
 
 namespace HurlingApi.Controllers
 {
+    /// <summary>
+    /// 
+    /// </summary>
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     [RoutePrefix("api/leagues")]
     public class LeaguesController : ApiController
     {
-        private readonly Repositiory<League> _leaguesRepository =
-            new Repositiory<League>(new HurlingModelContext());
-        private readonly Repositiory<Team> _teamsRepository =
-            new Repositiory<Team>(new HurlingModelContext());
-        private readonly LeagueDTOFactory _factory =
-            new LeagueDTOFactory();
+        private readonly FantasyHurlingRepository _repository = new FantasyHurlingRepository();
+        private readonly LeagueDTOFactory _factory =  new LeagueDTOFactory();
+        
         private bool _disposed;
 
-        protected override void Dispose(bool disposing)
-        {
-            if (!_disposed)
-            {
-                if (disposing)
-                {
-                    _leaguesRepository.Dispose();
-                    _teamsRepository.Dispose();
-                }
-
-                // release any unmanaged objects
-                // set object references to null
-
-                _disposed = true;
-            }
-
-            base.Dispose(disposing);
-        }
-
-        [Route("")]
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        [Route("", Name="leaguesRoute")]
         [HttpGet]
         public async Task<IQueryable<LeagueDTO>> GetLeagues()
         {
-            IEnumerable<League> leagues = await _leaguesRepository.GetAllAsync();
+            IEnumerable<League> leagues = await _repository.Leagues().GetAllAsync();
             IEnumerable<LeagueDTO> leagueDTOs = _factory.GetDTOCollection(leagues);
             IQueryable<LeagueDTO> oDataLeagueDTOs = leagueDTOs.AsQueryable<LeagueDTO>();
             return oDataLeagueDTOs;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpGet]
         [ResponseType(typeof(LeagueDTO))]
@@ -64,7 +54,7 @@ namespace HurlingApi.Controllers
             League league;
 
             //try to get requested league
-            try { league = await _leaguesRepository.FindSingleAsync(l => l.Id == id); }
+            try { league = await _repository.Leagues().FindSingleAsync(l => l.Id == id); }
             catch (InvalidOperationException) { throw; }
            
             //if doesn't exists send not found response
@@ -75,6 +65,12 @@ namespace HurlingApi.Controllers
             return Ok(leagueDTO);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="leagueDTO"></param>
+        /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpPut]
         [ResponseType(typeof(void))]
@@ -93,7 +89,7 @@ namespace HurlingApi.Controllers
             League league;
 
             //try to get requested league
-            try { league = await _leaguesRepository.FindSingleAsync(l => l.Id == id); }
+            try { league = await _repository.Leagues().FindSingleAsync(l => l.Id == id); }
             catch (InvalidOperationException) { throw; }
             
             //if doesn't exist send not found response
@@ -105,13 +101,18 @@ namespace HurlingApi.Controllers
             league.Week = leagueDTO.Week;
 
             //try to update repository
-            try { int result = await _leaguesRepository.UpdateAsync(league); }
+            try { int result = await _repository.Leagues().UpdateAsync(league); }
             catch (Exception) { throw; }
 
             //send no content response
             return StatusCode(HttpStatusCode.NoContent);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="leagueDTO"></param>
+        /// <returns></returns>
         [Route("")]
         [HttpPost]
         [ResponseType(typeof(LeagueDTO))]
@@ -122,7 +123,7 @@ namespace HurlingApi.Controllers
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
 
             //get all leagues
-            IEnumerable<League> leagues = await _leaguesRepository.GetAllAsync();
+            IEnumerable<League> leagues = await _repository.Leagues().GetAllAsync();
 
             //if there is a league in the repository already send bad request response
             if (leagues.Count() > 0)
@@ -134,16 +135,21 @@ namespace HurlingApi.Controllers
             League league = _factory.GeTModel(leagueDTO);
 
             //try to insert the league into the repository
-            try { int result = await _leaguesRepository.InsertAsync(league); }
+            try { int result = await _repository.Leagues().InsertAsync(league); }
             catch (Exception) { throw; }
 
             //InsertAsync(league) created new id, so leagueDTO must reflect that
             leagueDTO = _factory.GetDTO(league);
 
             //send created at route response
-            return CreatedAtRoute("DefaultRoute", new { id = league.Id }, leagueDTO);
+            return CreatedAtRoute("leaguesRoute", new { id = league.Id }, leagueDTO);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpDelete]
         [ResponseType(typeof(LeagueDTO))]
@@ -152,14 +158,14 @@ namespace HurlingApi.Controllers
             League league;
 
             //try to get requested league
-            try { league = await _leaguesRepository.FindSingleAsync(l => l.Id == id); }
+            try { league = await _repository.Leagues().FindSingleAsync(l => l.Id == id); }
             catch (InvalidOperationException) { throw; }
 
             //if doesn't exist send not found response
             if (league == null) { return NotFound(); }
 
             //find out if any team referencing this league exists
-            bool exist = await _teamsRepository.ExistAsync(t => t.LeagueId == id);
+            bool exist = await _repository.Teams().ExistAsync(t => t.LeagueId == id);
 
             //if exists send bad request response
             if (exist)
@@ -169,12 +175,34 @@ namespace HurlingApi.Controllers
             }
 
             //try to remove the league from the repository
-            try { int result = await _leaguesRepository.RemoveAsync(league); }
+            try { int result = await _repository.Leagues().RemoveAsync(league); }
             catch (Exception) { throw; }
 
             LeagueDTO leagueDTO = _factory.GetDTO(league);
             //send ok response
             return Ok(leagueDTO);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="disposing"></param>
+        protected override void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    _repository.Dispose();
+                }
+
+                // release any unmanaged objects
+                // set object references to null
+
+                _disposed = true;
+            }
+
+            base.Dispose(disposing);
         }
     }
 }

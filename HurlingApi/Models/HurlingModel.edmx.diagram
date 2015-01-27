@@ -4,20 +4,18 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="d51d99fc05e54d67936036bf55457655" Name="Diagram1" DisplayType="true" >
+      <Diagram DiagramId="d51d99fc05e54d67936036bf55457655" Name="Diagram1" DisplayType="true" ZoomLevel="94" >
         <EntityTypeShape EntityType="HurlingModel.Position" Width="1.5" PointX="7.75" PointY="7.125" />
         <EntityTypeShape EntityType="HurlingModel.User" Width="1.5" PointX="0.5" PointY="3.125" />
         <EntityTypeShape EntityType="HurlingModel.League" Width="2.25" PointX="7.625" PointY="4" />
-        <EntityTypeShape EntityType="HurlingModel.Team" Width="2" PointX="3.625" PointY="2.375" />
+        <EntityTypeShape EntityType="HurlingModel.Team" Width="2" PointX="3.625" PointY="2.375" FillColor="DarkOrange" />
         <EntityTypeShape EntityType="HurlingModel.Player" Width="2.125" PointX="1.625" PointY="8.75" />
         <EntityTypeShape EntityType="HurlingModel.Message" Width="2.125" PointX="0.5" PointY="6.25" />
         <AssociationConnector Association="HurlingModel.UserMessage" />
         <AssociationConnector Association="HurlingModel.PositionPlayer" />
-        <EntityTypeShape EntityType="HurlingModel.TeamPlayer" Width="1.5" PointX="5" PointY="6.625" />
-        <AssociationConnector Association="HurlingModel.TeamTeamPlayer" />
-        <AssociationConnector Association="HurlingModel.PlayerTeamPlayer" />
         <AssociationConnector Association="HurlingModel.TeamLeague" />
         <AssociationConnector Association="HurlingModel.UserTeam" />
+        <AssociationConnector Association="HurlingModel.TeamPlayer" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

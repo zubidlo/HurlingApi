@@ -51,7 +51,7 @@ namespace HurlingApi.Areas.HelpPage
 
         /// <summary>
         /// Gets factories for the objects that the supported formatters will serialize as samples. Processed in order,
-        /// stopping when the _factory successfully returns a non-<see langref="null"/> object.
+        /// stopping when the _teamFactory successfully returns a non-<see langref="null"/> object.
         /// </summary>
         /// <remarks>
         /// Collection includes just <see cref="ObjectGenerator.GenerateObject(Type)"/> initially. Use
@@ -199,7 +199,7 @@ namespace HurlingApi.Areas.HelpPage
                     }
                     catch
                     {
-                        // Ignore any problems encountered in the _factory; go on to the next one (if any).
+                        // Ignore any problems encountered in the _teamFactory; go on to the next one (if any).
                     }
                 }
             }
@@ -364,7 +364,7 @@ namespace HurlingApi.Areas.HelpPage
             return exception;
         }
 
-        // Default _factory for sample objects
+        // Default _teamFactory for sample objects
         private static object DefaultSampleObjectFactory(HelpPageSampleGenerator sampleGenerator, Type type)
         {
             // Try to create a default sample object

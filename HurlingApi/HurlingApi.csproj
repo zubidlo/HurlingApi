@@ -231,6 +231,7 @@
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AbstractFactoryDTO.cs" />
+    <Compile Include="Models\FantasyHurlingRepository.cs" />
     <Compile Include="Models\HurlingModel.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -251,8 +252,8 @@
     <Compile Include="Models\PlayerDTO.cs" />
     <Compile Include="Models\PlayerDTOFactory.cs" />
     <Compile Include="Models\PositionDTOFactory.cs" />
-    <Compile Include="Models\Repositiory.cs" />
-    <Compile Include="Models\IRepository.cs" />
+    <Compile Include="Models\Entity.cs" />
+    <Compile Include="Models\IEntity.cs" />
     <Compile Include="Models\League.cs">
       <DependentUpon>HurlingModel.tt</DependentUpon>
     </Compile>
@@ -271,9 +272,6 @@
     </Compile>
     <Compile Include="Models\TeamDTO.cs" />
     <Compile Include="Models\TeamDTOFactory.cs" />
-    <Compile Include="Models\TeamPlayer.cs">
-      <DependentUpon>HurlingModel.tt</DependentUpon>
-    </Compile>
     <Compile Include="Models\User.cs">
       <DependentUpon>HurlingModel.tt</DependentUpon>
     </Compile>

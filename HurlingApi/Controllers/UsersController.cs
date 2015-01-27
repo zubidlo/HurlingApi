@@ -15,46 +15,37 @@ using System.Web.Http.Cors;
 
 namespace HurlingApi.Controllers
 {
+    /// <summary>
+    /// 
+    /// </summary>
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     [RoutePrefix("api/users")]
     public class UsersController : ApiController
     {
-        private readonly Repositiory<User> _usersRepository = 
-            new Repositiory<User>(new HurlingModelContext());
-        private readonly Repositiory<Team> _teamsRepository = 
-            new Repositiory<Team>(new HurlingModelContext());
+        private readonly FantasyHurlingRepository _repository = new FantasyHurlingRepository();
         private readonly UserDTOFactory _factory = new UserDTOFactory();
+
         private bool _disposed;
 
-        protected override void Dispose(bool disposing)
-        {
-            if (!_disposed)
-            {
-                if (disposing)
-                {
-                    _usersRepository.Dispose();
-                    _teamsRepository.Dispose();
-                }
-
-                // release any unmanaged objects
-                // set object references to null
-
-                _disposed = true;
-            }
-
-            base.Dispose(disposing);
-        }
-       
-        [Route("", Name = "DefaultRoute")]
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        [Route("", Name = "usersRoute")]
         [HttpGet]
         public async Task<IQueryable<UserDTO>> GetUsers()
         {
-            IEnumerable<User> users = await _usersRepository.GetAllAsync();
+            IEnumerable<User> users = await _repository.Users().GetAllAsync();
             IEnumerable<UserDTO> userDTOs = _factory.GetDTOCollection(users);
             IQueryable<UserDTO> oDataUserDTOs = userDTOs.AsQueryable<UserDTO>();
             return oDataUserDTOs;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpGet]
         [ResponseType(typeof(UserDTO))]
@@ -62,7 +53,7 @@ namespace HurlingApi.Controllers
         {
             User user;
             //try to get requested user
-            try { user = await _usersRepository.FindSingleAsync(u => u.Id == id); }
+            try { user = await _repository.Users().FindSingleAsync(u => u.Id == id); }
             catch (InvalidOperationException) { throw; }
 
             //if doesn't exist send not found response
@@ -73,6 +64,11 @@ namespace HurlingApi.Controllers
             return Ok(userDTO);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
         [Route("username/{username}")]
         [HttpGet]
         [ResponseType(typeof(UserDTO))]
@@ -80,7 +76,7 @@ namespace HurlingApi.Controllers
         {
             User user;
             //try to get requested user
-            try { user = await _usersRepository.FindSingleAsync(u => u.Username == username); }
+            try { user = await _repository.Users().FindSingleAsync(u => u.Username == username); }
             catch (InvalidOperationException) { throw; }
 
             //if doesn't exist send not found response
@@ -91,6 +87,12 @@ namespace HurlingApi.Controllers
             return Ok(userDTO);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="userDTO"></param>
+        /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpPut]
         [ResponseType(typeof(void))]
@@ -109,14 +111,14 @@ namespace HurlingApi.Controllers
             User user, user1;
 
             //try to get requested user
-            try { user = await _usersRepository.FindSingleAsync(u => u.Id == id); }
+            try { user = await _repository.Users().FindSingleAsync(u => u.Id == id); }
             catch (InvalidOperationException) { throw; }
 
             //if doesn't exist send not found response
             if (user == null) { return NotFound(); }
 
             // try to get user with same username
-            try { user1 = await _usersRepository.FindSingleAsync(u => u.Username == userDTO.Username); }
+            try { user1 = await _repository.Users().FindSingleAsync(u => u.Username == userDTO.Username); }
             catch (InvalidOperationException) { throw; }   
 
             //if exists and if it is different that one we are editing send bad request response
@@ -132,13 +134,18 @@ namespace HurlingApi.Controllers
             user.Email = userDTO.Email;
 
             //try to update the user in the repository
-            try { int result = await _usersRepository.UpdateAsync(user); }
+            try { int result = await _repository.Users().UpdateAsync(user); }
             catch (Exception) { throw; }
 
             //send no content response
             return StatusCode(HttpStatusCode.NoContent);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userDTO"></param>
+        /// <returns></returns>
         [Route("")]
         [HttpPost]
         [ResponseType(typeof(UserDTO))]
@@ -148,7 +155,7 @@ namespace HurlingApi.Controllers
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
 
             //find out if there is an user with the same username
-            bool exist = await _usersRepository.ExistAsync(u => u.Username == userDTO.Username);
+            bool exist = await _repository.Users().ExistAsync(u => u.Username == userDTO.Username);
 
             //if exists send bad request response
             if (exist)
@@ -160,16 +167,21 @@ namespace HurlingApi.Controllers
             User user = _factory.GeTModel(userDTO);
 
             //try to insert the user into the repository
-            try { int result = await _usersRepository.InsertAsync(user); }
+            try { int result = await _repository.Users().InsertAsync(user); }
             catch(Exception ) { throw; }
                 
             //InsertAsync(user) created new id, so userDTO must reflect that
             userDTO = _factory.GetDTO(user);
                 
             //send created at route response
-            return CreatedAtRoute("DefaultRoute", new { id = user.Id }, userDTO);
+            return CreatedAtRoute("usersRoute", new { id = user.Id }, userDTO);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpDelete]
         [ResponseType(typeof(UserDTO))]
@@ -178,14 +190,14 @@ namespace HurlingApi.Controllers
             User user;
 
             //try to get requested user
-            try { user = await _usersRepository.FindSingleAsync(u => u.Id == id); }
+            try { user = await _repository.Users().FindSingleAsync(u => u.Id == id); }
             catch (InvalidOperationException) { throw; }
 
             //if doesn't exist send not found response
             if (user == null) { return NotFound(); }
 
             //find out if a the team referencing this user exist
-            bool exist = await _teamsRepository.ExistAsync(t => t.UserId == id);
+            bool exist = await _repository.Teams().ExistAsync(t => t.UserId == id);
 
             //if exists send bad request response
             if (exist)
@@ -194,13 +206,35 @@ namespace HurlingApi.Controllers
             }
 
             //try to remove the user
-            try { int result = await _usersRepository.RemoveAsync(user); }
+            try { int result = await _repository.Users().RemoveAsync(user); }
             catch(Exception) { throw; }
 
             UserDTO userDTO = _factory.GetDTO(user);
 
             //send ok response
             return Ok(userDTO);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="disposing"></param>
+        protected override void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    _repository.Dispose();
+                }
+
+                // release any unmanaged objects
+                // set object references to null
+
+                _disposed = true;
+            }
+
+            base.Dispose(disposing);
         }
     }
 }

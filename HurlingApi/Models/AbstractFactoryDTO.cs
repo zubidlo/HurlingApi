@@ -5,19 +5,25 @@ using System.Web;
 
 namespace HurlingApi.Models
 {
-    /// <summary></summary>
+    /// <summary>
+    /// 
+    /// </summary>
     /// <typeparam name="MODEL"></typeparam>
     /// <typeparam name="DTO"></typeparam>
     public abstract class AbstractFactoryDTO<MODEL,DTO>
         where MODEL : class
         where DTO : class
     {
-        /// <summary</summary>
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
         public abstract DTO GetDTO(MODEL model);
 
-        /// <summary></summary>
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
         public abstract MODEL GeTModel(DTO dto);

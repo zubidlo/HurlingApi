@@ -10,7 +10,7 @@ namespace HurlingApiUnitTests
     [TestClass]
     public class UserRepositoryTest : IDisposable
     {
-        private IRepository<User> _repository;
+        private IEntity<User> _repository;
         bool _disposed;
 
         public void Dispose()
@@ -43,7 +43,7 @@ namespace HurlingApiUnitTests
         [TestInitialize]
         public void Initialize()
         {
-            _repository = new Repositiory<User>(new HurlingModelContext());
+            _repository = new Entity<User>(new HurlingModelContext());
         }
 
         [TestMethod]
