@@ -208,7 +208,7 @@ namespace HurlingApi.Controllers
         /// <param name="playerId"></param>
         /// <returns></returns>
         [Route("id/{teamId:int}/player/id/{playerId:int}")]
-        [HttpPost]
+        [HttpPut]
         [ResponseType(typeof(string))]
         public async Task<IHttpActionResult> PostTeamPlayer([FromUri] int teamId, [FromUri] int playerId)
         {
@@ -226,9 +226,20 @@ namespace HurlingApi.Controllers
             //if doesn't exist send not found response
             if (team == null || player == null) { return NotFound(); }
 
+            //find out if there is this player already in the team
+            bool playerAlreadyInThisTeam = team.Players.Any(p => p.Id == playerId);
+
+            if (playerAlreadyInThisTeam) { return BadRequest("Player with id=" + playerId + " is in this team already!"); }
+
+            //find out if there is a player with same field position (we allow only one player per position)
+            bool positionAlreadyInThisTeam = team.Players.Any(p => p.PositionId == player.PositionId);
+
+            if (positionAlreadyInThisTeam) { return BadRequest("There is already a player with the same position in this team!"); }
+
+            //add player to this team
             team.Players.Add(player);
 
-            //try to update the team in the repository
+            //try to save changes in the repository
             try { int result = await _repository.Teams().SaveChangesAsync(); }
             catch (Exception) { throw; }
 
