@@ -349,6 +349,40 @@ namespace HurlingApi.Controllers
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="teamId"></param>
+        /// <param name="playerId"></param>
+        /// <returns></returns>
+        [Route("id/{teamId:int}/player/id/{playerId:int}")]
+        [HttpDelete]
+        public async Task<IHttpActionResult> DeletePlayerFromTeam([FromUri] int teamId, [FromUri] int playerId)
+        {
+            Team team;
+            //try to get requested team
+            try { team = await _repository.Teams().FindSingleAsync(t => t.Id == teamId); }
+            catch (InvalidOperationException) { throw; }
+
+            //if doesn't exist send not found response
+            if (team == null) { return NotFound(); }
+
+            Player player = team.Players.FirstOrDefault(p => p.Id == playerId);
+
+            if (player == null) { return NotFound(); }
+
+            //remove the player from the team
+            team.Players.Remove(player);
+
+            //try to save changes in the repository
+            try { int result = await _repository.Teams().SaveChangesAsync(); }
+            catch (Exception) { throw; }
+
+            PlayerDTO playerDTO = _playerFactory.GetDTO(player);
+            //send ok response
+            return Ok(playerDTO);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="disposing"></param>
         protected override void Dispose(bool disposing)
         {

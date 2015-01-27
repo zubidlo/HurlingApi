@@ -739,6 +739,14 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:HurlingApi.Controllers.TeamsController.DeletePlayerFromTeam(System.Int32,System.Int32)">
+            <summary>
+            
+            </summary>
+            <param name="teamId"></param>
+            <param name="playerId"></param>
+            <returns></returns>
+        </member>
         <member name="M:HurlingApi.Controllers.TeamsController.Dispose(System.Boolean)">
             <summary>
             
