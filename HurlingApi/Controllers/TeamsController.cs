@@ -97,7 +97,7 @@ namespace HurlingApi.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Route("id/{id:int}/messages")]
+        [Route("id/{id:int}/players")]
         [HttpGet]
         public async Task<IQueryable<PlayerDTO>> GetTeamPlayers([FromUri] int id)
         {
@@ -207,7 +207,7 @@ namespace HurlingApi.Controllers
         /// <param name="teamId"></param>
         /// <param name="playerId"></param>
         /// <returns></returns>
-        [Route("id/{teamId:int}/message/id/{playerId:int}")]
+        [Route("id/{teamId:int}/player/id/{playerId:int}")]
         [HttpPut]
         [ResponseType(typeof(string))]
         public async Task<IHttpActionResult> PostTeamPlayer([FromUri] int teamId, [FromUri] int playerId)
@@ -352,7 +352,7 @@ namespace HurlingApi.Controllers
         /// <param name="teamId"></param>
         /// <param name="playerId"></param>
         /// <returns></returns>
-        [Route("id/{teamId:int}/message/id/{playerId:int}")]
+        [Route("id/{teamId:int}/player/id/{playerId:int}")]
         [HttpDelete]
         public async Task<IHttpActionResult> DeletePlayerFromTeam([FromUri] int teamId, [FromUri] int playerId)
         {
