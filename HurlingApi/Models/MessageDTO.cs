@@ -32,7 +32,7 @@ namespace HurlingApi.Models
         /// <summary>
         /// 
         /// </summary>
-        [Required]
-        public System.DateTime Created { get; set; }
+        
+        public Nullable<System.DateTime> Created { get; set; }
     }
 }

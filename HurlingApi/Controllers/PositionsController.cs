@@ -199,7 +199,7 @@ namespace HurlingApi.Controllers
             //if doesn't exists send not found response
             if (position == null) { return NotFound(); }
 
-            //check if any player references this position
+            //check if any message references this position
             bool exist = await _repository.Players().ExistAsync(p => p.PositionId == id);
 
             //if exists send bad request response

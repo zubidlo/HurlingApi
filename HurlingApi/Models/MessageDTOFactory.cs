@@ -38,8 +38,10 @@ namespace HurlingApi.Models
                 Id = dto.Id,
                 Text = dto.Text,
                 UserId = dto.UserId,
-                Created = dto.Created
+                Created = DateTime.Now
             };
         }
+
+        
     }
 }

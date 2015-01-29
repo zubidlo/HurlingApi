@@ -596,6 +596,13 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:HurlingApi.Controllers.MessagesController.PostMessage(HurlingApi.Models.MessageDTO)">
+            <summary>
+            
+            </summary>
+            <param name="messageDTO"></param>
+            <returns></returns>
+        </member>
         <member name="M:HurlingApi.Controllers.MessagesController.Dispose(System.Boolean)">
             <summary>
             
@@ -625,7 +632,7 @@
             
             </summary>
             <param name="id"></param>
-            <param name="playerDTO"></param>
+            <param name="messageDTO"></param>
             <returns></returns>
         </member>
         <member name="M:HurlingApi.Controllers.PlayersController.PostPlayer(HurlingApi.Models.PlayerDTO)">
@@ -844,7 +851,7 @@
             <summary>
             
             </summary>
-            <typeparam name="MODEL"></typeparam>
+            <typeparam name="Model"></typeparam>
             <typeparam name="DTO"></typeparam>
         </member>
         <member name="M:HurlingApi.Models.AbstractFactoryDTO`2.GetDTO(`0)">

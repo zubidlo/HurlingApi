@@ -65,6 +65,64 @@ namespace HurlingApi.Controllers
             return Ok(messageDTO);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="messageDTO"></param>
+        /// <returns></returns>
+        [Route("")]
+        [HttpPost]
+        [ResponseType(typeof(MessageDTO))]
+        public async Task<IHttpActionResult> PostMessage([FromBody] MessageDTO messageDTO)
+        {
+            //if the model state is not valit send bad request response
+            if (!ModelState.IsValid) { return BadRequest(ModelState); }
+
+            //find out if a user with given id exists in the repository
+            bool exist = await _repository.Users().ExistAsync(u => u.Id == messageDTO.UserId);
+
+            //if doesn't exists send bad request response
+            if (!exist)
+            {
+                return BadRequest("User with Id=" + messageDTO.UserId + " doesn't exist in the repository.");
+            }
+
+            //messageDTO is ok, make new message
+            Message message = _factory.GeTModel(messageDTO);
+
+            //try to insert message into repository
+            try { int result = await _repository.Messages().InsertAsync(message); }
+            catch (Exception) { throw; }
+
+            //InsertAsync(message) created new id, so messageDTO must reflect that
+            messageDTO = _factory.GetDTO(message);
+
+            //send created at route response
+            return CreatedAtRoute("messagesRoute", new { id = message.Id }, messageDTO);
+        }
+
+        [Route("id/{id:int}")]
+        [HttpDelete]
+        [ResponseType(typeof(MessageDTO))]
+        public async Task<IHttpActionResult> DeleteMessage([FromUri] int id)
+        {
+            Message message;
+
+            //try to get a message with given id
+            try { message = await _repository.Messages().FindSingleAsync(m => m.Id == id); }
+            catch (InvalidOperationException) { throw; }
+
+            //if doesn't exists send not found response
+            if (message == null) { return NotFound(); }
+
+            //try to delete the message
+            try { int result = await _repository.Messages().RemoveAsync(message); }
+            catch (Exception) { throw; }
+
+            MessageDTO messageDTO = _factory.GetDTO(message);
+            //send ok response
+            return Ok(messageDTO);
+        }
 
         /// <summary>
         /// 

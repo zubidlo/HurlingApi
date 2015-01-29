@@ -53,7 +53,7 @@ namespace HurlingApi.Controllers
         {
             Player player;
 
-            //try to get requested player
+            //try to get requested message
             try { player = await _repository.Players().FindSingleAsync(p => p.Id == id); }
             catch (InvalidOperationException) { throw; }
 
@@ -69,7 +69,7 @@ namespace HurlingApi.Controllers
         /// 
         /// </summary>
         /// <param name="id"></param>
-        /// <param name="playerDTO"></param>
+        /// <param name="messageDTO"></param>
         /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpPut]
@@ -88,7 +88,7 @@ namespace HurlingApi.Controllers
 
             Player player;
 
-            //try to get requested player
+            //try to get requested message
             try { player = await _repository.Players().FindSingleAsync(p => p.Id == id); }
             catch (InvalidOperationException) { throw; }
 
@@ -104,7 +104,7 @@ namespace HurlingApi.Controllers
                 return BadRequest("Postion with Id=" + playerDTO.PositionId + " doesn't exist in the repository.");
             }
 
-            //now messageDTO is ok, set player's properties
+            //now messageDTO is ok, set message's properties
             player.FirstName = playerDTO.FirstName;
             player.LastName = playerDTO.LastName;
             player.GaaTeam = playerDTO.GaaTeam;
@@ -145,14 +145,14 @@ namespace HurlingApi.Controllers
                 return BadRequest("Postion with Id=" + playerDTO.PositionId + " doesn't exist in the repository.");
             }
 
-            //messageDTO is ok, make new player
+            //messageDTO is ok, make new message
             Player player = _factory.GeTModel(playerDTO);
 
-            //try to insert player into repository
+            //try to insert message into repository
             try { int result = await _repository.Players().InsertAsync(player); }
             catch (Exception) { throw; }
 
-            //InsertAsync(player) created new id, so messageDTO must reflect that
+            //InsertAsync(message) created new id, so messageDTO must reflect that
             playerDTO = _factory.GetDTO(player);
 
             //send created at route response
@@ -171,18 +171,18 @@ namespace HurlingApi.Controllers
         {
             Player player;
 
-            //try to get a player with given id
+            //try to get a message with given id
             try { player = await _repository.Players().FindSingleAsync(p => p.Id == id); }
             catch (InvalidOperationException) { throw; }
 
             //if doesn't exists send not found response
             if (player == null) { return NotFound(); }
 
-            //try to delete the player
+            //try to delete the message
             try { int result = await _repository.Players().RemoveAsync(player); }
             catch (Exception)
             {
-                return BadRequest("Deleting player with Id=" + id + " would break referential integrity " +
+                return BadRequest("Deleting message with Id=" + id + " would break referential integrity " +
                                     "of the repository. Check PlayersInTeams entity for references.");
             }
 
