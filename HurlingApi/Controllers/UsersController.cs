@@ -22,7 +22,7 @@ namespace HurlingApi.Controllers
     [RoutePrefix("api/users")]
     public class UsersController : ApiController
     {
-        private readonly FantasyHurlingRepository _repository = new FantasyHurlingRepository();
+        private readonly IRepository _repository = new FantasyHurlingRepository();
         private readonly UserDTOFactory _factory = new UserDTOFactory();
 
         private bool _disposed;

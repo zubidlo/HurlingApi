@@ -21,7 +21,7 @@ namespace HurlingApi.Controllers
     [RoutePrefix("api/positions")]
     public class PositionsController : ApiController
     {
-        private readonly FantasyHurlingRepository _repository = new FantasyHurlingRepository();
+        private readonly IRepository _repository = new FantasyHurlingRepository();
         private readonly PositionDTOFactory _factory = new PositionDTOFactory();
 
         private bool _disposed;
@@ -199,14 +199,14 @@ namespace HurlingApi.Controllers
             //if doesn't exists send not found response
             if (position == null) { return NotFound(); }
 
-            //check if any player references this position
+            //check if any message references this position
             bool exist = await _repository.Players().ExistAsync(p => p.PositionId == id);
 
             //if exists send bad request response
             if (exist)
             {
                 return BadRequest("Can't delete this position, because there are " +
-                                "still some players referencing the position!");
+                                "still some messages referencing the position!");
             }
 
             //try to remove the position from the repository

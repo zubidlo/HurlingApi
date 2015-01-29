@@ -17,14 +17,15 @@ namespace HurlingApi.Models
     /// <summary>
     /// 
     /// </summary>
-    public class FantasyHurlingRepository : IDisposable
+    public class FantasyHurlingRepository : IRepository
     {
-        private readonly DbContext _context = new HurlingModelContext();
+        private readonly DbContext _context;
         private readonly IEntity<User> userTable; 
         private readonly IEntity<League> leagueTable;
         private readonly IEntity<Player> playerTable;
         private readonly IEntity<Position> positionTable;
         private readonly IEntity<Team> teamTable;
+        private readonly IEntity<Message> messageTable;
 
         bool _disposed;
 
@@ -33,11 +34,13 @@ namespace HurlingApi.Models
         /// </summary>
         public FantasyHurlingRepository()
         {
+            _context = new HurlingModelContext();
             userTable = new Entity<User>(_context);
             leagueTable = new Entity<League>(_context);
             playerTable = new Entity<Player>(_context);
             positionTable = new Entity<Position>(_context);
             teamTable = new Entity<Team>(_context);
+            messageTable = new Entity<Message>(_context);
         }
 
         /// <summary>
@@ -88,6 +91,15 @@ namespace HurlingApi.Models
         /// <summary>
         /// 
         /// </summary>
+        /// <returns></returns>
+        public IEntity<Message> Messages()
+        {
+            return messageTable;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public void Dispose()
         {
             Dispose(true);
@@ -105,6 +117,12 @@ namespace HurlingApi.Models
             if (disposing)
             {
                 _context.Dispose();
+                userTable.Dispose();
+                leagueTable.Dispose();
+                playerTable.Dispose();
+                positionTable.Dispose();
+                teamTable.Dispose();
+                messageTable.Dispose();
             }
 
             // release any unmanaged objects

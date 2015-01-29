@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 01/26/2015 15:39:02
+-- Date Created: 01/29/2015 00:05:05
 -- Generated from EDMX file: C:\Users\martin\Documents\Visual Studio 2013\Projects\HurlingApi\HurlingApi\Models\HurlingModel.edmx
 -- --------------------------------------------------
 
@@ -29,6 +29,12 @@ GO
 IF OBJECT_ID(N'[dbo].[FK_UserTeam]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[Teams] DROP CONSTRAINT [FK_UserTeam];
 GO
+IF OBJECT_ID(N'[dbo].[FK_TeamPlayer_Team]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[TeamPlayer] DROP CONSTRAINT [FK_TeamPlayer_Team];
+GO
+IF OBJECT_ID(N'[dbo].[FK_TeamPlayer_Player]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[TeamPlayer] DROP CONSTRAINT [FK_TeamPlayer_Player];
+GO
 
 -- --------------------------------------------------
 -- Dropping existing tables
@@ -51,6 +57,9 @@ IF OBJECT_ID(N'[dbo].[Players]', 'U') IS NOT NULL
 GO
 IF OBJECT_ID(N'[dbo].[Messages]', 'U') IS NOT NULL
     DROP TABLE [dbo].[Messages];
+GO
+IF OBJECT_ID(N'[dbo].[TeamPlayer]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[TeamPlayer];
 GO
 
 -- --------------------------------------------------
@@ -114,7 +123,7 @@ CREATE TABLE [dbo].[Messages] (
     [Id] int IDENTITY(1,1) NOT NULL,
     [Text] nvarchar(max)  NOT NULL,
     [UserId] int  NOT NULL,
-    [Created] datetimeoffset  NULL
+    [Created] datetime  NOT NULL
 );
 GO
 

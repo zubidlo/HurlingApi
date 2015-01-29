@@ -97,7 +97,7 @@
     <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="Text" Type="nvarchar(max)" Nullable="false" />
     <Property Name="UserId" Type="int" Nullable="false" />
-    <Property Name="Created" Type="datetimeoffset" Nullable="true" />
+    <Property Name="Created" Type="datetime" Nullable="false" />
   </EntityType>
   <EntityType Name="TeamPlayer">
     <Key>
@@ -338,7 +338,7 @@
           <Property Name="Text" Type="String" Nullable="false" />
           <NavigationProperty Name="User" Relationship="HurlingModel.UserMessage" FromRole="Message" ToRole="User" />
           <Property Name="UserId" Type="Int32" Nullable="false" />
-          <Property Name="Created" Type="DateTimeOffset" Nullable="true" />
+          <Property Name="Created" Type="DateTime" Nullable="false" />
         </EntityType>
         <Association Name="UserMessage">
           <End Type="HurlingModel.User" Role="User" Multiplicity="1" />
