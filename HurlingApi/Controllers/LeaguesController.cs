@@ -22,7 +22,7 @@ namespace HurlingApi.Controllers
     [RoutePrefix("api/leagues")]
     public class LeaguesController : ApiController
     {
-        private readonly FantasyHurlingRepository _repository = new FantasyHurlingRepository();
+        private readonly IRepository _repository = new FantasyHurlingRepository();
         private readonly LeagueDTOFactory _factory =  new LeagueDTOFactory();
         
         private bool _disposed;

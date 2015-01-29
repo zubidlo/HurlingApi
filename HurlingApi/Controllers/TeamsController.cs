@@ -22,7 +22,7 @@ namespace HurlingApi.Controllers
     [RoutePrefix("api/teams")]
     public class TeamsController : ApiController
     {
-        private readonly FantasyHurlingRepository _repository = new FantasyHurlingRepository();
+        private readonly IRepository _repository = new FantasyHurlingRepository();
         private readonly TeamDTOFactory _teamFactory = new TeamDTOFactory();
         private readonly PlayerDTOFactory _playerFactory = new PlayerDTOFactory();
        
@@ -97,7 +97,7 @@ namespace HurlingApi.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Route("id/{id:int}/players")]
+        [Route("id/{id:int}/messages")]
         [HttpGet]
         public async Task<IQueryable<PlayerDTO>> GetTeamPlayers([FromUri] int id)
         {

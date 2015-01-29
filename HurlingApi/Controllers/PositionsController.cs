@@ -21,7 +21,7 @@ namespace HurlingApi.Controllers
     [RoutePrefix("api/positions")]
     public class PositionsController : ApiController
     {
-        private readonly FantasyHurlingRepository _repository = new FantasyHurlingRepository();
+        private readonly IRepository _repository = new FantasyHurlingRepository();
         private readonly PositionDTOFactory _factory = new PositionDTOFactory();
 
         private bool _disposed;
@@ -206,7 +206,7 @@ namespace HurlingApi.Controllers
             if (exist)
             {
                 return BadRequest("Can't delete this position, because there are " +
-                                "still some players referencing the position!");
+                                "still some messages referencing the position!");
             }
 
             //try to remove the position from the repository

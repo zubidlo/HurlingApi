@@ -578,6 +578,30 @@
             </summary>
             <param name="disposing"></param>
         </member>
+        <member name="T:HurlingApi.Controllers.MessagesController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:HurlingApi.Controllers.MessagesController.GetMessages">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:HurlingApi.Controllers.MessagesController.GetMessageById(System.Int32)">
+            <summary>
+            
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HurlingApi.Controllers.MessagesController.Dispose(System.Boolean)">
+            <summary>
+            
+            </summary>
+            <param name="disposing"></param>
+        </member>
         <member name="T:HurlingApi.Controllers.PlayersController">
             <summary>
             
@@ -608,7 +632,7 @@
             <summary>
             
             </summary>
-            <param name="playerDTO"></param>
+            <param name="messageDTO"></param>
             <returns></returns>
         </member>
         <member name="M:HurlingApi.Controllers.PlayersController.DeletePlayer(System.Int32)">
@@ -847,6 +871,47 @@
             
             </summary>
         </member>
+        <member name="T:HurlingApi.Models.IRepository">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:HurlingApi.Models.IRepository.Users">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:HurlingApi.Models.IRepository.Leagues">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:HurlingApi.Models.IRepository.Players">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:HurlingApi.Models.IRepository.Positions">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:HurlingApi.Models.IRepository.Teams">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:HurlingApi.Models.IRepository.Messages">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:HurlingApi.Models.FantasyHurlingRepository.#ctor">
             <summary>
             
@@ -877,6 +942,12 @@
             <returns></returns>
         </member>
         <member name="M:HurlingApi.Models.FantasyHurlingRepository.Teams">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:HurlingApi.Models.FantasyHurlingRepository.Messages">
             <summary>
             
             </summary>
@@ -923,6 +994,50 @@
         </member>
         <member name="M:HurlingApi.Models.LeagueDTOFactory.GeTModel(HurlingApi.Models.LeagueDTO)">
             <summary></summary>
+            <param name="dto"></param>
+            <returns></returns>
+        </member>
+        <member name="T:HurlingApi.Models.MessageDTO">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:HurlingApi.Models.MessageDTO.Id">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:HurlingApi.Models.MessageDTO.Text">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:HurlingApi.Models.MessageDTO.UserId">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:HurlingApi.Models.MessageDTO.Created">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:HurlingApi.Models.MessageDTOFactory">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:HurlingApi.Models.MessageDTOFactory.GetDTO(HurlingApi.Models.Message)">
+            <summary>
+            
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HurlingApi.Models.MessageDTOFactory.GeTModel(HurlingApi.Models.MessageDTO)">
+            <summary>
+            
+            </summary>
             <param name="dto"></param>
             <returns></returns>
         </member>

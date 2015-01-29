@@ -22,7 +22,7 @@ namespace HurlingApi.Controllers
     [RoutePrefix("api/players")]
     public class PlayersController : ApiController
     {
-        private readonly FantasyHurlingRepository _repository = new FantasyHurlingRepository();
+        private readonly IRepository _repository = new FantasyHurlingRepository();
         private readonly PlayerDTOFactory _factory = new PlayerDTOFactory();
 
         private bool _disposed;
@@ -31,7 +31,7 @@ namespace HurlingApi.Controllers
         /// 
         /// </summary>
         /// <returns></returns>
-        [Route("", Name="playersRoute")]
+        [Route("", Name = "playersRoute")]
         [HttpGet]
         public async Task<IQueryable<PlayerDTO>> GetPlayers()
         {
@@ -104,7 +104,7 @@ namespace HurlingApi.Controllers
                 return BadRequest("Postion with Id=" + playerDTO.PositionId + " doesn't exist in the repository.");
             }
 
-            //now playerDTO is ok, set player's properties
+            //now messageDTO is ok, set player's properties
             player.FirstName = playerDTO.FirstName;
             player.LastName = playerDTO.LastName;
             player.GaaTeam = playerDTO.GaaTeam;
@@ -126,7 +126,7 @@ namespace HurlingApi.Controllers
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="playerDTO"></param>
+        /// <param name="messageDTO"></param>
         /// <returns></returns>
         [Route("")]
         [HttpPost]
@@ -145,14 +145,14 @@ namespace HurlingApi.Controllers
                 return BadRequest("Postion with Id=" + playerDTO.PositionId + " doesn't exist in the repository.");
             }
 
-            //playerDTO is ok, make new player
+            //messageDTO is ok, make new player
             Player player = _factory.GeTModel(playerDTO);
 
             //try to insert player into repository
             try { int result = await _repository.Players().InsertAsync(player); }
             catch (Exception) { throw; }
 
-            //InsertAsync(player) created new id, so playerDTO must reflect that
+            //InsertAsync(player) created new id, so messageDTO must reflect that
             playerDTO = _factory.GetDTO(player);
 
             //send created at route response
