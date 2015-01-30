@@ -48,7 +48,6 @@ namespace HurlingApi.Controllers
         /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpGet]
-        [ResponseType(typeof(UserDTO))]
         public async Task<IHttpActionResult> GetUserById([FromUri] int id)
         {
             User user;
@@ -57,7 +56,10 @@ namespace HurlingApi.Controllers
             catch (InvalidOperationException) { throw; }
 
             //if doesn't exist send not found response
-            if (user == null) { return NotFound(); }
+            if (user == null)
+            {
+                return new NotFoundActionResult(Request, "Could not find user Id=" + id + ".");
+            }
 
             UserDTO userDTO = _factory.GetDTO(user);
             //send ok response
@@ -71,7 +73,6 @@ namespace HurlingApi.Controllers
         /// <returns></returns>
         [Route("username/{username}")]
         [HttpGet]
-        [ResponseType(typeof(UserDTO))]
         public async Task<IHttpActionResult> GetUserByUsername([FromUri] string username)
         {
             User user;
@@ -80,7 +81,10 @@ namespace HurlingApi.Controllers
             catch (InvalidOperationException) { throw; }
 
             //if doesn't exist send not found response
-            if (user == null) { return NotFound(); }
+            if (user == null)
+            {
+                return new NotFoundActionResult(Request, "Could not find league Username=" + username + ".");
+            }
 
             UserDTO userDTO = _factory.GetDTO(user);
             //send ok response
@@ -95,7 +99,6 @@ namespace HurlingApi.Controllers
         /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpPut]
-        [ResponseType(typeof(void))]
         public async Task<IHttpActionResult> EditUser([FromUri] int id, [FromBody] UserDTO userDTO)
         {
             //if id from URI matches Id from request body send bad request response
@@ -115,7 +118,10 @@ namespace HurlingApi.Controllers
             catch (InvalidOperationException) { throw; }
 
             //if doesn't exist send not found response
-            if (user == null) { return NotFound(); }
+            if (user == null)
+            {
+                return new NotFoundActionResult(Request, "Could not find user Id=" + id + ".");
+            }
 
             // try to get user with same username
             try { user1 = await _repository.Users().FindSingleAsync(u => u.Username == userDTO.Username); }
@@ -124,7 +130,7 @@ namespace HurlingApi.Controllers
             //if exists and if it is different that one we are editing send bad request response
             if (user1 != null && user1.Id != id)
             {
-                return BadRequest("There is already an user with name:" + userDTO.Username + " in the " +
+                return new ConflictActionResult(Request, "There is already an user with name:" + userDTO.Username + " in the " +
                                     "repository! We allow only unique usernames.");
             }
 
@@ -138,7 +144,7 @@ namespace HurlingApi.Controllers
             catch (Exception) { throw; }
 
             //send no content response
-            return StatusCode(HttpStatusCode.NoContent);
+            return Ok("User Id=" + id + " was successfully updated.");
         }
 
         /// <summary>
@@ -148,7 +154,6 @@ namespace HurlingApi.Controllers
         /// <returns></returns>
         [Route("")]
         [HttpPost]
-        [ResponseType(typeof(UserDTO))]
         public async Task<IHttpActionResult> PostUser([FromBody] UserDTO userDTO)
         {
             //if model state is not valid send bad request response
@@ -160,8 +165,8 @@ namespace HurlingApi.Controllers
             //if exists send bad request response
             if (exist)
             {
-                return BadRequest("There is already an user with name:" + userDTO.Username + " in " +
-                                    "the repository. We allow only unique usernames.");
+                return new ConflictActionResult(Request, "There is already an user with name:" + userDTO.Username + " in " +
+                                                "the repository. We allow only unique usernames.");
             }
 
             User user = _factory.GeTModel(userDTO);
@@ -184,7 +189,6 @@ namespace HurlingApi.Controllers
         /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpDelete]
-        [ResponseType(typeof(UserDTO))]
         public async Task<IHttpActionResult> DeleteUser([FromUri] int id)
         {
             User user;
@@ -194,7 +198,10 @@ namespace HurlingApi.Controllers
             catch (InvalidOperationException) { throw; }
 
             //if doesn't exist send not found response
-            if (user == null) { return NotFound(); }
+            if (user == null)
+            {
+                return new NotFoundActionResult(Request, "Could not find user id=" + id + "."); 
+            }
 
             //find out if a the team referencing this user exist
             bool exist = await _repository.Teams().ExistAsync(t => t.UserId == id);
@@ -202,7 +209,7 @@ namespace HurlingApi.Controllers
             //if exists send bad request response
             if (exist)
             {
-                return BadRequest("Can't delete this user, because some team still referencing the user!");
+                return new ConflictActionResult(Request, "Can't delete this user, because some team still referencing the user!");
             }
 
             UserDTO userDTO = _factory.GetDTO(user);

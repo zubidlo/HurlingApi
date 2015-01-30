@@ -48,7 +48,6 @@ namespace HurlingApi.Controllers
         /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpGet]
-        [ResponseType(typeof(PlayerDTO))]
         public async Task<IHttpActionResult> GetPlayerById(int id)
         {
             Player player;
@@ -58,7 +57,10 @@ namespace HurlingApi.Controllers
             catch (InvalidOperationException) { throw; }
 
             //if doesn't exist send not found response
-            if (player == null) { return NotFound(); }
+            if (player == null)
+            {
+                return new NotFoundActionResult(Request, "Could not find player id=" + id + "."); 
+            }
 
             PlayerDTO playerDTO = _factory.GetDTO(player);
             //send ok response
@@ -73,7 +75,6 @@ namespace HurlingApi.Controllers
         /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpPut]
-        [ResponseType(typeof(void))]
         public async Task<IHttpActionResult> EditPlayer([FromUri] int id, [FromBody] PlayerDTO playerDTO)
         {
             //if id from URI matches Id from request body send bad request response
@@ -93,23 +94,17 @@ namespace HurlingApi.Controllers
             catch (InvalidOperationException) { throw; }
 
             //if doesn't exists send not found response
-            if (player == null) { return NotFound(); }
+            if (player == null)
+            {
+                return new NotFoundActionResult(Request, "Could not find player id=" + id + "."); 
+            }
 
             //position can't be changed
             if (player.PositionId != playerDTO.PositionId)
             {
-                return BadRequest("Changing this player position could break repository rules. " +
+                return new ConflictActionResult(Request, "Changing this player position could break repository rules. " +
                     "There is only one player per position allowed in a team. Ask Martin.");
             }
-
-            ////find out if position with given id exists in the repository
-            //bool exist = await _repository.Positions().ExistAsync(p => p.Id == playerDTO.PositionId);
-
-            ////if doesn't exists send bad request response
-            //if (!exist)
-            //{
-            //    return BadRequest("Postion with Id=" + playerDTO.PositionId + " doesn't exist in the repository.");
-            //}
 
             //if lastweekpoints are modified update overallpoints
             if (playerDTO.LastWeekPoints != player.LastWeekPoints)
@@ -118,7 +113,8 @@ namespace HurlingApi.Controllers
 
                 //get all teams this player is in
                 List<Team> teams = (List<Team>) await _repository.Teams().GetAllAsync();
-                foreach(var team in teams) {
+                foreach(var team in teams)
+                {
                     List<Player> players = team.Players.AsQueryable<Player>().ToList();
                     Player playerInTeam = players.Find(p => p.Id == id);
                     if (playerInTeam != null) 
@@ -146,7 +142,7 @@ namespace HurlingApi.Controllers
             catch (Exception) { throw; }
 
             //send no content response
-            return StatusCode(HttpStatusCode.NoContent);
+            return Ok("Player Id=" + id + " was successfully updated.");
         }
 
         /// <summary>
@@ -156,7 +152,6 @@ namespace HurlingApi.Controllers
         /// <returns></returns>
         [Route("")]
         [HttpPost]
-        [ResponseType(typeof(PlayerDTO))]
         public async Task<IHttpActionResult> PostPlayer([FromBody] PlayerDTO playerDTO)
         {
             //if the model state is not valit send bad request response
@@ -195,7 +190,6 @@ namespace HurlingApi.Controllers
         /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpDelete]
-        [ResponseType(typeof(PlayerDTO))]
         public async Task<IHttpActionResult> DeletePlayer([FromUri] int id)
         {
             Player player;
@@ -205,7 +199,10 @@ namespace HurlingApi.Controllers
             catch (InvalidOperationException) { throw; }
 
             //if doesn't exists send not found response
-            if (player == null) { return NotFound(); }
+            if (player == null)
+            {
+                return new NotFoundActionResult(Request, "Could not find player id=" + id + ".");
+            }
 
             PlayerDTO playerDTO = _factory.GetDTO(player);
 
@@ -213,7 +210,7 @@ namespace HurlingApi.Controllers
             try { int result = await _repository.Players().RemoveAsync(player); }
             catch (Exception)
             {
-                return BadRequest("Deleting player with Id=" + id + " would break referential integrity " +
+                return new ConflictActionResult(Request, "Deleting player with Id=" + id + " would break referential integrity " +
                                     "of the repository. You must first manualy delete this player from all the " + 
                                     "teams he is in. Ask Martin to add automate cascade deleting feature.");
             }

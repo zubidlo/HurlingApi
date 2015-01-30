@@ -47,7 +47,6 @@ namespace HurlingApi.Controllers
         /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpGet]
-        [ResponseType(typeof(PositionDTO))]
         public async Task<IHttpActionResult> GetPositionById(int id)
         {
             Position position;
@@ -57,7 +56,10 @@ namespace HurlingApi.Controllers
             catch (InvalidOperationException) { throw; }
 
             //if doesn't exist send not found response
-            if (position == null) { return NotFound(); }
+            if (position == null)
+            {
+                return new NotFoundActionResult(Request, "Could not find position id=" + id + ".");
+            }
 
             PositionDTO positionDTO = _factory.GetDTO(position);
             //send ok response
@@ -72,7 +74,6 @@ namespace HurlingApi.Controllers
         /// <returns></returns>
         [Route("name/{name}")]
         [HttpGet]
-        [ResponseType(typeof(PositionDTO))]
         public async Task<IHttpActionResult> GetPositionByName([FromUri] string name)
         {
             Position position;
@@ -82,7 +83,10 @@ namespace HurlingApi.Controllers
             catch (InvalidOperationException) { throw; }
 
             //if doesn't exist send not found response
-            if (position == null) { return NotFound(); }
+            if (position == null)
+            {
+                return new NotFoundActionResult(Request, "Could not find position name=" + name + ".");
+            }
 
             PositionDTO positionDTO = _factory.GetDTO(position);
             //send ok response
@@ -97,7 +101,6 @@ namespace HurlingApi.Controllers
         /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpPut]
-        [ResponseType(typeof(void))]
         public async Task<IHttpActionResult> EditPosition([FromUri] int id, [FromBody] PositionDTO positionDTO)
         {
             //if id from URI matches Id from request body send bad request response
@@ -117,7 +120,10 @@ namespace HurlingApi.Controllers
             catch (InvalidOperationException) { throw; }
                 
             //if doesn't exists send not found response
-            if (position == null) { return NotFound(); }
+            if (position == null) 
+            {
+                return new NotFoundActionResult(Request, "Could not find position id=" + id + ".");
+            }
                 
             //try to get a position with same name
             try { position1 = await _repository.Positions().FindSingleAsync(p => p.Name == positionDTO.Name); }
@@ -125,8 +131,8 @@ namespace HurlingApi.Controllers
                 
             //if that exist and if it is different that one we are editing send bad request response
             if (position1 != null && position1.Id != id) 
-            { 
-                return BadRequest("There is already a position with Name:" + positionDTO.Name + " in " +
+            {
+                return new ConflictActionResult(Request, "There is already a position with Name:" + positionDTO.Name + " in " +
                                     "the repository! We allow only unique position names.");
             }
 
@@ -138,7 +144,7 @@ namespace HurlingApi.Controllers
             catch (Exception) { throw; }
 
             //send no content response
-            return StatusCode(HttpStatusCode.NoContent);
+            return Ok("Position Id=" + id + " was successfully updated.");
         }
 
         /// <summary>
@@ -148,7 +154,6 @@ namespace HurlingApi.Controllers
         /// <returns></returns>
         [Route("")]
         [HttpPost]
-        [ResponseType(typeof(PositionDTO))]
         public async Task<IHttpActionResult> PostPosition([FromBody] PositionDTO positionDTO)
         {
             //if model state is not valid send bad request response
@@ -163,7 +168,7 @@ namespace HurlingApi.Controllers
             //if exists send bad request response
             if (position != null) 
             {
-                return BadRequest("There is already a position with Name:" + positionDTO.Name + " in " +
+                return new ConflictActionResult(Request, "There is already a position with Name:" + positionDTO.Name + " in " +
                                     "the repository! We allow only unique position names.");
             }
 
@@ -187,7 +192,6 @@ namespace HurlingApi.Controllers
         /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpDelete]
-        [ResponseType(typeof(PositionDTO))]
         public async Task<IHttpActionResult> DeletePosition([FromUri] int id)
         {
             Position position;
@@ -197,7 +201,10 @@ namespace HurlingApi.Controllers
             catch (InvalidOperationException) { throw; }
             
             //if doesn't exists send not found response
-            if (position == null) { return NotFound(); }
+            if (position == null)
+            {
+                return new NotFoundActionResult(Request, "Could not find position id=" + id + ".");
+            }
 
             //check if any player references this position
             bool exist = await _repository.Players().ExistAsync(p => p.PositionId == id);
@@ -205,7 +212,7 @@ namespace HurlingApi.Controllers
             //if exists send bad request response
             if (exist)
             {
-                return BadRequest("Can't delete this position, because there are " +
+                return new ConflictActionResult(Request, "Can't delete this position, because there are " +
                                 "still some players referencing the position!");
             }
 

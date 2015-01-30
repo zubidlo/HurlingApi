@@ -49,7 +49,6 @@ namespace HurlingApi.Controllers
         /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpGet]
-        [ResponseType(typeof(TeamDTO))]
         public async Task<IHttpActionResult> GetTeamById([FromUri] int id)
         {
             Team team;
@@ -60,7 +59,10 @@ namespace HurlingApi.Controllers
             catch (InvalidOperationException) { throw; }
 
             //if doesn't exist send not found response
-            if (team == null) { return NotFound(); }
+            if (team == null)
+            {
+                return new NotFoundActionResult(Request, "Could not find team id=" + id + ".");
+            }
 
             teamDTO = _teamFactory.GetDTO(team);
             //send ok response
@@ -74,7 +76,6 @@ namespace HurlingApi.Controllers
         /// <returns></returns>
         [Route("name/{name}")]
         [HttpGet]
-        [ResponseType(typeof(TeamDTO))]
         public async Task<IHttpActionResult> GetTeamByName([FromUri] string name)
         {
             Team team;
@@ -85,7 +86,10 @@ namespace HurlingApi.Controllers
             catch (InvalidOperationException) { throw; }
 
             //if doesn't exist send not found response
-            if (team == null) { return NotFound(); }
+            if (team == null)
+            {
+                return new NotFoundActionResult(Request, "Could not find team name=" + name + ".");
+            }
 
             teamDTO = _teamFactory.GetDTO(team);
             //send ok response
@@ -108,7 +112,10 @@ namespace HurlingApi.Controllers
             catch (InvalidOperationException) { throw; }
 
             //if doesn't exist send not found response
-            if (team == null) { throw new ObjectNotFoundException("Team with id=" + id + " doesn't exist in the repository"); }
+            if (team == null)
+            {
+                throw new ObjectNotFoundException("Could not find team Id=" + team.Id + ".");
+            }
 
             IEnumerable<PlayerDTO> playerDTOs = _playerFactory.GetDTOCollection(team.Players);
             IQueryable<PlayerDTO> oDataPlayerDTOs = playerDTOs.AsQueryable();
@@ -123,13 +130,12 @@ namespace HurlingApi.Controllers
         /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpPut]
-        [ResponseType(typeof(void))]
         public async Task<IHttpActionResult> EditTeam([FromUri] int id, [FromBody] TeamDTO teamDTO)
         {
             //if id from URI matches Id from request body send bad request response
             if (id != teamDTO.Id)
             {
-                return BadRequest("The id from URI: " + id + " doesn'singleItem match " +
+                return BadRequest("The id from URI: " + id + " doesn't match " +
                                 "the Id from request body: " + teamDTO.Id + "!");
             }
 
@@ -143,7 +149,10 @@ namespace HurlingApi.Controllers
             catch (InvalidOperationException) { throw; }
 
             //if doesn't exists send not found response
-            if (team == null) { return NotFound(); }
+            if (team == null)
+            {
+                return new NotFoundActionResult(Request, "Could not find team Id=" + id + ".");
+            }
 
             //try to get a team with same name
             try { team1 = await _repository.Teams().FindSingleAsync(t => t.Name == teamDTO.Name); }
@@ -152,25 +161,26 @@ namespace HurlingApi.Controllers
             //if exists and if it is different that one we are editing throw bad request response
             if (team1 != null && team1.Id != id)
             {
-                return BadRequest("There is already a team with name:" + teamDTO.Name + " in " +
+                return new ConflictActionResult(Request, "There is already a team with name:" + teamDTO.Name + " in " +
                                 "the repository! We allow only unique team names.");
             }
 
             //teams can't be moved between users
             if (teamDTO.UserId != team.UserId)
             {
-                BadRequest("You cannot change UserID. It's not allowed to move teams between users. Ask Martin.");
+                return new ConflictActionResult(Request, "You cannot change UserID. It's not allowed to move " +
+                                                        "teams between users. Ask Martin.");
             }
 
             bool exist;
 
-            //find out if the league referenced by this team UserId exists
+            //find out if the league referenced by this team LeagueId exists
             exist = await _repository.Leagues().ExistAsync(l => l.Id == teamDTO.LeagueId);
 
             //if doesn't exist send bad request response
             if (!exist)
             {
-                return BadRequest("The league with Id=" + teamDTO.LeagueId + " doesn't exist in the repository!");
+                return new NotFoundActionResult(Request, "Could not find league Id=" + teamDTO.LeagueId + ".");
             }
 
             //update the team's properties
@@ -186,7 +196,7 @@ namespace HurlingApi.Controllers
             catch (Exception) { throw; }
 
             //send no content response
-            return StatusCode(HttpStatusCode.NoContent);
+            return Ok("Team Id=" + id + " was successfully updated.");
         }
 
         /// <summary>
@@ -197,7 +207,6 @@ namespace HurlingApi.Controllers
         /// <returns></returns>
         [Route("id/{teamId:int}/player/id/{playerId:int}")]
         [HttpPut]
-        [ResponseType(typeof(string))]
         public async Task<IHttpActionResult> PostTeamPlayer([FromUri] int teamId, [FromUri] int playerId)
         {
             Team team;
@@ -212,23 +221,37 @@ namespace HurlingApi.Controllers
             catch (InvalidOperationException) { throw; }
 
             //if doesn't exist send not found response
-            if (team == null || player == null) { return NotFound(); }
+            if (team == null) 
+            {
+                return new NotFoundActionResult(Request, "Could not find team Id=" + teamId + ".");
+            }
+            
+            if (player == null)
+            {
+                return new NotFoundActionResult(Request, "Could not find player Id=" + playerId + ".");
+            }
 
             //find out if there is this player already in the team
             bool playerAlreadyInThisTeam = team.Players.Any(p => p.Id == playerId);
 
-            if (playerAlreadyInThisTeam) { return BadRequest("Player with id=" + playerId + " is in this team already!"); }
+            if (playerAlreadyInThisTeam)
+            {
+                return new ConflictActionResult(Request, "Player with id=" + playerId + " is in this team already!");
+            }
 
             //find out if there is a player with same field position (we allow only one player per position)
             bool positionAlreadyInThisTeam = team.Players.Any(p => p.PositionId == player.PositionId);
 
-            if (positionAlreadyInThisTeam) { return BadRequest("There is already a player with the same position in this team!"); }
+            if (positionAlreadyInThisTeam)
+            {
+                return new ConflictActionResult(Request, "There is already a player with the same position in this team!"); 
+            }
 
             //find out if team has bugdet to buy this player
             if (team.Budget < player.Price)
-            { 
-                return BadRequest("Your this team budget=" + team.Budget +" is not big enough " +
-                                    " to cover this player price=" + player.Price + ".");
+            {
+                return new ConflictActionResult(Request, "Your this team budget=" + team.Budget + " is not big enough " +
+                                                " to cover this player price=" + player.Price + ".");
             }
 
             //decrease the team budget
@@ -243,7 +266,7 @@ namespace HurlingApi.Controllers
 
             PlayerDTO playerDTO = _playerFactory.GetDTO(player);
             //send ok response
-            return Ok("Player with id=" + playerId + " was added to team " + team.Name + ".");
+            return Ok("Player with Id=" + playerId + " was added to team Id=" + teamId + ".");
         }
 
         /// <summary>
@@ -253,7 +276,6 @@ namespace HurlingApi.Controllers
         /// <returns></returns>
         [Route("")]
         [HttpPost]
-        [ResponseType(typeof(TeamDTO))]
         public async Task<IHttpActionResult> PostTeam([FromBody] TeamDTO teamDTO)
         {
             //if model state is not valid send bad request response
@@ -265,7 +287,7 @@ namespace HurlingApi.Controllers
             //if exist send bad request response
             if (exist)
             {
-                return BadRequest("There is already an team with name:" + teamDTO.Name + " in " +
+                return new ConflictActionResult(Request, "There is already an team with name:" + teamDTO.Name + " in " +
                                     "the repository!. We allow only unique team names.");
             }
 
@@ -275,7 +297,7 @@ namespace HurlingApi.Controllers
             //check if doesn't exist send bad request response
             if (!exist)
             {
-                return BadRequest("User with Id=" + teamDTO.UserId + " doesn't exist in the repository!");
+                return new NotFoundActionResult(Request, "Could not find user with Id=" + teamDTO.UserId + ".");
             }
 
             //find out if team with same userId exists
@@ -284,7 +306,7 @@ namespace HurlingApi.Controllers
             //if exists send bad request response
             if (exist)
             {
-                return BadRequest("User with id=" + teamDTO.UserId + " already has " +
+                return new ConflictActionResult(Request, "User with id=" + teamDTO.UserId + " already has " +
                                 "a team! We allow only one team per user.");
             }
 
@@ -294,7 +316,7 @@ namespace HurlingApi.Controllers
             //check if doesn't exist send bad request response
             if (!exist)
             {
-                return BadRequest("League with Id=" + teamDTO.LeagueId + " doesn't exist in the repository!");
+                return new NotFoundActionResult(Request, "Could not find league Id=" + teamDTO.LeagueId + ".");
             }
 
             Team team = _teamFactory.GeTModel(teamDTO);
@@ -320,7 +342,6 @@ namespace HurlingApi.Controllers
         /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpDelete]
-        [ResponseType(typeof(TeamDTO))]
         public async Task<IHttpActionResult> DeleteTeam([FromUri] int id)
         {
             Team team;
@@ -330,7 +351,10 @@ namespace HurlingApi.Controllers
             catch (InvalidOperationException) { throw; }
             
             //if doesn't exist send not found response
-            if (team == null) { return NotFound(); }
+            if (team == null)
+            {
+                return new NotFoundActionResult(Request, "Could not find team Id=" + id + "."); 
+            }
 
             TeamDTO teamDTO = _teamFactory.GetDTO(team);
 
@@ -338,7 +362,7 @@ namespace HurlingApi.Controllers
             try { int result = await _repository.Teams().RemoveAsync(team); }
             catch (Exception)
             {
-                return BadRequest("Deleting team with Id=" + id + " would break referential " +
+                return new ConflictActionResult(Request, "Deleting team with Id=" + id + " would break referential " +
                                 "integrity of the repository. First manualy remove all players " +
                                 "from this team. Ask Martin for automatic cascade removal functionality.");
             }   
@@ -363,11 +387,17 @@ namespace HurlingApi.Controllers
             catch (InvalidOperationException) { throw; }
 
             //if doesn't exist send not found response
-            if (team == null) { return NotFound(); }
+            if (team == null)
+            {
+                return new NotFoundActionResult(Request, "Could not find team Id=" + teamId + "."); 
+            }
 
             Player player = team.Players.FirstOrDefault(p => p.Id == playerId);
 
-            if (player == null) { return NotFound(); }
+            if (player == null)
+            {
+                return new NotFoundActionResult(Request, "Could not find player Id=" + playerId + ".");
+            }
 
             //remove the player from the team
             team.Players.Remove(player);
@@ -379,9 +409,8 @@ namespace HurlingApi.Controllers
             try { int result = await _repository.Teams().SaveChangesAsync(); }
             catch (Exception) { throw; }
 
-            PlayerDTO playerDTO = _playerFactory.GetDTO(player);
             //send ok response
-            return Ok(playerDTO);
+            return Ok("Player with Id=" + playerId + " was removed from team Id=" + teamId + ".");
         }
 
         /// <summary>
