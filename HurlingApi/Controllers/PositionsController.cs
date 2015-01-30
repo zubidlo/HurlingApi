@@ -30,7 +30,7 @@ namespace HurlingApi.Controllers
         /// 
         /// </summary>
         /// <returns></returns>
-        [Route("", Name="positionsRoute")]
+        [Route("")]
         [HttpGet]
         public async Task<IQueryable<PositionDTO>> GetPostions()
         {
@@ -177,7 +177,7 @@ namespace HurlingApi.Controllers
             positionDTO = _factory.GetDTO(position);
 
             //send created at route response
-            return CreatedAtRoute("positionsRoute", new { id = position.Id }, positionDTO);
+            return Created<PositionDTO>(Request.RequestUri + "/id/" + positionDTO.Id.ToString(), positionDTO);
         }
 
         /// <summary>
@@ -199,21 +199,21 @@ namespace HurlingApi.Controllers
             //if doesn't exists send not found response
             if (position == null) { return NotFound(); }
 
-            //check if any message references this position
+            //check if any player references this position
             bool exist = await _repository.Players().ExistAsync(p => p.PositionId == id);
 
             //if exists send bad request response
             if (exist)
             {
                 return BadRequest("Can't delete this position, because there are " +
-                                "still some messages referencing the position!");
+                                "still some players referencing the position!");
             }
+
+            PositionDTO positionDTO = _factory.GetDTO(position);
 
             //try to remove the position from the repository
             try { int result = await _repository.Positions().RemoveAsync(position); }
             catch (Exception) { throw; }    
-            
-            PositionDTO positionDTO = _factory.GetDTO(position);
             
             //send ok response
             return Ok(positionDTO);

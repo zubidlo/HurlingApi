@@ -31,7 +31,7 @@ namespace HurlingApi.Controllers
         /// 
         /// </summary>
         /// <returns></returns>
-        [Route("", Name="leaguesRoute")]
+        [Route("")]
         [HttpGet]
         public async Task<IQueryable<LeagueDTO>> GetLeagues()
         {
@@ -73,7 +73,7 @@ namespace HurlingApi.Controllers
         /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpPut]
-        [ResponseType(typeof(void))]
+        [ResponseType(typeof(string))]
         public async Task<IHttpActionResult> EditLeague([FromUri] int id, [FromBody] LeagueDTO leagueDTO)
         {
             //if id from URI matches Id from request body send bad request response
@@ -105,7 +105,7 @@ namespace HurlingApi.Controllers
             catch (Exception) { throw; }
 
             //send no content response
-            return StatusCode(HttpStatusCode.NoContent);
+            return Ok("league " + league.Name + " was successfully updated");
         }
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace HurlingApi.Controllers
             leagueDTO = _factory.GetDTO(league);
 
             //send created at route response
-            return CreatedAtRoute("leaguesRoute", new { id = league.Id }, leagueDTO);
+            return Created<LeagueDTO>(Request.RequestUri + "/id/" + leagueDTO.Id.ToString() ,leagueDTO);
         }
 
         /// <summary>
@@ -174,11 +174,11 @@ namespace HurlingApi.Controllers
                                     + "some teams referencing it!");
             }
 
+            LeagueDTO leagueDTO = _factory.GetDTO(league);
             //try to remove the league from the repository
             try { int result = await _repository.Leagues().RemoveAsync(league); }
             catch (Exception) { throw; }
 
-            LeagueDTO leagueDTO = _factory.GetDTO(league);
             //send ok response
             return Ok(leagueDTO);
         }

@@ -31,7 +31,7 @@ namespace HurlingApi.Controllers
         /// 
         /// </summary>
         /// <returns></returns>
-        [Route("", Name = "messagesRoute")]
+        [Route("")]
         [HttpGet]
         public async Task<IQueryable<MessageDTO>> GetMessages()
         {
@@ -48,7 +48,6 @@ namespace HurlingApi.Controllers
         /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpGet]
-        [ResponseType(typeof(MessageDTO))]
         public async Task<IHttpActionResult> GetMessageById(int id)
         {
             Message message;
@@ -58,7 +57,10 @@ namespace HurlingApi.Controllers
             catch (InvalidOperationException) { throw; }
 
             //if doesn't exist send not found response
-            if (message == null) { return NotFound(); }
+            if (message == null)
+            {
+                return new NotFoundActionResult(Request, "Could not find message id=" + id + ".");
+            }
 
             MessageDTO messageDTO = _factory.GetDTO(message);
             //send ok response
@@ -72,7 +74,6 @@ namespace HurlingApi.Controllers
         /// <returns></returns>
         [Route("")]
         [HttpPost]
-        [ResponseType(typeof(MessageDTO))]
         public async Task<IHttpActionResult> PostMessage([FromBody] MessageDTO messageDTO)
         {
             //if the model state is not valit send bad request response
@@ -84,7 +85,7 @@ namespace HurlingApi.Controllers
             //if doesn't exists send bad request response
             if (!exist)
             {
-                return BadRequest("User with Id=" + messageDTO.UserId + " doesn't exist in the repository.");
+                return new ConflictActionResult(Request, "Could not find user Id=" + messageDTO.UserId + ".");
             }
 
             //messageDTO is ok, make new message
@@ -98,12 +99,16 @@ namespace HurlingApi.Controllers
             messageDTO = _factory.GetDTO(message);
 
             //send created at route response
-            return CreatedAtRoute("messagesRoute", new { id = message.Id }, messageDTO);
+            return Created<MessageDTO>(Request.RequestUri + "/id/" + messageDTO.Id.ToString(), messageDTO);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpDelete]
-        [ResponseType(typeof(MessageDTO))]
         public async Task<IHttpActionResult> DeleteMessage([FromUri] int id)
         {
             Message message;
@@ -113,13 +118,17 @@ namespace HurlingApi.Controllers
             catch (InvalidOperationException) { throw; }
 
             //if doesn't exists send not found response
-            if (message == null) { return NotFound(); }
+            if (message == null)
+            {
+                return new NotFoundActionResult(Request, "Could not find message id=" + id + "."); 
+            }
+
+            MessageDTO messageDTO = _factory.GetDTO(message);
 
             //try to delete the message
             try { int result = await _repository.Messages().RemoveAsync(message); }
             catch (Exception) { throw; }
 
-            MessageDTO messageDTO = _factory.GetDTO(message);
             //send ok response
             return Ok(messageDTO);
         }

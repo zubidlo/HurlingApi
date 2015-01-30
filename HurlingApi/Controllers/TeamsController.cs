@@ -32,7 +32,7 @@ namespace HurlingApi.Controllers
         /// 
         /// </summary>
         /// <returns></returns>
-        [Route("", Name="teamsRoute")]
+        [Route("")]
         [HttpGet]
         public async Task<IQueryable<TeamDTO>> GetTeams()
         {
@@ -156,25 +156,13 @@ namespace HurlingApi.Controllers
                                 "the repository! We allow only unique team names.");
             }
 
-            //find out if user referenced by this team UserId exists
-            bool exist = await _repository.Users().ExistAsync(u => u.Id == teamDTO.UserId);
-
-            //if doesn't exist send bad request response
-            if (!exist)
+            //teams can't be moved between users
+            if (teamDTO.UserId != team.UserId)
             {
-                return BadRequest("The user with Id=" + teamDTO.UserId + " doesn't exist in the repository!");
+                BadRequest("You cannot change UserID. It's not allowed to move teams between users. Ask Martin.");
             }
 
-            //try to get some other team with the same user id
-            try { team1 = await _repository.Teams().FindSingleAsync(t => t.UserId == teamDTO.UserId); }
-            catch (InvalidOperationException) { throw; }
-
-            //cif found team is different from one we are editing send bad request response
-            if (team1 != null && team1.Id != id)
-            {
-                return BadRequest("User with Id=" + teamDTO.UserId + " already " +
-                                "has a team! We allow only one team per user.");
-            }
+            bool exist;
 
             //find out if the league referenced by this team UserId exists
             exist = await _repository.Leagues().ExistAsync(l => l.Id == teamDTO.LeagueId);
@@ -215,7 +203,7 @@ namespace HurlingApi.Controllers
             Team team;
             Player player;
 
-            //try to get requested team and message
+            //try to get requested team and player
             try
             {
                 team = await _repository.Teams().FindSingleAsync(t => t.Id == teamId);
@@ -226,17 +214,27 @@ namespace HurlingApi.Controllers
             //if doesn't exist send not found response
             if (team == null || player == null) { return NotFound(); }
 
-            //find out if there is this message already in the team
+            //find out if there is this player already in the team
             bool playerAlreadyInThisTeam = team.Players.Any(p => p.Id == playerId);
 
             if (playerAlreadyInThisTeam) { return BadRequest("Player with id=" + playerId + " is in this team already!"); }
 
-            //find out if there is a message with same field position (we allow only one message per position)
+            //find out if there is a player with same field position (we allow only one player per position)
             bool positionAlreadyInThisTeam = team.Players.Any(p => p.PositionId == player.PositionId);
 
-            if (positionAlreadyInThisTeam) { return BadRequest("There is already a message with the same position in this team!"); }
+            if (positionAlreadyInThisTeam) { return BadRequest("There is already a player with the same position in this team!"); }
 
-            //add message to this team
+            //find out if team has bugdet to buy this player
+            if (team.Budget < player.Price)
+            { 
+                return BadRequest("Your this team budget=" + team.Budget +" is not big enough " +
+                                    " to cover this player price=" + player.Price + ".");
+            }
+
+            //decrease the team budget
+            team.Budget -= player.Price;
+
+            //add player to this team
             team.Players.Add(player);
 
             //try to save changes in the repository
@@ -245,7 +243,7 @@ namespace HurlingApi.Controllers
 
             PlayerDTO playerDTO = _playerFactory.GetDTO(player);
             //send ok response
-            return Ok("Player with id=" + playerId + " was added to team " + team.Name);
+            return Ok("Player with id=" + playerId + " was added to team " + team.Name + ".");
         }
 
         /// <summary>
@@ -300,6 +298,9 @@ namespace HurlingApi.Controllers
             }
 
             Team team = _teamFactory.GeTModel(teamDTO);
+            //new team points to 0
+            team.OverAllPoints = 0;
+            team.LastWeekPoints = 0;
 
             //try to insert the team into the repository
             try { int result = await _repository.Teams().InsertAsync(team); }
@@ -309,7 +310,7 @@ namespace HurlingApi.Controllers
             teamDTO = _teamFactory.GetDTO(team);
 
             //send created at route response
-            return CreatedAtRoute("teamsRoute", new { id = team.Id }, teamDTO);
+            return Created<TeamDTO>(Request.RequestUri + "/id/" + teamDTO.Id.ToString(), teamDTO);
         }
 
         /// <summary>
@@ -331,17 +332,17 @@ namespace HurlingApi.Controllers
             //if doesn't exist send not found response
             if (team == null) { return NotFound(); }
 
+            TeamDTO teamDTO = _teamFactory.GetDTO(team);
+
             //try to remove the team from the repository
             try { int result = await _repository.Teams().RemoveAsync(team); }
             catch (Exception)
             {
                 return BadRequest("Deleting team with Id=" + id + " would break referential " +
-                                "integrity of the repository. There must be still some references " +
-                                "to this team in the repository. PlayersInTeams maybe?");
+                                "integrity of the repository. First manualy remove all players " +
+                                "from this team. Ask Martin for automatic cascade removal functionality.");
             }   
              
-            TeamDTO teamDTO = _teamFactory.GetDTO(team);
-
             //send ok response
             return Ok(teamDTO);
         }
@@ -368,8 +369,11 @@ namespace HurlingApi.Controllers
 
             if (player == null) { return NotFound(); }
 
-            //remove the message from the team
+            //remove the player from the team
             team.Players.Remove(player);
+            
+            //return money back to team budget
+            team.Budget += player.Price;
 
             //try to save changes in the repository
             try { int result = await _repository.Teams().SaveChangesAsync(); }

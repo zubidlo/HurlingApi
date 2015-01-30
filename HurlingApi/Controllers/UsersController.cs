@@ -31,7 +31,7 @@ namespace HurlingApi.Controllers
         /// 
         /// </summary>
         /// <returns></returns>
-        [Route("", Name = "usersRoute")]
+        [Route("")]
         [HttpGet]
         public async Task<IQueryable<UserDTO>> GetUsers()
         {
@@ -174,7 +174,7 @@ namespace HurlingApi.Controllers
             userDTO = _factory.GetDTO(user);
                 
             //send created at route response
-            return CreatedAtRoute("usersRoute", new { id = user.Id }, userDTO);
+            return Created<UserDTO>(Request.RequestUri + "/id/" + userDTO.Id.ToString(), userDTO);
         }
 
         /// <summary>
@@ -205,11 +205,11 @@ namespace HurlingApi.Controllers
                 return BadRequest("Can't delete this user, because some team still referencing the user!");
             }
 
+            UserDTO userDTO = _factory.GetDTO(user);
+
             //try to remove the user
             try { int result = await _repository.Users().RemoveAsync(user); }
             catch(Exception) { throw; }
-
-            UserDTO userDTO = _factory.GetDTO(user);
 
             //send ok response
             return Ok(userDTO);
