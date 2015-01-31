@@ -52,7 +52,6 @@ namespace HurlingApi.Controllers
         public async Task<IHttpActionResult> GetTeamById([FromUri] int id)
         {
             Team team;
-            TeamDTO teamDTO;
 
             //try to get requested team
             try { team = await _repository.Teams().FindSingleAsync(t => t.Id == id); }
@@ -64,7 +63,7 @@ namespace HurlingApi.Controllers
                 return new NotFoundActionResult(Request, "Could not find team id=" + id + ".");
             }
 
-            teamDTO = _teamFactory.GetDTO(team);
+            var teamDTO = _teamFactory.GetDTO(team);
             //send ok response
             return Ok(teamDTO);
         }
@@ -79,7 +78,6 @@ namespace HurlingApi.Controllers
         public async Task<IHttpActionResult> GetTeamByName([FromUri] string name)
         {
             Team team;
-            TeamDTO teamDTO;
 
             //try to get requested team
             try { team = await _repository.Teams().FindSingleAsync(t => t.Name == name); }
@@ -91,7 +89,7 @@ namespace HurlingApi.Controllers
                 return new NotFoundActionResult(Request, "Could not find team name=" + name + ".");
             }
 
-            teamDTO = _teamFactory.GetDTO(team);
+            var teamDTO = _teamFactory.GetDTO(team);
             //send ok response
             return Ok(teamDTO);
         }
@@ -142,7 +140,7 @@ namespace HurlingApi.Controllers
             //if model state is not valid send bad request response
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
 
-            Team team, team1;
+            Team team;
 
             //try to get requested team
             try { team = await _repository.Teams().FindSingleAsync(t => t.Id == id); }
@@ -153,6 +151,8 @@ namespace HurlingApi.Controllers
             {
                 return new NotFoundActionResult(Request, "Could not find team Id=" + id + ".");
             }
+
+            Team team1;
 
             //try to get a team with same name
             try { team1 = await _repository.Teams().FindSingleAsync(t => t.Name == teamDTO.Name); }
@@ -264,7 +264,6 @@ namespace HurlingApi.Controllers
             try { int result = await _repository.Teams().SaveChangesAsync(); }
             catch (Exception) { throw; }
 
-            PlayerDTO playerDTO = _playerFactory.GetDTO(player);
             //send ok response
             return Ok("Player with Id=" + playerId + " was added to team Id=" + teamId + ".");
         }
@@ -319,7 +318,8 @@ namespace HurlingApi.Controllers
                 return new NotFoundActionResult(Request, "Could not find league Id=" + teamDTO.LeagueId + ".");
             }
 
-            Team team = _teamFactory.GeTModel(teamDTO);
+            var team = _teamFactory.GeTModel(teamDTO);
+
             //new team points to 0
             team.OverAllPoints = 0;
             team.LastWeekPoints = 0;
@@ -356,8 +356,6 @@ namespace HurlingApi.Controllers
                 return new NotFoundActionResult(Request, "Could not find team Id=" + id + "."); 
             }
 
-            TeamDTO teamDTO = _teamFactory.GetDTO(team);
-
             //try to remove the team from the repository
             try { int result = await _repository.Teams().RemoveAsync(team); }
             catch (Exception)
@@ -368,7 +366,7 @@ namespace HurlingApi.Controllers
             }   
              
             //send ok response
-            return Ok(teamDTO);
+            return Ok("Team Id=" + id + " deleted.");
         }
 
         /// <summary>
@@ -382,6 +380,7 @@ namespace HurlingApi.Controllers
         public async Task<IHttpActionResult> DeletePlayerFromTeam([FromUri] int teamId, [FromUri] int playerId)
         {
             Team team;
+
             //try to get requested team
             try { team = await _repository.Teams().FindSingleAsync(t => t.Id == teamId); }
             catch (InvalidOperationException) { throw; }
@@ -392,25 +391,25 @@ namespace HurlingApi.Controllers
                 return new NotFoundActionResult(Request, "Could not find team Id=" + teamId + "."); 
             }
 
-            Player player = team.Players.FirstOrDefault(p => p.Id == playerId);
+            var player = team.Players.FirstOrDefault(p => p.Id == playerId);
 
             if (player == null)
             {
                 return new NotFoundActionResult(Request, "Could not find player Id=" + playerId + ".");
             }
 
-            //remove the player from the team
-            team.Players.Remove(player);
-            
             //return money back to team budget
             team.Budget += player.Price;
 
+            //remove the player from the team
+            team.Players.Remove(player);
+            
             //try to save changes in the repository
             try { int result = await _repository.Teams().SaveChangesAsync(); }
             catch (Exception) { throw; }
 
             //send ok response
-            return Ok("Player with Id=" + playerId + " was removed from team Id=" + teamId + ".");
+            return Ok("Player Id=" + playerId + " was removed from team Id=" + teamId + ".");
         }
 
         /// <summary>

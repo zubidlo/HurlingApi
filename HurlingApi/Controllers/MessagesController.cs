@@ -62,7 +62,7 @@ namespace HurlingApi.Controllers
                 return new NotFoundActionResult(Request, "Could not find message id=" + id + ".");
             }
 
-            MessageDTO messageDTO = _factory.GetDTO(message);
+            var messageDTO = _factory.GetDTO(message);
             //send ok response
             return Ok(messageDTO);
         }
@@ -85,11 +85,11 @@ namespace HurlingApi.Controllers
             //if doesn't exists send bad request response
             if (!exist)
             {
-                return new ConflictActionResult(Request, "Could not find user Id=" + messageDTO.UserId + ".");
+                return new ConflictActionResult(Request, "Could not find message Id=" + messageDTO.UserId + ".");
             }
 
             //messageDTO is ok, make new message
-            Message message = _factory.GeTModel(messageDTO);
+            var message = _factory.GeTModel(messageDTO);
 
             //try to insert message into repository
             try { int result = await _repository.Messages().InsertAsync(message); }
@@ -123,14 +123,12 @@ namespace HurlingApi.Controllers
                 return new NotFoundActionResult(Request, "Could not find message id=" + id + "."); 
             }
 
-            MessageDTO messageDTO = _factory.GetDTO(message);
-
             //try to delete the message
             try { int result = await _repository.Messages().RemoveAsync(message); }
             catch (Exception) { throw; }
 
             //send ok response
-            return Ok(messageDTO);
+            return Ok("Message Id=" + id + " deleted.");
         }
 
         /// <summary>

@@ -61,7 +61,7 @@ namespace HurlingApi.Controllers
                 return new NotFoundActionResult(Request, "Could not find position id=" + id + ".");
             }
 
-            PositionDTO positionDTO = _factory.GetDTO(position);
+            var positionDTO = _factory.GetDTO(position);
             //send ok response
             return Ok(positionDTO);
             
@@ -88,7 +88,7 @@ namespace HurlingApi.Controllers
                 return new NotFoundActionResult(Request, "Could not find position name=" + name + ".");
             }
 
-            PositionDTO positionDTO = _factory.GetDTO(position);
+            var positionDTO = _factory.GetDTO(position);
             //send ok response
             return Ok(positionDTO);
         }
@@ -106,14 +106,14 @@ namespace HurlingApi.Controllers
             //if id from URI matches Id from request body send bad request response
             if (id != positionDTO.Id) 
             { 
-                return BadRequest("The id from URI: " + id + " doesn'singleItem match " +
+                return BadRequest("The id from URI: " + id + " doesn't match " +
                                 "the Id from request body: " + positionDTO.Id + "!"); 
             }
 
             //if model state is not valid send bad request response
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
 
-            Position position, position1;
+            Position position;
 
             //try to get requested position
             try { position = await _repository.Positions().FindSingleAsync(p => p.Id == id); }
@@ -124,7 +124,9 @@ namespace HurlingApi.Controllers
             {
                 return new NotFoundActionResult(Request, "Could not find position id=" + id + ".");
             }
-                
+             
+            Position position1;
+
             //try to get a position with same name
             try { position1 = await _repository.Positions().FindSingleAsync(p => p.Name == positionDTO.Name); }
             catch (InvalidOperationException) { throw; }
@@ -216,14 +218,12 @@ namespace HurlingApi.Controllers
                                 "still some players referencing the position!");
             }
 
-            PositionDTO positionDTO = _factory.GetDTO(position);
-
             //try to remove the position from the repository
             try { int result = await _repository.Positions().RemoveAsync(position); }
             catch (Exception) { throw; }    
             
             //send ok response
-            return Ok(positionDTO);
+            return Ok("Position Id=" + id + " deleted.");
         }
 
         /// <summary>

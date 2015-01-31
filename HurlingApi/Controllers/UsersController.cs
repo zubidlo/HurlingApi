@@ -61,7 +61,8 @@ namespace HurlingApi.Controllers
                 return new NotFoundActionResult(Request, "Could not find user Id=" + id + ".");
             }
 
-            UserDTO userDTO = _factory.GetDTO(user);
+            var userDTO = _factory.GetDTO(user);
+
             //send ok response
             return Ok(userDTO);
         }
@@ -83,10 +84,11 @@ namespace HurlingApi.Controllers
             //if doesn't exist send not found response
             if (user == null)
             {
-                return new NotFoundActionResult(Request, "Could not find league Username=" + username + ".");
+                return new NotFoundActionResult(Request, "Could not find user Username=" + username + ".");
             }
 
-            UserDTO userDTO = _factory.GetDTO(user);
+            var  userDTO = _factory.GetDTO(user);
+
             //send ok response
             return Ok(userDTO);
         }
@@ -111,7 +113,7 @@ namespace HurlingApi.Controllers
             //if model state is not valid send bad request response
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
 
-            User user, user1;
+            User user;
 
             //try to get requested user
             try { user = await _repository.Users().FindSingleAsync(u => u.Id == id); }
@@ -122,6 +124,8 @@ namespace HurlingApi.Controllers
             {
                 return new NotFoundActionResult(Request, "Could not find user Id=" + id + ".");
             }
+
+            User user1;
 
             // try to get user with same username
             try { user1 = await _repository.Users().FindSingleAsync(u => u.Username == userDTO.Username); }
@@ -169,7 +173,7 @@ namespace HurlingApi.Controllers
                                                 "the repository. We allow only unique usernames.");
             }
 
-            User user = _factory.GeTModel(userDTO);
+            var user = _factory.GeTModel(userDTO);
 
             //try to insert the user into the repository
             try { int result = await _repository.Users().InsertAsync(user); }
@@ -212,14 +216,12 @@ namespace HurlingApi.Controllers
                 return new ConflictActionResult(Request, "Can't delete this user, because some team still referencing the user!");
             }
 
-            UserDTO userDTO = _factory.GetDTO(user);
-
             //try to remove the user
             try { int result = await _repository.Users().RemoveAsync(user); }
             catch(Exception) { throw; }
 
             //send ok response
-            return Ok(userDTO);
+            return Ok("User Id=" + id +" deleted.");
         }
 
         /// <summary>

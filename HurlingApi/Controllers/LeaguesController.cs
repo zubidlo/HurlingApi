@@ -24,7 +24,6 @@ namespace HurlingApi.Controllers
     {
         private readonly IRepository _repository = new FantasyHurlingRepository();
         private readonly LeagueDTOFactory _factory =  new LeagueDTOFactory();
-        
         private bool _disposed;
 
         /// <summary>
@@ -62,7 +61,8 @@ namespace HurlingApi.Controllers
                 return new NotFoundActionResult(Request, "Could not find league id=" + id + ".");
             }
 
-            LeagueDTO leagueDTO = _factory.GetDTO(league);
+            var leagueDTO = _factory.GetDTO(league);
+
             //send ok response
             return Ok(leagueDTO);
         }
@@ -135,7 +135,7 @@ namespace HurlingApi.Controllers
                                     " We allow only one league to exist.");
             }
 
-            League league = _factory.GeTModel(leagueDTO);
+            var league = _factory.GeTModel(leagueDTO);
 
             //try to insert the league into the repository
             try { int result = await _repository.Leagues().InsertAsync(league); }
@@ -179,14 +179,12 @@ namespace HurlingApi.Controllers
                                                 + "some teams referencing it! Delete all the team in this league first.");
             }
 
-            LeagueDTO leagueDTO = _factory.GetDTO(league);
-
             //try to remove the league from the repository
             try { int result = await _repository.Leagues().RemoveAsync(league); }
             catch (Exception) { throw; }
 
             //send ok response
-            return Ok(leagueDTO);
+            return Ok("League Id=" + id + " deleted.");
         }
 
         /// <summary>

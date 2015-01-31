@@ -62,7 +62,8 @@ namespace HurlingApi.Controllers
                 return new NotFoundActionResult(Request, "Could not find player id=" + id + "."); 
             }
 
-            PlayerDTO playerDTO = _factory.GetDTO(player);
+            var playerDTO = _factory.GetDTO(player);
+
             //send ok response
             return Ok(playerDTO);
         }
@@ -111,17 +112,11 @@ namespace HurlingApi.Controllers
             {
                 playerDTO.OverallPoints += playerDTO.LastWeekPoints;
 
-                //get all teams this player is in
-                List<Team> teams = (List<Team>) await _repository.Teams().GetAllAsync();
-                foreach(var team in teams)
+                //update points in all teams player is in
+                foreach (var team in player.Teams.ToList())
                 {
-                    List<Player> players = team.Players.AsQueryable<Player>().ToList();
-                    Player playerInTeam = players.Find(p => p.Id == id);
-                    if (playerInTeam != null) 
-                    { 
-                        team.OverAllPoints += playerDTO.OverallPoints;
-                        team.LastWeekPoints += playerDTO.LastWeekPoints;
-                    }
+                    team.OverAllPoints += playerDTO.OverallPoints;
+                    team.LastWeekPoints += playerDTO.LastWeekPoints;
                 }
             }
 
@@ -167,7 +162,7 @@ namespace HurlingApi.Controllers
             }
 
             //playerDTO is ok, make new player
-            Player player = _factory.GeTModel(playerDTO);
+            var player = _factory.GeTModel(playerDTO);
             player.Id = 0;
             player.LastWeekPoints = 0;
             player.OverallPoints = 0;
@@ -204,8 +199,6 @@ namespace HurlingApi.Controllers
                 return new NotFoundActionResult(Request, "Could not find player id=" + id + ".");
             }
 
-            PlayerDTO playerDTO = _factory.GetDTO(player);
-
             //try to delete the player
             try { int result = await _repository.Players().RemoveAsync(player); }
             catch (Exception)
@@ -216,7 +209,7 @@ namespace HurlingApi.Controllers
             }
 
             //send ok response
-            return Ok(playerDTO);
+            return Ok("Player Id=" + id + " deleted.");
         }
 
         /// <summary>
