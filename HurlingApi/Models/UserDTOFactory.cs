@@ -5,12 +5,8 @@ using System.Web;
 
 namespace HurlingApi.Models
 {
-    /// <summary></summary>
     public class UserDTOFactory : AbstractFactoryDTO<User, UserDTO>
     {
-        /// <summary></summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
         public override UserDTO GetDTO(User model)
         {
             return new UserDTO()
@@ -22,9 +18,6 @@ namespace HurlingApi.Models
             };
         }
 
-        /// <summary></summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
         public override User GeTModel(UserDTO dto)
         {
             return new User()

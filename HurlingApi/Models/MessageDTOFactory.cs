@@ -5,16 +5,8 @@ using System.Web;
 
 namespace HurlingApi.Models
 {
-    /// <summary>
-    /// 
-    /// </summary>
     public class MessageDTOFactory : AbstractFactoryDTO<Message, MessageDTO>
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
         public override MessageDTO GetDTO(Message model)
         {
             return new MessageDTO
@@ -26,11 +18,6 @@ namespace HurlingApi.Models
             };
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
         public override Message GeTModel(MessageDTO dto)
         {
             return new Message
@@ -41,7 +28,5 @@ namespace HurlingApi.Models
                 Created = DateTime.Now
             };
         }
-
-        
     }
 }

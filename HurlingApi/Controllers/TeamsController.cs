@@ -15,9 +15,6 @@ using System.Web.Http.Cors;
 
 namespace HurlingApi.Controllers
 {
-    /// <summary>
-    /// 
-    /// </summary>
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     [RoutePrefix("api/teams")]
     public class TeamsController : ApiController
@@ -28,10 +25,6 @@ namespace HurlingApi.Controllers
        
         private bool _disposed;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         [Route("")]
         [HttpGet]
         public async Task<IQueryable<TeamDTO>> GetTeams()
@@ -42,11 +35,6 @@ namespace HurlingApi.Controllers
             return oDataTeamDTOs;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpGet]
         public async Task<IHttpActionResult> GetTeamById([FromUri] int id)
@@ -68,11 +56,6 @@ namespace HurlingApi.Controllers
             return Ok(teamDTO);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
         [Route("name/{name}")]
         [HttpGet]
         public async Task<IHttpActionResult> GetTeamByName([FromUri] string name)
@@ -94,11 +77,6 @@ namespace HurlingApi.Controllers
             return Ok(teamDTO);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         [Route("id/{id:int}/players")]
         [HttpGet]
         public async Task<IQueryable<PlayerDTO>> GetTeamPlayers([FromUri] int id)
@@ -120,12 +98,6 @@ namespace HurlingApi.Controllers
             return oDataPlayerDTOs;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="teamDTO"></param>
-        /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpPut]
         public async Task<IHttpActionResult> EditTeam([FromUri] int id, [FromBody] TeamDTO teamDTO)
@@ -199,12 +171,6 @@ namespace HurlingApi.Controllers
             return Ok("Team Id=" + id + " was successfully updated.");
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="teamId"></param>
-        /// <param name="playerId"></param>
-        /// <returns></returns>
         [Route("id/{teamId:int}/player/id/{playerId:int}")]
         [HttpPut]
         public async Task<IHttpActionResult> PostTeamPlayer([FromUri] int teamId, [FromUri] int playerId)
@@ -268,11 +234,6 @@ namespace HurlingApi.Controllers
             return Ok("Player with Id=" + playerId + " was added to team Id=" + teamId + ".");
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="teamDTO"></param>
-        /// <returns></returns>
         [Route("")]
         [HttpPost]
         public async Task<IHttpActionResult> PostTeam([FromBody] TeamDTO teamDTO)
@@ -335,11 +296,6 @@ namespace HurlingApi.Controllers
             return Created<TeamDTO>(Request.RequestUri + "/id/" + teamDTO.Id.ToString(), teamDTO);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpDelete]
         public async Task<IHttpActionResult> DeleteTeam([FromUri] int id)
@@ -369,12 +325,6 @@ namespace HurlingApi.Controllers
             return Ok("Team Id=" + id + " deleted.");
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="teamId"></param>
-        /// <param name="playerId"></param>
-        /// <returns></returns>
         [Route("id/{teamId:int}/player/id/{playerId:int}")]
         [HttpDelete]
         public async Task<IHttpActionResult> DeletePlayerFromTeam([FromUri] int teamId, [FromUri] int playerId)
@@ -412,10 +362,6 @@ namespace HurlingApi.Controllers
             return Ok("Player Id=" + playerId + " was removed from team Id=" + teamId + ".");
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="disposing"></param>
         protected override void Dispose(bool disposing)
         {
             if (!_disposed)

@@ -15,9 +15,6 @@ using System.Web.Http.Cors;
 
 namespace HurlingApi.Controllers
 {
-    /// <summary>
-    /// 
-    /// </summary>
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     [RoutePrefix("api/players")]
     public class PlayersController : ApiController
@@ -27,10 +24,6 @@ namespace HurlingApi.Controllers
 
         private bool _disposed;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         [Route("")]
         [HttpGet]
         public async Task<IQueryable<PlayerDTO>> GetPlayers()
@@ -41,11 +34,6 @@ namespace HurlingApi.Controllers
             return oDataPlayerDTOs;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpGet]
         public async Task<IHttpActionResult> GetPlayerById(int id)
@@ -68,12 +56,6 @@ namespace HurlingApi.Controllers
             return Ok(playerDTO);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="playerDTO"></param>
-        /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpPut]
         public async Task<IHttpActionResult> EditPlayer([FromUri] int id, [FromBody] PlayerDTO playerDTO)
@@ -140,11 +122,6 @@ namespace HurlingApi.Controllers
             return Ok("Player Id=" + id + " was successfully updated.");
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="playerDTO"></param>
-        /// <returns></returns>
         [Route("")]
         [HttpPost]
         public async Task<IHttpActionResult> PostPlayer([FromBody] PlayerDTO playerDTO)
@@ -178,11 +155,6 @@ namespace HurlingApi.Controllers
             return Created<PlayerDTO>(Request.RequestUri + "/id/" + playerDTO.Id.ToString(), playerDTO);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpDelete]
         public async Task<IHttpActionResult> DeletePlayer([FromUri] int id)
@@ -212,10 +184,6 @@ namespace HurlingApi.Controllers
             return Ok("Player Id=" + id + " deleted.");
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="disposing"></param>
         protected override void Dispose(bool disposing)
         {
             if (!_disposed)

@@ -14,9 +14,6 @@ using HurlingApi.Models;
 
 namespace HurlingApi.Models
 {
-    /// <summary>
-    /// 
-    /// </summary>
     public class FantasyHurlingRepository : IRepository
     {
         private readonly DbContext _context;
@@ -29,9 +26,6 @@ namespace HurlingApi.Models
 
         bool _disposed;
 
-        /// <summary>
-        /// 
-        /// </summary>
         public FantasyHurlingRepository()
         {
             _context = new HurlingModelContext();
@@ -43,73 +37,42 @@ namespace HurlingApi.Models
             messageTable = new Entity<Message>(_context);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         public IEntity<User> Users()
         {
             return userTable;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         public IEntity<League> Leagues()
         {
             return leagueTable;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         public IEntity<Player> Players()
         {
             return playerTable;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         public IEntity<Position> Positions()
         {
             return positionTable;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         public IEntity<Team> Teams()
         {
             return teamTable;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         public IEntity<Message> Messages()
         {
             return messageTable;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing)
         {
             if (_disposed) return;
@@ -131,9 +94,6 @@ namespace HurlingApi.Models
             _disposed = true;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         ~FantasyHurlingRepository()
         {
             Dispose(false);

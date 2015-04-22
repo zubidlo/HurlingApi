@@ -6,11 +6,8 @@ using System.Web.Mvc;
 
 namespace HurlingApi.Controllers
 {
-    /// <summary></summary>
     public class HomeController : Controller
     {
-        /// <summary></summary>
-        /// <returns></returns>
         public ActionResult Index()
         {
             return View();

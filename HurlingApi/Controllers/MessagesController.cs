@@ -15,9 +15,6 @@ using System.Web.Http.Cors;
 
 namespace HurlingApi.Controllers
 {
-    /// <summary>
-    /// 
-    /// </summary>
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     [RoutePrefix("api/messages")]
     public class MessagesController : ApiController
@@ -27,10 +24,6 @@ namespace HurlingApi.Controllers
 
         private bool _disposed;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         [Route("")]
         [HttpGet]
         public async Task<IQueryable<MessageDTO>> GetMessages()
@@ -41,11 +34,6 @@ namespace HurlingApi.Controllers
             return oDataMessageDTOs;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpGet]
         public async Task<IHttpActionResult> GetMessageById(int id)
@@ -67,11 +55,6 @@ namespace HurlingApi.Controllers
             return Ok(messageDTO);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="messageDTO"></param>
-        /// <returns></returns>
         [Route("")]
         [HttpPost]
         public async Task<IHttpActionResult> PostMessage([FromBody] MessageDTO messageDTO)
@@ -102,11 +85,6 @@ namespace HurlingApi.Controllers
             return Created<MessageDTO>(Request.RequestUri + "/id/" + messageDTO.Id.ToString(), messageDTO);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpDelete]
         public async Task<IHttpActionResult> DeleteMessage([FromUri] int id)
@@ -131,10 +109,6 @@ namespace HurlingApi.Controllers
             return Ok("Message Id=" + id + " deleted.");
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="disposing"></param>
         protected override void Dispose(bool disposing)
         {
             if (!_disposed)

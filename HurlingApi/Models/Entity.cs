@@ -10,38 +10,23 @@ using System.Threading.Tasks;
 
 namespace HurlingApi.Models
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
     public class Entity<T> : IEntity<T> where T : class
     {
         private readonly DbContext _context;
         
         bool _disposed;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="context"></param>
         public Entity(DbContext context)
         {
             _context = context;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing)
         {
             if (_disposed) return;
@@ -57,18 +42,11 @@ namespace HurlingApi.Models
             _disposed = true;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         ~Entity()
         {
             Dispose(false);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         public async Task<IEnumerable<T>> GetAllAsync()
         {
             IEnumerable<T> items = await _context.Set<T>().ToListAsync<T>();
@@ -76,12 +54,6 @@ namespace HurlingApi.Models
         }
         
         
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="match"></param>
-        /// <returns></returns>
-        /// <exception cref="System.InvalidOperationException"></exception>
         public async Task<T> FindSingleAsync(Expression<Func<T, bool>> match)
         {
             T singleItem = null;
@@ -92,27 +64,17 @@ namespace HurlingApi.Models
             }
             catch (InvalidOperationException)
             {
-                throw new InvalidOperationException("More than one requested " + singleItem.GetType().Name + " found in the repository.");
+                throw new InvalidOperationException("More than one requested " + 
+                    singleItem.GetType().Name + " found in the repository.");
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="match"></param>
-        /// <returns></returns>
         public async Task<bool> ExistAsync(Expression<Func<T, bool>> match)
         {
             bool exist = await _context.Set<T>().AnyAsync(match);
             return exist;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="t"></param>
-        /// <returns></returns>
-        /// <exception cref="System.Exception"></exception>
         public async Task<int> UpdateAsync(T t)
         {
             try
@@ -127,12 +89,6 @@ namespace HurlingApi.Models
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="t"></param>
-        /// <returns></returns>
-        /// <exception cref="System.Exception"></exception>
         public async Task<int> InsertAsync(T t)
         {
             try
@@ -147,12 +103,6 @@ namespace HurlingApi.Models
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="t"></param>
-        /// <returns></returns>
-        /// <exception cref="System.Exception"></exception>
         public async Task<int> RemoveAsync(T t)
         {
             try
@@ -167,10 +117,6 @@ namespace HurlingApi.Models
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         public async Task<int> SaveChangesAsync()
         {
             try {

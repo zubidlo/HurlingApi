@@ -15,9 +15,6 @@ using System.Web.Http.Cors;
 
 namespace HurlingApi.Controllers
 {
-    /// <summary>
-    /// 
-    /// </summary>
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     [RoutePrefix("api/leagues")]
     public class LeaguesController : ApiController
@@ -26,10 +23,6 @@ namespace HurlingApi.Controllers
         private readonly LeagueDTOFactory _factory =  new LeagueDTOFactory();
         private bool _disposed;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         [Route("")]
         [HttpGet]
         public async Task<IQueryable<LeagueDTO>> GetLeagues()
@@ -40,11 +33,6 @@ namespace HurlingApi.Controllers
             return oDataLeagueDTOs;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpGet]
         public async Task<IHttpActionResult> GetLeagueById(int id)
@@ -67,12 +55,6 @@ namespace HurlingApi.Controllers
             return Ok(leagueDTO);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="leagueDTO"></param>
-        /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpPut]
         public async Task<IHttpActionResult> EditLeague([FromUri] int id, [FromBody] LeagueDTO leagueDTO)
@@ -112,11 +94,6 @@ namespace HurlingApi.Controllers
             return Ok("League Id=" + id + " was successfully updated.");
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="leagueDTO"></param>
-        /// <returns></returns>
         [Route("")]
         [HttpPost]
         public async Task<IHttpActionResult> PostLeague([FromBody] LeagueDTO leagueDTO)
@@ -148,11 +125,6 @@ namespace HurlingApi.Controllers
             return Created<LeagueDTO>(Request.RequestUri + "/id/" + leagueDTO.Id.ToString() ,leagueDTO);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpDelete]
         public async Task<IHttpActionResult> DeleteLeague([FromUri] int id)
@@ -187,10 +159,6 @@ namespace HurlingApi.Controllers
             return Ok("League Id=" + id + " deleted.");
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="disposing"></param>
         protected override void Dispose(bool disposing)
         {
             if (!_disposed)

@@ -14,9 +14,6 @@ using System.Web.Http.Cors;
 
 namespace HurlingApi.Controllers
 {
-    /// <summary>
-    /// 
-    /// </summary>
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     [RoutePrefix("api/positions")]
     public class PositionsController : ApiController
@@ -26,10 +23,6 @@ namespace HurlingApi.Controllers
 
         private bool _disposed;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         [Route("")]
         [HttpGet]
         public async Task<IQueryable<PositionDTO>> GetPostions()
@@ -40,11 +33,6 @@ namespace HurlingApi.Controllers
             return oDataPositionDTOs;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpGet]
         public async Task<IHttpActionResult> GetPositionById(int id)
@@ -67,11 +55,6 @@ namespace HurlingApi.Controllers
             
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
         [Route("name/{name}")]
         [HttpGet]
         public async Task<IHttpActionResult> GetPositionByName([FromUri] string name)
@@ -93,12 +76,6 @@ namespace HurlingApi.Controllers
             return Ok(positionDTO);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="positionDTO"></param>
-        /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpPut]
         public async Task<IHttpActionResult> EditPosition([FromUri] int id, [FromBody] PositionDTO positionDTO)
@@ -149,11 +126,6 @@ namespace HurlingApi.Controllers
             return Ok("Position Id=" + id + " was successfully updated.");
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="positionDTO"></param>
-        /// <returns></returns>
         [Route("")]
         [HttpPost]
         public async Task<IHttpActionResult> PostPosition([FromBody] PositionDTO positionDTO)
@@ -187,11 +159,6 @@ namespace HurlingApi.Controllers
             return Created<PositionDTO>(Request.RequestUri + "/id/" + positionDTO.Id.ToString(), positionDTO);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpDelete]
         public async Task<IHttpActionResult> DeletePosition([FromUri] int id)
@@ -226,10 +193,6 @@ namespace HurlingApi.Controllers
             return Ok("Position Id=" + id + " deleted.");
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="disposing"></param>
         protected override void Dispose(bool disposing)
         {
             if (!_disposed)

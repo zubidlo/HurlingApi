@@ -15,9 +15,6 @@ using System.Web.Http.Cors;
 
 namespace HurlingApi.Controllers
 {
-    /// <summary>
-    /// 
-    /// </summary>
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     [RoutePrefix("api/users")]
     public class UsersController : ApiController
@@ -27,10 +24,6 @@ namespace HurlingApi.Controllers
 
         private bool _disposed;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         [Route("")]
         [HttpGet]
         public async Task<IQueryable<UserDTO>> GetUsers()
@@ -41,11 +34,6 @@ namespace HurlingApi.Controllers
             return oDataUserDTOs;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpGet]
         public async Task<IHttpActionResult> GetUserById([FromUri] int id)
@@ -67,11 +55,6 @@ namespace HurlingApi.Controllers
             return Ok(userDTO);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="username"></param>
-        /// <returns></returns>
         [Route("username/{username}")]
         [HttpGet]
         public async Task<IHttpActionResult> GetUserByUsername([FromUri] string username)
@@ -93,12 +76,6 @@ namespace HurlingApi.Controllers
             return Ok(userDTO);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="userDTO"></param>
-        /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpPut]
         public async Task<IHttpActionResult> EditUser([FromUri] int id, [FromBody] UserDTO userDTO)
@@ -151,11 +128,6 @@ namespace HurlingApi.Controllers
             return Ok("User Id=" + id + " was successfully updated.");
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="userDTO"></param>
-        /// <returns></returns>
         [Route("")]
         [HttpPost]
         public async Task<IHttpActionResult> PostUser([FromBody] UserDTO userDTO)
@@ -186,11 +158,6 @@ namespace HurlingApi.Controllers
             return Created<UserDTO>(Request.RequestUri + "/id/" + userDTO.Id.ToString(), userDTO);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         [Route("id/{id:int}")]
         [HttpDelete]
         public async Task<IHttpActionResult> DeleteUser([FromUri] int id)
@@ -224,10 +191,6 @@ namespace HurlingApi.Controllers
             return Ok("User Id=" + id +" deleted.");
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="disposing"></param>
         protected override void Dispose(bool disposing)
         {
             if (!_disposed)
