@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HurlingApi.Models
 {
-    interface IRepository : IDisposable
+    public interface IRepository : IDisposable
     {
         IEntity<User> Users();
         IEntity<League> Leagues();

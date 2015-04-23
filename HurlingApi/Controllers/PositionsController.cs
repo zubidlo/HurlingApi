@@ -18,10 +18,16 @@ namespace HurlingApi.Controllers
     [RoutePrefix("api/positions")]
     public class PositionsController : ApiController
     {
-        private readonly IRepository _repository = new FantasyHurlingRepository();
+        private IRepository _repository;
         private readonly PositionDTOFactory _factory = new PositionDTOFactory();
-
         private bool _disposed;
+
+        public PositionsController() { _repository =  new FantasyHurlingRepository(); }
+
+        public PositionsController(IRepository repository)
+        {
+            _repository = repository;
+        }
 
         [Route("")]
         [HttpGet]
